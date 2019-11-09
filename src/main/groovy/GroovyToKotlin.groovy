@@ -81,7 +81,7 @@ class GroovyToKotlin {
         append("val ${field.name}: $t")
         if (field.initialValueExpression != null) {
             append(" = ")
-            translate(field.initialValueExpression)
+            translateExpr(field.initialValueExpression)
         }
         lineBreak()
     }
@@ -104,20 +104,14 @@ class GroovyToKotlin {
             lineBreak()
             push()
             for (stmt in block.statements) {
-                translate(stmt)
+                translateStatement(stmt)
             }
             pop()
             newLineCrlf("}")
         }
     }
 
-    void translate(ExpressionStatement stmt) {
-        indent()
-        translate(stmt.expression)
-        lineBreak()
-    }
-
-    void translate(MethodCallExpression expr) {
+    void translateExpr(MethodCallExpression expr) {
         def m = (ConstantExpression)expr.method
         def args = (ArgumentListExpression)expr.arguments
         append("${m.value}(")
@@ -126,7 +120,7 @@ class GroovyToKotlin {
             if (cnt++ > 0) {
                 append(", ")
             }
-            translate(arg)
+            translateExpr(arg)
         }
         append(")")
     }
@@ -135,35 +129,35 @@ class GroovyToKotlin {
      * {@link org.codehaus.groovy.ast.expr.ConstructorCallExpression#getText}
      * @param expr
      */
-    void translate(ConstructorCallExpression expr) {
+    void translateExpr(ConstructorCallExpression expr) {
         // todo see org.codehaus.groovy.ast.expr.ConstructorCallExpression.getText
         append("new ")
         append(expr.getType().getText())
         append(expr.arguments.text)
     }
 
-    void translate(GStringExpression expr) {
+    void translateExpr(GStringExpression expr) {
         append("\"${expr.verbatimText}\"")
     }
 
-    void translate(DeclarationExpression expr) {
+    void translateExpr(DeclarationExpression expr) {
         def left = (VariableExpression)expr.leftExpression
         def st = left.dynamicTyped ? 'val' : typeToString(left.originType)
         append("$st ${left.name} = ")
-        translate(expr.rightExpression)
+        translateExpr(expr.rightExpression)
     }
 
-    void translate(BinaryExpression expr) {
-        translate(expr.leftExpression)
+    void translateExpr(BinaryExpression expr) {
+        translateExpr(expr.leftExpression)
         append(" ${expr.operation.text} ")
-        translate(expr.rightExpression)
+        translateExpr(expr.rightExpression)
     }
 
-    void translate(VariableExpression expr) {
+    void translateExpr(VariableExpression expr) {
         append(expr.name)
     }
 
-    void translate(ConstantExpression expr) {
+    void translateExpr(ConstantExpression expr) {
         // todo use expr.constantName probably
         // todo improve checking for string/gstring
         if (expr.type == ClassHelper.STRING_TYPE) {
@@ -173,25 +167,25 @@ class GroovyToKotlin {
         }
     }
 
-    void translate(NotExpression expr) {
+    void translateExpr(NotExpression expr) {
         append("!")
-        translate(expr.expression)
+        translateExpr(expr.expression)
     }
 
-    void translate(BooleanExpression expr) {
-        translate(expr.expression)
+    void translateExpr(BooleanExpression expr) {
+        translateExpr(expr.expression)
     }
 
-    void translate(MapExpression expr) {
+    void translateExpr(MapExpression expr) {
         appendLn('mapOf(')
         push()
         int cnt = 0
         for (MapEntryExpression item in expr.mapEntryExpressions) {
             def isLast = ++cnt >= expr.mapEntryExpressions.size()
             indent()
-            translate(item.keyExpression)
+            translateExpr(item.keyExpression)
             append(' to ')
-            translate(item.valueExpression)
+            translateExpr(item.valueExpression)
             if (!isLast) {
                 append(',')
             }
@@ -201,26 +195,32 @@ class GroovyToKotlin {
         newLine(')')
     }
 
-    void translate(ListExpression expr) {
+    void translateExpr(ListExpression expr) {
         append("NOT_IMPL(ListExpression)")
     }
 
-    void translate(ClosureListExpression expr) {
+    void translateExpr(ClosureListExpression expr) {
         append("NOT_IMPL(ClosureListExpression)")
     }
 
-    void translate(Expression expr) {
+    void translateExpr(Expression expr) {
         append("NOT_IMPL(${expr.class.name})")
     }
 
-    void translate(IfStatement stmt) {
+    void translateStatement(ExpressionStatement stmt) {
+        indent()
+        translateExpr(stmt.expression)
+        lineBreak()
+    }
+
+    void translateStatement(IfStatement stmt) {
         newLine("if (")
-        translate(stmt.booleanExpression)
+        translateExpr(stmt.booleanExpression)
         append(") ")
         //lineBreak()
         push()
         //outln("// if block")
-        translate(stmt.ifBlock)
+        translateStatement(stmt.ifBlock)
         pop()
         //indent()
         //out("}")
@@ -228,31 +228,31 @@ class GroovyToKotlin {
             append(" else {")
             lineBreak()
             indent()
-            translate(stmt.elseBlock)
+            translateStatement(stmt.elseBlock)
             newLineCrlf("}")
         }
         lineBreak()
     }
 
-    void translate(BlockStatement stmt) {
+    void translateStatement(BlockStatement stmt) {
         append("{")
         lineBreak()
         //push()
         for (aStmt in stmt.statements) {
-            translate(aStmt)
+            translateStatement(aStmt)
             //outln("// a stmt")
         }
         //pop()
         newLineCrlf("}")
     }
 
-    void translate(ReturnStatement stmt) {
+    void translateStatement(ReturnStatement stmt) {
         newLine("return ")
-        translate(stmt.expression)
+        translateExpr(stmt.expression)
         lineBreak()
     }
 
-    void translate(Statement stmt) {
+    void translateStatement(Statement stmt) {
         newLineCrlf("/* not implemented for: ${stmt.class.name} */")
     }
 
