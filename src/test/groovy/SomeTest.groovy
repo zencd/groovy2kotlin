@@ -1,3 +1,4 @@
+import groovyjarjarasm.asm.Opcodes
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -6,7 +7,7 @@ import static org.junit.Assert.assertEquals
 class SomeTest {
     @Test
     void test_class() {
-        def (groovy, kotlin) = splitGroovyAndKotlin("""
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
 }
 ---------------
@@ -18,7 +19,7 @@ class ClassName {
 
     @Test
     void test_field() {
-        def (groovy, kotlin) = splitGroovyAndKotlin("""
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
     String field
 }
@@ -31,7 +32,7 @@ class ClassName {
 
     @Test
     void test_class_anno() {
-        def (groovy, kotlin) = splitGroovyAndKotlin("""
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 @Deprecated
 class ClassName {
 }
@@ -44,7 +45,7 @@ class ClassName {
 
     @Test
     void test_local_var_primitive() {
-        def (groovy, kotlin) = splitGroovyAndKotlin("""
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
     void main() {
         int i = 0
@@ -61,7 +62,7 @@ class ClassName {
 
     @Test
     void test_local_var_def() {
-        def (groovy, kotlin) = splitGroovyAndKotlin("""
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
     void main() {
         def i = 0
@@ -78,7 +79,7 @@ class ClassName {
 
     @Test
     void test_return_required_for_functions() {
-        def (groovy, kotlin) = splitGroovyAndKotlin("""
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
     String getSome() {
         return "hello"
@@ -95,7 +96,7 @@ class ClassName {
 
     @Test
     void test_make_map() {
-        def (groovy, kotlin) = splitGroovyAndKotlin("""
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
     Map makeMap() {
         return [name: 11, age: 22]
@@ -116,7 +117,7 @@ class ClassName {
     @Test
     @Disabled
     void test_method_with_args() {
-        def (groovy, kotlin) = splitGroovyAndKotlin("""
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
     void funk(int a, int b) {
     }
@@ -127,6 +128,18 @@ class ClassName {
     }
 }""")
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
+    void getModifierString() {
+        assertEquals("", GroovyToKotlin.getModifierString(0))
+        assertEquals("abstract", GroovyToKotlin.getModifierString(Opcodes.ACC_ABSTRACT))
+        assertEquals("", GroovyToKotlin.getModifierString(Opcodes.ACC_PUBLIC))
+        assertEquals("private", GroovyToKotlin.getModifierString(Opcodes.ACC_PRIVATE))
+        assertEquals("protected", GroovyToKotlin.getModifierString(Opcodes.ACC_PROTECTED))
+        assertEquals("static", GroovyToKotlin.getModifierString(Opcodes.ACC_STATIC))
+        assertEquals("final", GroovyToKotlin.getModifierString(Opcodes.ACC_FINAL))
+        assertEquals("static final", GroovyToKotlin.getModifierString(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC|Opcodes.ACC_FINAL))
     }
 
     static def splitGroovyAndKotlin(String s) {

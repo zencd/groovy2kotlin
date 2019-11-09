@@ -74,7 +74,7 @@ class GroovyToKotlin {
     void translate(FieldNode field) {
         def t = typeToString(field.type)
         indent()
-        def mods = getModifiersString(field.modifiers)
+        def mods = getModifierString(field.modifiers)
         if (mods) {
             append(mods + " ")
         }
@@ -90,7 +90,7 @@ class GroovyToKotlin {
         def rt2 = typeToString(method.returnType)
         def rt3 = (rt2 == 'void') ? '' : ": ${rt2}" // todo
         indent()
-        def mods = getModifiersString(method.modifiers)
+        def mods = getModifierString(method.modifiers)
         if (mods) {
             append(mods + " ")
         }
@@ -256,16 +256,25 @@ class GroovyToKotlin {
         newLineCrlf("/* not implemented for: ${stmt.class.name} */")
     }
 
-    String getModifiersString(int mods) {
-        def words = []
-        if (mods & Opcodes.ACC_STATIC) words.add('static')
-        //if (mods & Opcodes.ACC_PUBLIC) words.add('public')
-        if (mods & Opcodes.ACC_PRIVATE) words.add('private')
-        if (mods & Opcodes.ACC_PROTECTED) words.add('protected')
-        return words.join(' ')
+    static String getModifierString(final int mods) {
+        final def bit2string = [
+                //(Opcodes.ACC_PUBLIC): 'public', // omitting as everything is public in Kotlin by default
+                (Opcodes.ACC_PRIVATE): 'private',
+                (Opcodes.ACC_PROTECTED): 'protected',
+                (Opcodes.ACC_ABSTRACT): 'abstract',
+                (Opcodes.ACC_STATIC): 'static',
+                (Opcodes.ACC_FINAL): 'final',
+        ]
+        final def words = []
+        bit2string.each { mask, word ->
+            if ((mods & mask) != 0) {
+                words.add(word)
+            }
+        }
+        return words ? words.join(' ') : ''
     }
 
-    String typeToString(ClassNode classNode) {
+    static String typeToString(ClassNode classNode) {
         if (classNode == ClassHelper.VOID_TYPE) {
             return "void"
         } else {
