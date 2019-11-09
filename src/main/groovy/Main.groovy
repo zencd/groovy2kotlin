@@ -54,7 +54,7 @@ class Main {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos, true, "UTF-8")
         def g2k = new GroovyToKotlin(module, ps)
-        g2k.transform()
+        g2k.translate()
         return new String(baos.toByteArray(), StandardCharsets.UTF_8)
     }
 
@@ -88,12 +88,12 @@ class Main {
     static void main3() {
         //File srcFile = new File("src/Pacient.groovy")
         //File srcFile = new File("src/examples/SiteSupportEx.txt")
-        File srcFile = new File("C:\\projects\\sitewatch\\src\\main\\groovy\\watch\\SaleItem.groovy")
+        File srcFile = new File("groovy-samples/SaleItem.groovy")
         ModuleNode module = parseFile(srcFile)
         //println "module: $module"
         def g2k = new GroovyToKotlin(module, System.out)
         println "---- $srcFile ----"
-        g2k.transform()
+        g2k.translate()
     }
 
     static void main1() {

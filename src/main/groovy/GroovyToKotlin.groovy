@@ -8,10 +8,15 @@ import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.BooleanExpression
+import org.codehaus.groovy.ast.expr.ClosureListExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
+import org.codehaus.groovy.ast.expr.ConstructorCallExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.GStringExpression
+import org.codehaus.groovy.ast.expr.ListExpression
+import org.codehaus.groovy.ast.expr.MapEntryExpression
+import org.codehaus.groovy.ast.expr.MapExpression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.NotExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
@@ -32,79 +37,223 @@ class GroovyToKotlin {
         this.out = out
     }
 
-    void transform() {
+    void translate() {
         for (imp in module.imports) {
-            outln(imp.text)
+            newLineCrlf(imp.text)
         }
-        outln("")
+        newLineCrlf("")
         for (cls in module.classes) {
-            transform(cls)
+            translate(cls)
         }
     }
 
-    void transform(ClassNode classNode) {
-        transform(classNode.annotations)
-        outln("class ${classNode.nameWithoutPackage} {")
+    void translate(ClassNode classNode) {
+        translate(classNode.annotations)
+        newLineCrlf("class ${classNode.nameWithoutPackage} {")
         push()
         for (field in classNode.fields) {
-            transform(field)
+            translate(field)
         }
         for (method in classNode.methods) {
-            transform(method)
+            translate(method)
         }
         pop()
-        outln("}")
+        newLineCrlf("}")
     }
 
-    void transform(List<AnnotationNode> annos) {
+    void translate(List<AnnotationNode> annos) {
         for (anno in annos) {
-            transform(anno)
+            translate(anno)
         }
     }
 
-    void transform(AnnotationNode anno) {
-        outln("@${anno.classNode.name}")
+    void translate(AnnotationNode anno) {
+        newLineCrlf("@${anno.classNode.name}")
     }
 
-    void transform(FieldNode field) {
+    void translate(FieldNode field) {
         def t = typeToString(field.type)
         indent()
         def mods = getModifiersString(field.modifiers)
         if (mods) {
-            out(mods + " ")
+            append(mods + " ")
         }
-        out("val ${field.name}: $t")
+        append("val ${field.name}: $t")
         if (field.initialValueExpression != null) {
-            out(" = ")
-            transform(field.initialValueExpression)
+            append(" = ")
+            translate(field.initialValueExpression)
         }
         lineBreak()
     }
 
-    void transform(MethodNode method) {
+    void translate(MethodNode method) {
         def rt2 = typeToString(method.returnType)
         def rt3 = (rt2 == 'void') ? '' : ": ${rt2}" // todo
         indent()
         def mods = getModifiersString(method.modifiers)
         if (mods) {
-            out(mods + " ")
+            append(mods + " ")
         }
-        out("fun ${method.name}()${rt3}")
+        append("fun ${method.name}()${rt3}")
         def block = (BlockStatement)method.code
         if (block == null) {
             //out(" // no body")
             lineBreak()
         } else {
-            out(" {")
+            append(" {")
             lineBreak()
             push()
             for (stmt in block.statements) {
-                transform(stmt)
+                translate(stmt)
             }
             pop()
-            outln("}")
+            newLineCrlf("}")
         }
+    }
 
+    void translate(ExpressionStatement stmt) {
+        indent()
+        translate(stmt.expression)
+        lineBreak()
+    }
+
+    void translate(MethodCallExpression expr) {
+        def m = (ConstantExpression)expr.method
+        def args = (ArgumentListExpression)expr.arguments
+        append("${m.value}(")
+        int cnt = 0
+        for (arg in args.expressions) {
+            if (cnt++ > 0) {
+                append(", ")
+            }
+            translate(arg)
+        }
+        append(")")
+    }
+
+    /**
+     * {@link org.codehaus.groovy.ast.expr.ConstructorCallExpression#getText}
+     * @param expr
+     */
+    void translate(ConstructorCallExpression expr) {
+        // todo see org.codehaus.groovy.ast.expr.ConstructorCallExpression.getText
+        append("new ")
+        append(expr.getType().getText())
+        append(expr.arguments.text)
+    }
+
+    void translate(GStringExpression expr) {
+        append("\"${expr.verbatimText}\"")
+    }
+
+    void translate(DeclarationExpression expr) {
+        def left = (VariableExpression)expr.leftExpression
+        def st = left.dynamicTyped ? 'val' : typeToString(left.originType)
+        append("$st ${left.name} = ")
+        translate(expr.rightExpression)
+    }
+
+    void translate(BinaryExpression expr) {
+        translate(expr.leftExpression)
+        append(" ${expr.operation.text} ")
+        translate(expr.rightExpression)
+    }
+
+    void translate(VariableExpression expr) {
+        append(expr.name)
+    }
+
+    void translate(ConstantExpression expr) {
+        // todo use expr.constantName probably
+        // todo improve checking for string/gstring
+        if (expr.type == ClassHelper.STRING_TYPE) {
+            append("\"${expr.value}\"")
+        } else {
+            append("${expr.value}")
+        }
+    }
+
+    void translate(NotExpression expr) {
+        append("!")
+        translate(expr.expression)
+    }
+
+    void translate(BooleanExpression expr) {
+        translate(expr.expression)
+    }
+
+    void translate(MapExpression expr) {
+        appendLn('mapOf(')
+        push()
+        int cnt = 0
+        for (MapEntryExpression item in expr.mapEntryExpressions) {
+            def isLast = ++cnt >= expr.mapEntryExpressions.size()
+            indent()
+            translate(item.keyExpression)
+            append(' to ')
+            translate(item.valueExpression)
+            if (!isLast) {
+                append(',')
+            }
+            lineBreak()
+        }
+        pop()
+        newLine(')')
+    }
+
+    void translate(ListExpression expr) {
+        append("NOT_IMPL(ListExpression)")
+    }
+
+    void translate(ClosureListExpression expr) {
+        append("NOT_IMPL(ClosureListExpression)")
+    }
+
+    void translate(Expression expr) {
+        append("NOT_IMPL(${expr.class.name})")
+    }
+
+    void translate(IfStatement stmt) {
+        newLine("if (")
+        translate(stmt.booleanExpression)
+        append(") ")
+        //lineBreak()
+        push()
+        //outln("// if block")
+        translate(stmt.ifBlock)
+        pop()
+        //indent()
+        //out("}")
+        if (stmt.elseBlock != null && stmt.elseBlock != EmptyStatement.INSTANCE) {
+            append(" else {")
+            lineBreak()
+            indent()
+            translate(stmt.elseBlock)
+            newLineCrlf("}")
+        }
+        lineBreak()
+    }
+
+    void translate(BlockStatement stmt) {
+        append("{")
+        lineBreak()
+        //push()
+        for (aStmt in stmt.statements) {
+            translate(aStmt)
+            //outln("// a stmt")
+        }
+        //pop()
+        newLineCrlf("}")
+    }
+
+    void translate(ReturnStatement stmt) {
+        newLine("return ")
+        translate(stmt.expression)
+        lineBreak()
+    }
+
+    void translate(Statement stmt) {
+        newLineCrlf("/* not implemented for: ${stmt.class.name} */")
     }
 
     String getModifiersString(int mods) {
@@ -116,115 +265,6 @@ class GroovyToKotlin {
         return words.join(' ')
     }
 
-    void transform(ExpressionStatement stmt) {
-        indent()
-        transform(stmt.expression)
-        lineBreak()
-    }
-
-    void transform(MethodCallExpression expr) {
-        def m = (ConstantExpression)expr.method
-        def args = (ArgumentListExpression)expr.arguments
-        out("${m.value}(")
-        int cnt = 0
-        for (arg in args.expressions) {
-            if (cnt++ > 0) {
-                out(", ")
-            }
-            transform(arg)
-        }
-        out(")")
-    }
-
-    void transform(GStringExpression expr) {
-        out("\"${expr.verbatimText}\"")
-    }
-
-    void transform(DeclarationExpression expr) {
-        def left = (VariableExpression)expr.leftExpression
-        def st = typeToString(left.originType)
-        out("$st ${left.name} = ")
-        transform(expr.rightExpression)
-    }
-
-    void transform(BinaryExpression expr) {
-        transform(expr.leftExpression)
-        out(" ${expr.operation.text} ")
-        transform(expr.rightExpression)
-    }
-
-    void transform(VariableExpression expr) {
-        out(expr.name)
-    }
-
-    void transform(ConstantExpression expr) {
-        // todo use expr.constantName probably
-        // todo improve checking for string/gstring
-        if (expr.type == ClassHelper.STRING_TYPE) {
-            out("\"${expr.value}\"")
-        } else {
-            out("${expr.value}")
-        }
-    }
-
-    void transform(NotExpression expr) {
-        out("!")
-        transform(expr.expression)
-    }
-
-    void transform(BooleanExpression expr) {
-        transform(expr.expression)
-    }
-
-    void transform(Expression expr) {
-        out("NOT_IMPL(${expr.class.name})")
-    }
-
-    void transform(IfStatement stmt) {
-        indent()
-        out("if (")
-        transform(stmt.booleanExpression)
-        out(") ")
-        //lineBreak()
-        push()
-        //outln("// if block")
-        transform(stmt.ifBlock)
-        pop()
-        //indent()
-        //out("}")
-        if (stmt.elseBlock != null && stmt.elseBlock != EmptyStatement.INSTANCE) {
-            out(" else {")
-            lineBreak()
-            indent()
-            transform(stmt.elseBlock)
-            outln("}")
-        }
-        lineBreak()
-    }
-
-    void transform(BlockStatement stmt) {
-        out("{")
-        lineBreak()
-        //push()
-        for (aStmt in stmt.statements) {
-            transform(aStmt)
-            //outln("// a stmt")
-        }
-        //pop()
-        outln("}")
-    }
-
-    void transform(ReturnStatement stmt) {
-        indent()
-        out("return ")
-        transform(stmt.expression)
-        lineBreak()
-    }
-
-    void transform(Statement stmt) {
-        outln("/* not implemented for: ${stmt.class.name} */")
-    }
-
     String typeToString(ClassNode classNode) {
         if (classNode == ClassHelper.VOID_TYPE) {
             return "void"
@@ -233,18 +273,27 @@ class GroovyToKotlin {
         }
     }
 
-    private void outln(String s) {
+    private void newLineCrlf(String s) {
         indent()
         out.println(s)
     }
 
+    private void newLine(String s) {
+        indent()
+        out.print(s)
+    }
+
     private void indent() {
-        String strIndent = '  ' * indent
+        String strIndent = '    ' * indent
         out.print(strIndent)
     }
 
-    private void out(String s) {
+    private void append(String s) {
         out.print(s)
+    }
+
+    private void appendLn(String s) {
+        out.println(s)
     }
 
     private void lineBreak() {
