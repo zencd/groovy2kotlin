@@ -6,6 +6,7 @@ import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
+import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.BooleanExpression
@@ -86,7 +87,7 @@ class GroovyToKotlin {
             translate(field)
         }
         for (method in classNode.methods) {
-            translate(method)
+            translateMethod(method)
         }
         pop()
         newLineCrlf("}")
@@ -103,7 +104,7 @@ class GroovyToKotlin {
     }
 
     void translate(FieldNode field) {
-        def t = typeToString(field.type)
+        def t = typeToKotlinString(field.type)
         indent()
         def mods = getModifierString(field.modifiers)
         if (mods) {
@@ -117,15 +118,18 @@ class GroovyToKotlin {
         lineBreak()
     }
 
-    void translate(MethodNode method) {
-        def rt2 = typeToString(method.returnType)
+    void translateMethod(MethodNode method) {
+        def rt2 = typeToKotlinString(method.returnType)
         def rt3 = (rt2 == 'Void') ? '' : ": ${rt2}" // todo improve checking
         indent()
         def mods = getModifierString(method.modifiers)
         if (mods) {
             append(mods + " ")
         }
-        append("fun ${method.name}()${rt3}")
+        append("fun ${method.name}(")
+        append(getParametersText(method.parameters))
+        append(")")
+        append(rt3)
         def block = (BlockStatement) method.code
         if (block == null) {
             //out(" // no body")
@@ -140,6 +144,32 @@ class GroovyToKotlin {
             pop()
             newLineCrlf("}")
         }
+    }
+
+    /**
+     * todo see an impl: {@link org.codehaus.groovy.ast.AstToTextHelper#getParametersText}
+     */
+    static String getParametersText(Parameter[] parameters) {
+        if (parameters == null) return "";
+        if (parameters.length == 0) return "";
+        StringBuilder result = new StringBuilder();
+        int max = parameters.length;
+        for (int x = 0; x < max; x++) {
+            result.append(getParameterText(parameters[x]));
+            if (x < (max - 1)) {
+                result.append(", ");
+            }
+        }
+        return result.toString();
+    }
+
+    static String getParameterText(Parameter node) {
+        String name = node.getName() == null ? "<unknown>" : node.getName()
+        String type = typeToKotlinString(node.getType())
+        if (node.getInitialExpression() != null) {
+            return "$name: $type = " + node.getInitialExpression().getText()
+        }
+        return "${name}: ${type}"
     }
 
     void translateExpr(MethodCallExpression expr) {
@@ -176,7 +206,7 @@ class GroovyToKotlin {
         if (left.dynamicTyped) {
             append("val ${left.name} = ")
         } else {
-            def st = typeToString(left.originType)
+            def st = typeToKotlinString(left.originType)
             append("val ${left.name}: $st = ")
         }
         translateExpr(expr.rightExpression)
@@ -309,7 +339,7 @@ class GroovyToKotlin {
         return words ? words.join(' ') : ''
     }
 
-    static String typeToString(ClassNode classNode) {
+    static String typeToKotlinString(ClassNode classNode) {
         def clazz = classNode.clazz
 
         def groovyTypeToKotlin = [

@@ -37,7 +37,9 @@ import java.nio.charset.StandardCharsets
  * USE OF THE NODES
  * See {@link org.codehaus.groovy.antlr.AntlrParserPlugin#methodDef}
  *
+ * HELPERS
  * {@link org.codehaus.groovy.ast.ClassHelper}
+ * {@link org.codehaus.groovy.ast.AstToTextHelper}
  */
 class Main {
     static void main(String[] args) {

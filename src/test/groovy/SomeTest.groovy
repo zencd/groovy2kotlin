@@ -44,7 +44,7 @@ class ClassName {
     }
 
     @Test
-    void test_field() {
+    void regular_field() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
     String field
@@ -53,6 +53,21 @@ class ClassName {
 class ClassName {
     private val field: String
 }""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
+    @Disabled
+    void final_field_without_type() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+final x = 'hello'
+}
+---------------
+class ClassName {
+val x = 'hello'
+}
+""")
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
     }
 
@@ -143,7 +158,6 @@ class ClassName {
     }
 
     @Test
-    @Disabled
     void test_method_with_args() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {

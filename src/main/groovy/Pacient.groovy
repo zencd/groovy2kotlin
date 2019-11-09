@@ -1,4 +1,5 @@
 class Pacient {
+    final noTypeField = ''
     void funk1() {
         funk2(11, "abc")
         funk2(22)
