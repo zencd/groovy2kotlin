@@ -54,7 +54,7 @@ class Main {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos, true, "UTF-8")
         def g2k = new GroovyToKotlin(module, ps)
-        g2k.translate()
+        g2k.translateModule()
         return new String(baos.toByteArray(), StandardCharsets.UTF_8)
     }
 
@@ -93,7 +93,7 @@ class Main {
         //println "module: $module"
         def g2k = new GroovyToKotlin(module, System.out)
         println "---- $srcFile ----"
-        g2k.translate()
+        g2k.translateModule()
     }
 
     static void main1() {

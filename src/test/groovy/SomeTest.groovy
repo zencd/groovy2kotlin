@@ -18,6 +18,32 @@ class ClassName {
     }
 
     @Test
+    void test_regular_import() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+import java.util.*
+import java.util.List
+import static java.util.Collections.*
+import static java.util.Collections.emptyList
+class ClassName {
+}
+---------------
+import java.util.*
+import java.util.List
+import static java.util.Collections.*
+import static java.util.Collections.emptyList
+class ClassName {
+}
+""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
+    @Disabled
+    void empty_module() {
+        assertGeneratedKotlin('', Main.toKotlin(''))
+    }
+
+    @Test
     void test_field() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
@@ -148,9 +174,19 @@ class ClassName {
     }
 
     static void assertGeneratedKotlin(String expected, String actual) {
-        expected = normalizeCrlf(expected).trim()
-        actual = normalizeCrlf(actual).trim()
+        expected = normalize(expected).trim()
+        actual = normalize(actual).trim()
         assertEquals(expected, actual)
+    }
+
+    static String normalize(String s) {
+        def list = Arrays.asList(s.split("\\r?\\n"))
+        list = list.collect {
+            it.trim()
+        }.findAll {
+            !it.isEmpty()
+        }
+        return list.join('\n').trim()
     }
 
     static String normalizeCrlf(String s) {

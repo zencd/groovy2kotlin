@@ -3,6 +3,7 @@ import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
+import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
@@ -37,14 +38,44 @@ class GroovyToKotlin {
         this.out = out
     }
 
-    void translate() {
-        for (imp in module.imports) {
-            newLineCrlf(imp.text)
-        }
+    void translateModule() {
+        translateImports(module)
         newLineCrlf("")
         for (cls in module.classes) {
             translate(cls)
         }
+    }
+
+    void translateImports(ModuleNode module) {
+        def allImports = module.starImports + module.imports + module.staticStarImports.values() + module.staticImports.values()
+        for (imp in (allImports)) {
+            newLineCrlf(makeImportText(imp))
+        }
+    }
+
+    public String makeImportText(ImportNode imp) {
+        String typeName = imp.getClassName();
+        def isStar = imp.isStar()
+        def isStatic = imp.isStatic()
+        def packageName = imp.getPackageName()
+        def alias = imp.getAlias()
+        def fieldName = imp.getFieldName()
+        if (isStar && !isStatic) {
+            return "import " + packageName + "*";
+        }
+        if (isStar) {
+            return "import static " + typeName + ".*";
+        }
+        if (isStatic) {
+            if (alias != null && alias.length() != 0 && !alias.equals(fieldName)) {
+                return "import static " + typeName + "." + fieldName + " as " + alias;
+            }
+            return "import static " + typeName + "." + fieldName;
+        }
+        if (alias == null || alias.length() == 0) {
+            return "import " + typeName;
+        }
+        return "import " + typeName;
     }
 
     void translate(ClassNode classNode) {
