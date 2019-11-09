@@ -74,13 +74,15 @@ class ClassName {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
     void main() {
-        int i = 0
+        int _int = 0
+        float _float = 0
     }
 }
 -------------------
 class ClassName {
     fun main() {
-        int i = 0
+        val _int: Int = 0
+        val _float: Float = 0
     }
 }""")
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
@@ -173,15 +175,20 @@ class ClassName {
         return [split[0], split[1]]
     }
 
+    /**
+     * Loosely compares two source texts
+     */
     static void assertGeneratedKotlin(String expected, String actual) {
-        expected = normalize(expected).trim()
-        actual = normalize(actual).trim()
+        expected = normalize(expected)
+        actual = normalize(actual)
         assertEquals(expected, actual)
     }
 
     static String normalize(String s) {
         def list = Arrays.asList(s.split("\\r?\\n"))
         list = list.collect {
+            it.replace(' {2,}', ' ')
+        }.collect {
             it.trim()
         }.findAll {
             !it.isEmpty()

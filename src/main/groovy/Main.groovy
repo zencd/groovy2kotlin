@@ -14,19 +14,17 @@ import org.codehaus.groovy.antlr.treewalker.Visitor
 import org.codehaus.groovy.antlr.treewalker.VisitorAdapter
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.ParserPlugin
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.runtime.ResourceGroovyMethods
 import org.codehaus.groovy.syntax.Reduction
-import org.codehaus.groovy.tools.groovydoc.SimpleGroovyClassDocAssembler
-
-import groovy.util.logging.Commons
 
 import java.nio.charset.StandardCharsets
 
 /**
  * LOW-LEVEL
  * {@link org.codehaus.groovy.tools.groovydoc.GroovyRootDocBuilder#parseGroovy}
+ * {@link org.codehaus.groovy.tools.groovydoc.SimpleGroovyClassDocAssembler} - its visitor
+ * {@link org.codehaus.groovy.tools.groovydoc.SimpleGroovyClassDocAssembler#getJavaDocCommentsBeforeNode} - retrieves comments
  * {@link org.codehaus.groovy.antlr.treewalker.SourcePrinter}
  * {@link org.codehaus.groovy.ast.ClassNode}
  * {@link org.codehaus.groovy.ast.GroovyClassVisitor}

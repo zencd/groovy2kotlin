@@ -119,14 +119,14 @@ class GroovyToKotlin {
 
     void translate(MethodNode method) {
         def rt2 = typeToString(method.returnType)
-        def rt3 = (rt2 == 'void') ? '' : ": ${rt2}" // todo
+        def rt3 = (rt2 == 'Void') ? '' : ": ${rt2}" // todo improve checking
         indent()
         def mods = getModifierString(method.modifiers)
         if (mods) {
             append(mods + " ")
         }
         append("fun ${method.name}()${rt3}")
-        def block = (BlockStatement)method.code
+        def block = (BlockStatement) method.code
         if (block == null) {
             //out(" // no body")
             lineBreak()
@@ -143,8 +143,8 @@ class GroovyToKotlin {
     }
 
     void translateExpr(MethodCallExpression expr) {
-        def m = (ConstantExpression)expr.method
-        def args = (ArgumentListExpression)expr.arguments
+        def m = (ConstantExpression) expr.method
+        def args = (ArgumentListExpression) expr.arguments
         append("${m.value}(")
         int cnt = 0
         for (arg in args.expressions) {
@@ -172,9 +172,13 @@ class GroovyToKotlin {
     }
 
     void translateExpr(DeclarationExpression expr) {
-        def left = (VariableExpression)expr.leftExpression
-        def st = left.dynamicTyped ? 'val' : typeToString(left.originType)
-        append("$st ${left.name} = ")
+        def left = (VariableExpression) expr.leftExpression
+        if (left.dynamicTyped) {
+            append("val ${left.name} = ")
+        } else {
+            def st = typeToString(left.originType)
+            append("val ${left.name}: $st = ")
+        }
         translateExpr(expr.rightExpression)
     }
 
@@ -290,11 +294,11 @@ class GroovyToKotlin {
     static String getModifierString(final int mods) {
         final def bit2string = [
                 //(Opcodes.ACC_PUBLIC): 'public', // omitting as everything is public in Kotlin by default
-                (Opcodes.ACC_PRIVATE): 'private',
+                (Opcodes.ACC_PRIVATE)  : 'private',
                 (Opcodes.ACC_PROTECTED): 'protected',
-                (Opcodes.ACC_ABSTRACT): 'abstract',
-                (Opcodes.ACC_STATIC): 'static',
-                (Opcodes.ACC_FINAL): 'final',
+                (Opcodes.ACC_ABSTRACT) : 'abstract',
+                (Opcodes.ACC_STATIC)   : 'static',
+                (Opcodes.ACC_FINAL)    : 'final',
         ]
         final def words = []
         bit2string.each { mask, word ->
@@ -306,8 +310,36 @@ class GroovyToKotlin {
     }
 
     static String typeToString(ClassNode classNode) {
-        if (classNode == ClassHelper.VOID_TYPE) {
-            return "void"
+        def clazz = classNode.clazz
+
+        def groovyTypeToKotlin = [
+                (ClassHelper.VOID_TYPE)      : 'Void',
+                (ClassHelper.STRING_TYPE)    : 'String',
+                (ClassHelper.GSTRING_TYPE)   : 'String',
+                (ClassHelper.boolean_TYPE)   : 'Boolean',
+                (ClassHelper.char_TYPE)      : 'Char',
+                (ClassHelper.byte_TYPE)      : 'Byte',
+                (ClassHelper.int_TYPE)       : 'Int',
+                (ClassHelper.long_TYPE)      : 'Long',
+                (ClassHelper.short_TYPE)     : 'Short',
+                (ClassHelper.double_TYPE)    : 'Double',
+                (ClassHelper.float_TYPE)     : 'Float',
+                (ClassHelper.Byte_TYPE)      : 'Byte',
+                (ClassHelper.Short_TYPE)     : 'Short',
+                (ClassHelper.Integer_TYPE)   : 'Integer',
+                (ClassHelper.Long_TYPE)      : 'Long',
+                (ClassHelper.Character_TYPE) : 'Character',
+                (ClassHelper.Float_TYPE)     : 'Float',
+                (ClassHelper.Double_TYPE)    : 'Double',
+                (ClassHelper.Boolean_TYPE)   : 'Boolean',
+                (ClassHelper.BigInteger_TYPE): 'BigInteger',
+                (ClassHelper.BigDecimal_TYPE): 'BigDecimal',
+                (ClassHelper.Number_TYPE)    : 'Number',
+        ]
+
+        def kotlinType = groovyTypeToKotlin[classNode]
+        if (kotlinType) {
+            return kotlinType
         } else {
             return classNode.toString()
         }
