@@ -1,0 +1,16 @@
+package examples
+
+import watch.SaleItem;
+
+public interface SiteSupportEx {
+
+    String getCode()
+
+    String getTitle()
+
+    void getUpdates(UpdateContext context)
+
+    void clean()
+
+    String getItemUid(SaleItem item)
+}
