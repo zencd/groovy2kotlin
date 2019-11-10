@@ -34,6 +34,7 @@ import static Utils.makeImportText
 import static Utils.typeToKotlinString
 import static Utils.getModifierString
 import static Utils.getJavaDocCommentsBeforeNode
+import static Utils.getParametersText
 
 class GroovyToKotlin {
     ModuleNode module
@@ -66,7 +67,6 @@ class GroovyToKotlin {
             newLineCrlf(makeImportText(imp))
         }
     }
-
 
     void translate(ClassNode classNode) {
         def classComments = getJavaDocCommentsBeforeNode(sbuf, classNode)
@@ -136,34 +136,9 @@ class GroovyToKotlin {
         }
     }
 
-    /**
-     * todo see an impl: {@link org.codehaus.groovy.ast.AstToTextHelper#getParametersText}
-     */
-    static String getParametersText(Parameter[] parameters) {
-        if (parameters == null) return ""
-        if (parameters.length == 0) return ""
-        StringBuilder result = new StringBuilder()
-        int max = parameters.length
-        for (int x = 0; x < max; x++) {
-            result.append(getParameterText(parameters[x]))
-            if (x < (max - 1)) {
-                result.append(", ")
-            }
-        }
-        return result.toString()
-    }
-
-    static String getParameterText(Parameter node) {
-        String name = node.getName() == null ? "<unknown>" : node.getName()
-        String type = typeToKotlinString(node.getType())
-        if (node.getInitialExpression() != null) {
-            return "$name: $type = " + node.getInitialExpression().getText()
-        }
-        return "${name}: ${type}"
-    }
-
     void translateExpr(MethodCallExpression expr) {
         def m = (ConstantExpression) expr.method
+        def oe = expr.objectExpression
         def args = (ArgumentListExpression) expr.arguments
         append("${m.value}(")
         int cnt = 0

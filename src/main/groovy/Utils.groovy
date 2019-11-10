@@ -7,6 +7,7 @@ import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ImportNode
+import org.codehaus.groovy.ast.Parameter
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -14,7 +15,34 @@ import java.util.regex.Pattern
 class Utils {
     private static final Pattern PREV_JAVADOC_COMMENT_PATTERN = Pattern.compile("(?s)/\\*\\*(.*?)\\*/");
 
+    // todo make it non static
     static lastLineCol = new LineColumn(1, 1)
+
+    /**
+     * todo see an impl: {@link org.codehaus.groovy.ast.AstToTextHelper#getParametersText}
+     */
+    static String getParametersText(Parameter[] parameters) {
+        if (parameters == null) return ""
+        if (parameters.length == 0) return ""
+        StringBuilder result = new StringBuilder()
+        int max = parameters.length
+        for (int x = 0; x < max; x++) {
+            result.append(getParameterText(parameters[x]))
+            if (x < (max - 1)) {
+                result.append(", ")
+            }
+        }
+        return result.toString()
+    }
+
+    static String getParameterText(Parameter node) {
+        String name = node.getName() == null ? "<unknown>" : node.getName()
+        String type = typeToKotlinString(node.getType())
+        if (node.getInitialExpression() != null) {
+            return "$name: $type = " + node.getInitialExpression().getText()
+        }
+        return "${name}: ${type}"
+    }
 
     static String makeImportText(ImportNode imp) {
         String typeName = imp.getClassName();
