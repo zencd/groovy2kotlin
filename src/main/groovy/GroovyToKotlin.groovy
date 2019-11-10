@@ -45,8 +45,6 @@ class GroovyToKotlin {
             'import java.util.*',
             'import java.io.*',
             'import java.net.*',
-            'import groovy.lang.*',
-            'import groovy.util.*',
             'import java.math.BigInteger',
             'import java.math.BigDecimal',
     ]
@@ -73,8 +71,12 @@ class GroovyToKotlin {
 
     void translateImports(ModuleNode module) {
         def allImports = module.starImports + module.imports + module.staticStarImports.values() + module.staticImports.values()
-        for (imp in (allImports)) {
-            newLineCrlf(makeImportText(imp))
+        for (imp in allImports) {
+            def line = makeImportText(imp)
+            def isGroovyPackage = line.startsWith('import groovy.')
+            if (!isGroovyPackage) {
+                newLineCrlf(line)
+            }
         }
         for (def imp : DEFAULT_IMPORTS) {
             newLineCrlf(imp)
