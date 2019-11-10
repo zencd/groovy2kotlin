@@ -4,7 +4,9 @@ An utility converting [Groovy](http://groovy-lang.org/) sources to [Kotlin](http
 
 ## requirements
 
-- Groovy 2.5.8, at least tested against it
+The author uses:
+- JDK 1.8
+- Groovy 2.5.8
 
 ## todo first
 
