@@ -88,9 +88,9 @@ class Main {
     static void main3() {
         //File srcFile = new File("src/Pacient.groovy")
         //File srcFile = new File("src/examples/SiteSupportEx.txt")
-        File srcFile = new File("groovy-samples/SaleItem.groovy")
+        //File srcFile = new File("groovy-samples/SaleItem.groovy")
+        File srcFile = new File("C:\\projects\\sitewatch\\src\\main\\groovy\\watch\\db-example.groovy")
         ModuleNode module = parseFile(srcFile)
-        //println "module: $module"
         String groovyText = srcFile.getText('utf-8')
         def g2k = new GroovyToKotlin(module, System.out, groovyText)
         println "---- $srcFile ----"

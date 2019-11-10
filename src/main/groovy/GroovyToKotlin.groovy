@@ -64,6 +64,8 @@ class GroovyToKotlin {
         for (imp in (allImports)) {
             newLineCrlf(makeImportText(imp))
         }
+        newLineCrlf('import java.io.*')
+        newLineCrlf('import java.net.*')
     }
 
     void translate(ClassNode classNode) {
@@ -75,6 +77,7 @@ class GroovyToKotlin {
             translate(field)
         }
         for (method in classNode.methods) {
+            newLineCrlf('')
             translateMethod(method)
         }
         pop()
@@ -122,19 +125,28 @@ class GroovyToKotlin {
         append(getParametersText(method.parameters))
         append(")")
         append(rt3)
-        def block = (BlockStatement) method.code
-        if (block == null) {
-            //out(" // no body")
+        def code = method.code
+        if (code == null) {
             lineBreak()
-        } else {
+        } else if (code instanceof BlockStatement) {
             append(" {")
             lineBreak()
             push()
-            for (stmt in block.statements) {
+            for (stmt in code.statements) {
                 translateStatement(stmt)
             }
             pop()
             newLineCrlf("}")
+        } else if (code instanceof ExpressionStatement) {
+            append(" {")
+            lineBreak()
+            push()
+            translateStatement(code)
+            pop()
+            newLineCrlf("}")
+        } else {
+            lineBreak()
+            newLineCrlf("// unsupported ${code.class}")
         }
     }
 
@@ -169,7 +181,7 @@ class GroovyToKotlin {
      */
     void translateExpr(ConstructorCallExpression expr) {
         // todo see org.codehaus.groovy.ast.expr.ConstructorCallExpression.getText
-        append("new ")
+        //append("new ")
         append(expr.getType().getText())
         append(expr.arguments.text)
     }
@@ -247,11 +259,11 @@ class GroovyToKotlin {
     }
 
     void translateExpr(ClosureListExpression expr) {
-        append("NOT_IMPL(ClosureListExpression)")
+        append("EXPR_NOT_IMPL(ClosureListExpression)")
     }
 
     void translateExpr(Expression expr) {
-        append("NOT_IMPL(${expr.class.name})")
+        append("EXPR_NOT_IMPL(${expr.class.name})")
     }
 
     void translateStatement(ExpressionStatement stmt) {
@@ -333,7 +345,7 @@ class GroovyToKotlin {
     }
 
     private void lineBreak() {
-        out.println()
+        out.println("")
     }
 
     private void push() {

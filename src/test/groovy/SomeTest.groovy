@@ -5,12 +5,16 @@ import org.junit.jupiter.api.Test
 import static org.junit.Assert.assertEquals
 
 class SomeTest {
+
+    static DEFAULT_IMPORTS = ["import java.io.*", "import java.net.*"].join('\n')
+
     @Test
     void test_class() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
 }
 ---------------
+$DEFAULT_IMPORTS
 class ClassName {
 }
 """)
@@ -31,6 +35,7 @@ import java.util.*
 import java.util.List
 import static java.util.Collections.*
 import static java.util.Collections.emptyList
+$DEFAULT_IMPORTS
 class ClassName {
 }
 """)
@@ -50,6 +55,7 @@ class ClassName {
     String field
 }
 -------------------
+$DEFAULT_IMPORTS
 class ClassName {
     private var field: String
 }""")
@@ -63,6 +69,7 @@ class ClassName {
     def funk() { def x = [1, 2, 3] }
 }
 -------------------
+$DEFAULT_IMPORTS
 class ClassName {
     fun funk(): java.lang.Object {
         val x = listOf(1, 2, 3)
@@ -93,6 +100,7 @@ private val x = "hello"
 class ClassName {
 }
 -------------------
+$DEFAULT_IMPORTS
 @Deprecated
 class ClassName {
 }""")
@@ -109,6 +117,7 @@ class ClassName {
     }
 }
 -------------------
+$DEFAULT_IMPORTS
 class ClassName {
     fun main() {
         val _int: Int = 0
@@ -127,6 +136,7 @@ class ClassName {
     }
 }
 -------------------
+$DEFAULT_IMPORTS
 class ClassName {
     fun main() {
         val i = 0
@@ -144,6 +154,7 @@ class ClassName {
     }
 }
 -------------------
+$DEFAULT_IMPORTS
 class ClassName {
     fun getSome(): String {
         return "hello"
@@ -161,6 +172,7 @@ class ClassName {
     }
 }
 -------------------
+$DEFAULT_IMPORTS
 class ClassName {
     fun makeMap(): Map {
         return mapOf(
@@ -180,6 +192,7 @@ class ClassName {
     }
 }
 -------------------
+${DEFAULT_IMPORTS}
 class ClassName {
     fun funk(a: Int, b: Int) {
     }
@@ -195,6 +208,7 @@ class ClassName {
     void main() { funk() }
 }
 -------------------
+$DEFAULT_IMPORTS
 class ClassName {
     fun funk() {
         return 22
@@ -214,6 +228,7 @@ class ClassName {
     void main() { this.funk() }
 }
 -------------------
+$DEFAULT_IMPORTS
 class ClassName {
     fun funk() {
         return 22
@@ -233,6 +248,7 @@ class ClassName {
     void main() { ClassName.funk() }
 }
 -------------------
+$DEFAULT_IMPORTS
 class ClassName {
     static fun funk() {
         return 22

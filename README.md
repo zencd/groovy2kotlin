@@ -6,11 +6,13 @@ An utility converting [Groovy](http://groovy-lang.org/) sources to [Kotlin](http
 
 - Groovy 2.5.8, at least tested against it
 
-## todo
+## todo first
 
+- auto-import classes like File, URL
 - preserve javadoc
 - move static members into the companion object
+- `Some.class` -> `Some::class.java`
 
-## todo
+## todo requiring more analysis
 
-- translate Groovy's implicit return
+- translate Groovy's implicit `return`
