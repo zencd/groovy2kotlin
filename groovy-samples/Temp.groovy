@@ -1,7 +1,13 @@
 class Temp {
     void main() {
-        for (xxx in [1, 2, 3]) {
-            println(xxx)
+        try {
+            println("0")
+        } catch (RuntimeException e) {
+            println("1")
+        } catch (Exception e) {
+            println("2")
+        } finally {
+            println("99")
         }
     }
 }

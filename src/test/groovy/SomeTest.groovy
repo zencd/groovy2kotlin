@@ -63,6 +63,42 @@ class ForLoop {
     }
 
     @Test
+    void try_catch_finally() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class Temp {
+    void main() {
+        try {
+            println("0")
+        } catch (RuntimeException e) {
+            println("1")
+        } catch (Exception e) {
+            println("2")
+        } finally {
+            println("99")
+        }
+    }
+}---------------
+$DEFAULT_IMPORTS
+class Temp {
+    companion object {
+    }
+    fun main() {
+        try {
+            this.println("0")
+        } catch (e: RuntimeException) {
+            this.println("1")
+        } catch (e: Exception) {
+            this.println("2")
+        } finally {
+            this.println("99")
+        }
+    }
+}
+""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
     void property_expression() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {

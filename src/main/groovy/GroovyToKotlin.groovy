@@ -25,12 +25,14 @@ import org.codehaus.groovy.ast.expr.PostfixExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.CatchStatement
 import org.codehaus.groovy.ast.stmt.EmptyStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ForStatement
 import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
+import org.codehaus.groovy.ast.stmt.TryCatchStatement
 
 import static Utils.makeImportText
 import static Utils.typeToKotlinString
@@ -437,6 +439,32 @@ class GroovyToKotlin {
         translateExpr(stmt.collectionExpression)
         out.append(") ")
         translateStatement(stmt.loopBlock)
+        out.lineBreak()
+    }
+
+    void translateStatement(CatchStatement stmt) {
+        def name = stmt.variable.name
+        def type = typeToKotlinString(stmt.variable.type)
+        out.append(" catch ($name: $type) ")
+        translateStatement(stmt.code)
+    }
+
+    void translateStatement(TryCatchStatement stmt) {
+        def valName = stmt.tryStatement
+        out.newLine("try ")
+        translateStatement(stmt.tryStatement)
+        for (c in stmt.catchStatements) {
+            translateStatement(c)
+        }
+        if (stmt.finallyStatement && stmt.finallyStatement != EmptyStatement.INSTANCE) {
+            def fs = (stmt.finallyStatement as BlockStatement).statements[0] // XXX a strange structure provided by Groovy
+            out.append(" finally ")
+            translateStatement(fs)
+            out.append("")
+        }
+        //translateExpr(stmt.collectionExpression)
+        //out.append(") ")
+        //translateStatement(stmt.loopBlock)
         out.lineBreak()
     }
 
