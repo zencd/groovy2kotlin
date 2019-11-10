@@ -40,6 +40,17 @@ class GroovyToKotlin {
     PrintStream out
     int indent = 0
 
+    static DEFAULT_IMPORTS = [
+            'import java.lang.*',
+            'import java.util.*',
+            'import java.io.*',
+            'import java.net.*',
+            'import groovy.lang.*',
+            'import groovy.util.*',
+            'import java.math.BigInteger',
+            'import java.math.BigDecimal',
+    ]
+
     SourceBuffer sbuf
 
     GroovyToKotlin(ModuleNode module, PrintStream out, String groovyText) {
@@ -48,7 +59,7 @@ class GroovyToKotlin {
 
         sbuf = new SourceBuffer()
         for (int i = 0; i < groovyText.length(); i++) {
-            sbuf.write((int)groovyText.charAt(i))
+            sbuf.write((int) groovyText.charAt(i))
         }
     }
 
@@ -65,9 +76,9 @@ class GroovyToKotlin {
         for (imp in (allImports)) {
             newLineCrlf(makeImportText(imp))
         }
-        newLineCrlf('import java.util.*')
-        newLineCrlf('import java.io.*')
-        newLineCrlf('import java.net.*')
+        for (def imp : DEFAULT_IMPORTS) {
+            newLineCrlf(imp)
+        }
     }
 
     void translate(ClassNode classNode) {
@@ -170,7 +181,7 @@ class GroovyToKotlin {
 
     void translateExpr(ArgumentListExpression expr) {
         append("(")
-        expr.expressions.eachWithIndex{ arg, int i ->
+        expr.expressions.eachWithIndex { arg, int i ->
             appendIf(", ", i > 0)
             translateExpr(arg)
         }

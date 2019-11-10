@@ -7,9 +7,14 @@ import static org.junit.Assert.assertEquals
 class SomeTest {
 
     static DEFAULT_IMPORTS = [
-            "import java.util.*",
-            "import java.io.*",
-            "import java.net.*",
+            'import java.lang.*',
+            'import java.util.*',
+            'import java.io.*',
+            'import java.net.*',
+            'import groovy.lang.*',
+            'import groovy.util.*',
+            'import java.math.BigInteger',
+            'import java.math.BigDecimal',
     ].join('\n')
 
     @Test
