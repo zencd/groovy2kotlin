@@ -16,7 +16,9 @@ An utility converting [Groovy](http://groovy-lang.org/) sources to [Kotlin](http
 - `Some.class` -> `Some::class.java`
 - replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
 - translate `def` in formal params as`Any` probably, not `Object`
-- `String.getBytes()` N/A, replace with `String.toByteArray()`
+- Standard functions unavailable in Kt:
+    - `String.getBytes()` => `toByteArray()`
+    - `String.replaceAll`
 
 ## todo requiring more analysis
 

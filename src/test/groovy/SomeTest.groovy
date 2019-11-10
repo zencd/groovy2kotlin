@@ -39,6 +39,30 @@ class ClassName {
     }
 
     @Test
+    void for_loop() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ForLoop {
+    void main() {
+        for (xxx in [1, 2, 3]) {
+            println(xxx)
+        }
+    }
+}---------------
+$DEFAULT_IMPORTS
+class ForLoop {
+    companion object {
+    }
+    fun main() {
+        for (xxx in listOf(1, 2, 3)) {
+            this.println(xxx)
+        }
+    }
+}
+""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
     void property_expression() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {

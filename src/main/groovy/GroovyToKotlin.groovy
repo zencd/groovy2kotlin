@@ -27,6 +27,7 @@ import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.EmptyStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
+import org.codehaus.groovy.ast.stmt.ForStatement
 import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
@@ -427,6 +428,15 @@ class GroovyToKotlin {
     void translateStatement(ReturnStatement stmt) {
         out.newLine("return ")
         translateExpr(stmt.expression)
+        out.lineBreak()
+    }
+
+    void translateStatement(ForStatement stmt) {
+        def valName = stmt.variable.name
+        out.newLine("for ($valName in ")
+        translateExpr(stmt.collectionExpression)
+        out.append(") ")
+        translateStatement(stmt.loopBlock)
         out.lineBreak()
     }
 
