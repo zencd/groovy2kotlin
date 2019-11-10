@@ -1,5 +1,16 @@
 # groovy2kotlin
-Converts Groovy sources to Kotlin
 
+An utility converting [Groovy](http://groovy-lang.org/) sources to [Kotlin](https://kotlinlang.org/) language.
 
-Groovy 2.5.8 (test)
+## requirements
+
+- Groovy 2.5.8, at least tested against it
+
+## todo
+
+- preserve javadoc
+- move static members into the companion object
+
+## todo
+
+- translate Groovy's implicit return
