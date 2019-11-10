@@ -1,0 +1,14 @@
+﻿class ClassName {
+    String getSome() {
+        return "hello"
+    }
+}
+-------------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+    fun getSome(): String {
+        return "hello"
+    }
+}

@@ -1,0 +1,16 @@
+﻿class ClassName {
+    void funk() { return 22 }
+    void main() { funk() }
+}
+-------------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+    fun funk() {
+        return 22
+    }
+    fun main() {
+        this.funk()
+    }
+}

@@ -154,4 +154,13 @@ class Utils {
     static boolean isStatic(int mods) {
         return (mods & Opcodes.ACC_STATIC) != 0
     }
+
+    public static final String UTF8_BOM = "\uFEFF";
+
+    static String cutBom(String s) {
+        if (s != null && s.startsWith(UTF8_BOM)) {
+            s = s.substring(1);
+        }
+        return s;
+    }
 }

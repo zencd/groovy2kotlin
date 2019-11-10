@@ -1,0 +1,12 @@
+﻿class ClassName {
+    void funk(int a, int b) {
+    }
+}
+-------------------
+${DEFAULT_IMPORTS}
+class ClassName {
+    companion object {
+    }
+    fun funk(a: Int, b: Int) {
+    }
+}

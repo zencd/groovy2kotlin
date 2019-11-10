@@ -1,0 +1,14 @@
+﻿class ClassName {
+    void main() {
+        def i = 0
+    }
+}
+-------------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+    fun main() {
+        val i = 0
+    }
+}

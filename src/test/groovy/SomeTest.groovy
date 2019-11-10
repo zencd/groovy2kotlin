@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals
 
 class SomeTest {
 
-    static DEFAULT_IMPORTS = [
+    static String DEFAULT_IMPORTS = [
             'import java.lang.*',
             'import java.util.*',
             'import java.io.*',
@@ -16,217 +16,67 @@ class SomeTest {
     ].join('\n')
 
     @Test
-    void postfix_expr() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    int main() {
-        int i = 0
-        i++
-    }
-}
----------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun main(): Int {
-        val i: Int = 0
-        i++
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "postfix_expr"() {
+        testFromFile("postfix_expr.txt")
     }
 
     @Test
-    void for_loop() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ForLoop {
-    void main() {
-        for (xxx in [1, 2, 3]) {
-            println(xxx)
-        }
-    }
-}---------------
-$DEFAULT_IMPORTS
-class ForLoop {
-    companion object {
-    }
-    fun main() {
-        for (xxx in listOf(1, 2, 3)) {
-            this.println(xxx)
-        }
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "for_loop"() {
+        testFromFile("for_loop.txt")
     }
 
     @Test
-    void try_catch_finally() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class Temp {
-    void main() {
-        try {
-            println("0")
-        } catch (RuntimeException e) {
-            println("1")
-        } catch (Exception e) {
-            println("2")
-        } finally {
-            println("99")
-        }
-    }
-}---------------
-$DEFAULT_IMPORTS
-class Temp {
-    companion object {
-    }
-    fun main() {
-        try {
-            this.println("0")
-        } catch (e: RuntimeException) {
-            this.println("1")
-        } catch (e: Exception) {
-            this.println("2")
-        } finally {
-            this.println("99")
-        }
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "property_expression"() {
+        testFromFile("property_expression.txt")
     }
 
     @Test
-    void property_expression() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    void main(def x) {
-        x.prop
-    }
-}
----------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun main(x: java.lang.Object) {
-        x.prop
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "class"() {
+        testFromFile("class.txt")
     }
 
     @Test
-    @Disabled
-    void test_from_files() {
-        def files = new File("test-data/input-output-tests").listFiles()
-        files.findAll {
-            it.name.endsWith('.txt')
-        }.forEach {
-            testFromFile(it)
-        }
+    void "generics_missed_in_constructor_call"() {
+        testFromFile("generics_missed_in_constructor_call.txt")
     }
 
-    void testFromFile(File file) {
+    @Test
+    void "package_use"() {
+        testFromFile("package_use.txt")
+    }
+
+    @Test
+    void "try_catch_finally"() {
+        testFromFile("try_catch_finally.txt")
+    }
+
+    //@Test
+    //@Disabled
+    //void test_from_files() {
+    //    def files = new File("test-data/input-output-tests").listFiles()
+    //    files.findAll {
+    //        it.name.endsWith('.txt')
+    //    }.forEach {
+    //        testFromFile(it)
+    //    }
+    //}
+
+    void testFromFile(String path) {
+        File file = new File("test-data/input-output-tests", path)
         def text = file.getText('utf-8')
         def (String groovy, String kotlin) = splitGroovyAndKotlin(text)
+        kotlin = kotlin.replace('$DEFAULT_IMPORTS', DEFAULT_IMPORTS)
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
     }
 
     @Test
-    void test_class() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-}
----------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "cast_expression"() {
+        testFromFile("cast_expression.txt")
     }
 
     @Test
-    void generics_missed_in_constructor_call() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-public static final def ERRORS = new ArrayList<ErrorInfo>()
-}
----------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-        val ERRORS = ArrayList<ErrorInfo>()
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
-    }
-
-    @Test
-    void package_use() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-package xxx
-class ClassName {
-}
----------------
-package xxx
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
-    }
-
-    @Test
-    void cast_expression() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    int main() {
-        return 11 as int
-    }
-}
----------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun main(): Int {
-        return (Int)11
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
-    }
-
-    @Test
-    void attribute_expression() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    int field = 11
-    int main() {
-        return this.@field
-    }
-}
----------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    var field: Int = 11
-    fun main(): Int {
-        return this.field
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "attribute_expression"() {
+        testFromFile("attribute_expression.txt")
     }
 
     @Disabled("`this.` generated")
@@ -250,48 +100,13 @@ class ClassName {
     }
 
     @Test
-    void if_stmt() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    void main() {
-        if (true) { int x = 0 }
-    }
-}
----------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun main() {
-        if (true) {
-            val x: Int = 0
-        }
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "if_stmt"() {
+        testFromFile("if_stmt.txt")
     }
 
     @Test
-    void test_regular_import() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-import java.util.*
-import java.util.List
-import static java.util.Collections.*
-import static java.util.Collections.emptyList
-class ClassName {
-}
----------------
-import java.util.*
-import java.util.List
-import java.util.Collections.*
-import java.util.Collections.emptyList
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "regular_import"() {
+        testFromFile("regular_import.txt")
     }
 
     @Test
@@ -301,37 +116,13 @@ class ClassName {
     }
 
     @Test
-    void regular_field() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    String field
-}
--------------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    var field: String
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "regular_field"() {
+        testFromFile("regular_field.txt")
     }
 
     @Test
-    void list_expr() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    def funk() { def x = [1, 2, 3] }
-}
--------------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun funk(): java.lang.Object {
-        val x = listOf(1, 2, 3)
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "list_expr"() {
+        testFromFile("list_expr.txt")
     }
 
     @Test
@@ -350,188 +141,48 @@ private val x = "hello"
     }
 
     @Test
-    void test_class_anno() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-@Deprecated
-class ClassName {
-}
--------------------
-$DEFAULT_IMPORTS
-@Deprecated
-class ClassName {
-    companion object {
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "class_anno"() {
+        testFromFile("class_anno.txt")
     }
 
     @Test
-    void test_local_var_primitive() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    void main() {
-        int _int = 0
-        float _float = 0
-    }
-}
--------------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun main() {
-        val _int: Int = 0
-        val _float: Float = 0
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "local_var_primitive"() {
+        testFromFile("local_var_primitive.txt")
     }
 
     @Test
-    void test_local_var_def() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    void main() {
-        def i = 0
-    }
-}
--------------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun main() {
-        val i = 0
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "local_var_def"() {
+        testFromFile("local_var_def.txt")
     }
 
     @Test
-    void test_return_required_for_functions() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    String getSome() {
-        return "hello"
-    }
-}
--------------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun getSome(): String {
-        return "hello"
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "return_required_for_functions"() {
+        testFromFile("return_required_for_functions.txt")
     }
 
     @Test
-    void test_make_map() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    Map makeMap() {
-        return [name: 11, age: 22]
-    }
-}
--------------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun makeMap(): Map {
-        return mapOf(
-            "name" to 11,
-            "age" to 22
-        )
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "make_map"() {
+        testFromFile("make_map.txt")
     }
 
     @Test
-    void test_method_with_args() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    void funk(int a, int b) {
-    }
-}
--------------------
-${DEFAULT_IMPORTS}
-class ClassName {
-    companion object {
-    }
-    fun funk(a: Int, b: Int) {
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "method_with_args"() {
+        testFromFile("method_with_args.txt")
     }
 
     @Test
-    void invoking_member_method_without_this() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    void funk() { return 22 }
-    void main() { funk() }
-}
--------------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun funk() {
-        return 22
-    }
-    fun main() {
-        this.funk()
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "invoking_member_method_without_this"() {
+        testFromFile("invoking_member_method_without_this.txt")
     }
 
     @Test
-    void invoking_member_method_via_this() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    void funk() { return 22 }
-    void main() { this.funk() }
-}
--------------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-    }
-    fun funk() {
-        return 22
-    }
-    fun main() {
-        this.funk()
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "invoking_member_method_via_this"() {
+        testFromFile("invoking_member_method_via_this.txt")
     }
 
     @Test
-    void invoking_static_method_with_class_specified() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    static void funk() { return 22 }
-    void main() { ClassName.funk() }
-}
--------------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-        fun funk() {
-            return 22
-        }
-    }
-    fun main() {
-        ClassName.funk()
-    }
-}""")
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    void "invoking_static_method_with_class_specified"() {
+        testFromFile("invoking_static_method_with_class_specified.txt")
     }
 
     @Test
@@ -547,6 +198,7 @@ class ClassName {
     }
 
     static def splitGroovyAndKotlin(String s) {
+        s = Utils.cutBom(s)  // with BOM groovy parser goes crazy: it thinks there is no class in file
         def split = s.split('-{5,}')
         return [split[0], split[1]]
     }

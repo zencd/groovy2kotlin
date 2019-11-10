@@ -1,0 +1,16 @@
+﻿class ClassName {
+    int field = 11
+    int main() {
+        return this.@field
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+    var field: Int = 11
+    fun main(): Int {
+        return this.field
+    }
+}

@@ -1,0 +1,17 @@
+﻿class ClassName {
+    Map makeMap() {
+        return [name: 11, age: 22]
+    }
+}
+-------------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+    fun makeMap(): Map {
+        return mapOf(
+            "name" to 11,
+            "age" to 22
+        )
+    }
+}

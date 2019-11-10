@@ -1,7 +1,9 @@
-﻿class ClassName {
+﻿@Deprecated
+class ClassName {
 }
----------------
+-------------------
 $DEFAULT_IMPORTS
+@Deprecated
 class ClassName {
     companion object {
     }

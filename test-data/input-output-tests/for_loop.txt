@@ -1,0 +1,17 @@
+﻿class ForLoop {
+    void main() {
+        for (xxx in [1, 2, 3]) {
+            println(xxx)
+        }
+    }
+}---------------
+$DEFAULT_IMPORTS
+class ForLoop {
+    companion object {
+    }
+    fun main() {
+        for (xxx in listOf(1, 2, 3)) {
+            this.println(xxx)
+        }
+    }
+}

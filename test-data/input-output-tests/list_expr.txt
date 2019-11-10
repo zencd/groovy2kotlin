@@ -1,0 +1,12 @@
+﻿class ClassName {
+    def funk() { def x = [1, 2, 3] }
+}
+-------------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+    fun funk(): java.lang.Object {
+        val x = listOf(1, 2, 3)
+    }
+}

@@ -1,8 +1,10 @@
 ﻿class ClassName {
+    String field
 }
----------------
+-------------------
 $DEFAULT_IMPORTS
 class ClassName {
     companion object {
     }
+    var field: String
 }

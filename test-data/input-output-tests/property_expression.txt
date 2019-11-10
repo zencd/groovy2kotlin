@@ -1,8 +1,14 @@
 ﻿class ClassName {
+    void main(def x) {
+        x.prop
+    }
 }
 ---------------
 $DEFAULT_IMPORTS
 class ClassName {
     companion object {
+    }
+    fun main(x: java.lang.Object) {
+        x.prop
     }
 }

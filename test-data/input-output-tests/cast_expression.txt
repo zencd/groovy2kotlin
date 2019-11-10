@@ -1,8 +1,14 @@
 ﻿class ClassName {
+    int main() {
+        return 11 as int
+    }
 }
 ---------------
 $DEFAULT_IMPORTS
 class ClassName {
     companion object {
+    }
+    fun main(): Int {
+        return (Int)11
     }
 }

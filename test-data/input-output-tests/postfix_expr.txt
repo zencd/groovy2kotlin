@@ -1,0 +1,16 @@
+﻿class ClassName {
+    int main() {
+        int i = 0
+        i++
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+    fun main(): Int {
+        val i: Int = 0
+        i++
+    }
+}
