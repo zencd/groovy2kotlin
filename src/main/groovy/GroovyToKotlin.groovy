@@ -108,7 +108,7 @@ class GroovyToKotlin {
         classCompanionPiece.touched = false
 
         for (field in classNode.fields) {
-            translate(field)
+            translateField(field)
         }
         for (method in classNode.methods) {
             out.newLineCrlf('')
@@ -128,42 +128,41 @@ class GroovyToKotlin {
         out.newLineCrlf("@${anno.classNode.name}")
     }
 
-    void translate(FieldNode field) {
-        def impl = {
-            //println("writing field to ${out.getCurrentPiece()}")
-            out.indent()
-            def mods = getModifierString(field.modifiers, false, false)
-            if (mods) {
-                out.append(mods + " ")
-            }
-            def varOrVal = isFinal(field.modifiers) ? 'val' : 'var'
-            out.append("$varOrVal ${field.name}")
-            if (!field.dynamicTyped) {
-                def t = typeToKotlinString(field.type)
-                out.append(": $t")
-            }
-            if (field.initialValueExpression != null) {
-                out.append(" = ")
-                translateExpr(field.initialValueExpression)
-            }
-            out.lineBreak()
-        }
-
+    void translateField(FieldNode field) {
         def piece = null
         if (isStatic(field.modifiers)) {
             piece = classCompanions[field.declaringClass]
         }
-        //println("piece: $piece")
 
         if (piece) {
             out.pushPiece(piece)
             piece.push()
-            impl()
+            translateFieldImpl(field)
             piece.pop()
             out.popPiece()
         } else {
-            impl()
+            translateFieldImpl(field)
         }
+    }
+
+    private void translateFieldImpl(FieldNode field) {
+        out.indent()
+        def mods = getModifierString(field.modifiers, false, false)
+        if (mods) {
+            out.append(mods + " ")
+        }
+        def varOrVal = isFinal(field.modifiers) ? 'val' : 'var'
+        out.append("$varOrVal ${field.name}")
+        if (!field.dynamicTyped) {
+            def t = typeToKotlinString(field.type)
+            out.append(": $t")
+        }
+        if (field.initialValueExpression != null) {
+            out.append(" = ")
+            def xxx = field.initialValueExpression
+            translateExpr(field.initialValueExpression)
+        }
+        out.lineBreak()
     }
 
     void translateMethod(MethodNode method) {
@@ -252,7 +251,9 @@ class GroovyToKotlin {
     void translateExpr(ConstructorCallExpression expr) {
         // todo see org.codehaus.groovy.ast.expr.ConstructorCallExpression.getText
         //append("new ")
-        out.append(expr.getType().getText())
+        //def tt = expr.getType().getText()
+        def tt = typeToKotlinString(expr.getType())
+        out.append(tt)
         out.append(expr.arguments.text)
     }
 

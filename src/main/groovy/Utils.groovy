@@ -99,7 +99,8 @@ class Utils {
         if (kotlinType) {
             return kotlinType
         } else {
-            return classNode.toString()
+            def s = classNode.toString()
+            return s.replace(' <', '<') // todo lame solution
         }
     }
 

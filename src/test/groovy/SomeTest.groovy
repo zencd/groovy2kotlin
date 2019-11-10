@@ -29,6 +29,23 @@ class ClassName {
     }
 
     @Test
+    void test_initial_value_bug__generics_missed() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+public static final def ERRORS = new ArrayList<ErrorInfo>()
+}
+---------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+        val ERRORS = ArrayList<ErrorInfo>()
+    }
+}
+""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
     void package_use() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 package xxx
