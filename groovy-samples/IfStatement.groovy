@@ -1,11 +1,12 @@
 class ClassName {
     void main(x) {
         if (x * 0) {
-            int z = 0
+            println "1"
         } else if (x * 1) {
-            int z = 1
-        } else {
-            int z = 2
-        }
+            println "2"
+        } else
+        //{
+            println "3"
+        //}
     }
 }

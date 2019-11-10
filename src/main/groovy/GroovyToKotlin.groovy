@@ -287,6 +287,11 @@ class GroovyToKotlin {
             //indent()
             if (els instanceof IfStatement) {
                 translateStatement(els, false)
+            } else if (els instanceof ExpressionStatement) {
+                lineBreak()
+                push()
+                translateStatement(els)
+                pop()
             } else {
                 translateStatement(els)
             }
