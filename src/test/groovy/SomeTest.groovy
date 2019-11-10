@@ -21,6 +21,46 @@ class ClassName {
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
     }
 
+    @Disabled("`this.` generated")
+    @Test
+    void call_function_without_braces() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+    void main() {
+        println "hi"
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class ClassName {
+    fun main() {
+        println("hi")
+    }
+}
+""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
+    void if_stmt() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+    void main() {
+        if (true) { int x = 0 }
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class ClassName {
+    fun main() {
+        if (true) {
+            val x: Int = 0
+        }
+    }
+}""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
     @Test
     void test_regular_import() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""

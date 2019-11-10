@@ -272,37 +272,40 @@ class GroovyToKotlin {
         lineBreak()
     }
 
-    void translateStatement(IfStatement stmt) {
-        newLine("if (")
+    void translateStatement(IfStatement stmt, boolean first = true) {
+        if (first) {
+            indent()
+        }
+        append("if (")
         translateExpr(stmt.booleanExpression)
         append(") ")
-        //lineBreak()
-        push()
-        //outln("// if block")
         translateStatement(stmt.ifBlock)
-        pop()
-        //indent()
-        //out("}")
-        if (stmt.elseBlock != null && stmt.elseBlock != EmptyStatement.INSTANCE) {
-            append(" else {")
-            lineBreak()
-            indent()
-            translateStatement(stmt.elseBlock)
-            newLineCrlf("}")
+        def els = stmt.elseBlock
+        if (els != null && els != EmptyStatement.INSTANCE) {
+            append(" else ")
+            //lineBreak()
+            //indent()
+            if (els instanceof IfStatement) {
+                translateStatement(els, false)
+            } else {
+                translateStatement(els)
+            }
+            //newLineCrlf("}")
         }
-        lineBreak()
+        if (first) {
+            lineBreak()
+        }
     }
 
     void translateStatement(BlockStatement stmt) {
         append("{")
+        push()
         lineBreak()
-        //push()
         for (aStmt in stmt.statements) {
             translateStatement(aStmt)
-            //outln("// a stmt")
         }
-        //pop()
-        newLineCrlf("}")
+        pop()
+        newLine("}")
     }
 
     void translateStatement(ReturnStatement stmt) {

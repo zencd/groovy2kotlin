@@ -16,3 +16,4 @@ An utility converting [Groovy](http://groovy-lang.org/) sources to [Kotlin](http
 ## todo requiring more analysis
 
 - translate Groovy's implicit `return`
+- "groovy truth" can't be translated straightly
