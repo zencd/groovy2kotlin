@@ -16,6 +16,29 @@ class SomeTest {
     ].join('\n')
 
     @Test
+    void postfix_expr() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+    int main() {
+        int i = 0
+        i++
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+    fun main(): Int {
+        val i: Int = 0
+        i++
+    }
+}
+""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
     @Disabled
     void test_from_files() {
         def files = new File("test-data/input-output-tests").listFiles()

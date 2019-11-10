@@ -21,6 +21,7 @@ import org.codehaus.groovy.ast.expr.MapEntryExpression
 import org.codehaus.groovy.ast.expr.MapExpression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.NotExpression
+import org.codehaus.groovy.ast.expr.PostfixExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.EmptyStatement
@@ -349,6 +350,11 @@ class GroovyToKotlin {
         def ty = typeToKotlinString(expr.getType())
         out.append("($ty)")
         translateExpr(expr.expression)
+    }
+
+    void translateExpr(PostfixExpression expr) {
+        translateExpr(expr.expression)
+        out.append(expr.operation.text)
     }
 
     void translateExpr(Expression expr) {
