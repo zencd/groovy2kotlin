@@ -14,6 +14,7 @@ import org.codehaus.groovy.antlr.treewalker.Visitor
 import org.codehaus.groovy.antlr.treewalker.VisitorAdapter
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.ResolveVisitor
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.runtime.ResourceGroovyMethods
 import org.codehaus.groovy.syntax.Reduction
@@ -40,6 +41,9 @@ import java.nio.charset.StandardCharsets
  * HELPERS
  * {@link org.codehaus.groovy.ast.ClassHelper}
  * {@link org.codehaus.groovy.ast.AstToTextHelper}
+ *
+ * SOME CLASS RESOLVER
+ * {@link org.codehaus.groovy.control.ResolveVisitor}
  */
 class Main {
     static void main(String[] args) {
@@ -55,7 +59,8 @@ class Main {
         //File srcFile = new File("groovy-samples/SaleItem.groovy")
         //File srcFile = new File("groovy-samples/IfStatement.groovy")
         //File srcFile = new File("groovy-samples/AttributeExpr.groovy")
-        File srcFile = new File("groovy-samples/StaticMembers.groovy")
+        //File srcFile = new File("groovy-samples/StaticMembers.groovy")
+        File srcFile = new File("groovy-samples/StringGetBytes.groovy")
         //File srcFile = new File("C:\\projects\\sitewatch\\src\\main\\groovy\\watch\\db-example.groovy")
         ModuleNode module = parseFile(srcFile)
         String groovyText = srcFile.getText(StandardCharsets.UTF_8.name())
@@ -85,11 +90,13 @@ class Main {
     }
 
     static ModuleNode parseFile(File srcFile) {
-        SourceUnit sourceUnit = new SourceUnit(srcFile, CompilerConfiguration.DEFAULT, null, null)
+        GroovyClassLoader gcl = new GroovyClassLoader(this.getClassLoader())
+        SourceUnit sourceUnit = new SourceUnit(srcFile, CompilerConfiguration.DEFAULT, gcl, null)
         Reader reader = null
         try {
             reader = new FileReader(srcFile)
-            return parseFile(sourceUnit, reader)
+            def module = parseFile(sourceUnit, reader)
+            return module
         } finally {
             reader?.close()
         }
@@ -98,7 +105,11 @@ class Main {
     static ModuleNode parseFile(SourceUnit sourceUnit, Reader reader) {
         AntlrParserPlugin plugin = (AntlrParserPlugin) new AntlrParserPluginFactory().createParserPlugin()
         Reduction cst = plugin.parseCST(sourceUnit, reader)
-        return plugin.buildAST(sourceUnit, null, cst);
+        def moduleNode = plugin.buildAST(sourceUnit, null, cst)
+
+        //ResolveVisitor visitor = new ResolveVisitor()
+
+        return moduleNode;
     }
 
     static void main1() {
