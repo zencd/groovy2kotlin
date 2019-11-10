@@ -113,11 +113,11 @@ class Utils {
                 //(Opcodes.ACC_STATIC)   : 'static',
                 //(Opcodes.ACC_FINAL)    : 'final',
         ]
-        if (allowFinal) {
-            bit2string[Opcodes.ACC_FINAL] = 'final'
-        }
         if (allowStatic) {
             bit2string[Opcodes.ACC_STATIC] = 'static'
+        }
+        if (allowFinal) {
+            bit2string[Opcodes.ACC_FINAL] = 'final'
         }
         final def words = []
         bit2string.each { mask, word ->

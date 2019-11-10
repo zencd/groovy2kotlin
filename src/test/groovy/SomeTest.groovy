@@ -15,6 +15,22 @@ class SomeTest {
             'import java.math.BigDecimal',
     ].join('\n')
 
+    //@Test
+    //void test_from_files() {
+    //    def files = new File("test-data/input-output-tests").listFiles()
+    //    files.findAll {
+    //        it.name.endsWith('.txt')
+    //    }.forEach {
+    //        testFromFile(it)
+    //    }
+    //}
+
+    //void testFromFile(File file) {
+    //    def text = file.getText('utf-8')
+    //    def (String groovy, String kotlin) = splitGroovyAndKotlin(text)
+    //    assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    //}
+
     @Test
     void test_class() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
@@ -23,13 +39,15 @@ class ClassName {
 ---------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
 }
 """)
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
     }
 
     @Test
-    void test_initial_value_bug__generics_missed() {
+    void generics_missed_in_constructor_call() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
 public static final def ERRORS = new ArrayList<ErrorInfo>()
@@ -73,6 +91,8 @@ class ClassName {
 ---------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     fun main(): Int {
         return (Int)11
     }
@@ -93,6 +113,8 @@ class ClassName {
 ---------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     private var field: Int = 11
     fun main(): Int {
         return this.field
@@ -133,6 +155,8 @@ class ClassName {
 ---------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     fun main() {
         if (true) {
             val x: Int = 0
@@ -158,6 +182,8 @@ import java.util.Collections.*
 import java.util.Collections.emptyList
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
 }
 """)
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
@@ -178,6 +204,8 @@ class ClassName {
 -------------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     private var field: String
 }""")
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
@@ -192,6 +220,8 @@ class ClassName {
 -------------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     fun funk(): java.lang.Object {
         val x = listOf(1, 2, 3)
     }
@@ -224,6 +254,8 @@ class ClassName {
 $DEFAULT_IMPORTS
 @Deprecated
 class ClassName {
+    companion object {
+    }
 }""")
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
     }
@@ -240,6 +272,8 @@ class ClassName {
 -------------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     fun main() {
         val _int: Int = 0
         val _float: Float = 0
@@ -259,6 +293,8 @@ class ClassName {
 -------------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     fun main() {
         val i = 0
     }
@@ -277,6 +313,8 @@ class ClassName {
 -------------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     fun getSome(): String {
         return "hello"
     }
@@ -295,6 +333,8 @@ class ClassName {
 -------------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     fun makeMap(): Map {
         return mapOf(
             "name" to 11,
@@ -315,6 +355,8 @@ class ClassName {
 -------------------
 ${DEFAULT_IMPORTS}
 class ClassName {
+    companion object {
+    }
     fun funk(a: Int, b: Int) {
     }
 }""")
@@ -331,6 +373,8 @@ class ClassName {
 -------------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     fun funk() {
         return 22
     }
@@ -351,6 +395,8 @@ class ClassName {
 -------------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+    }
     fun funk() {
         return 22
     }
@@ -371,8 +417,10 @@ class ClassName {
 -------------------
 $DEFAULT_IMPORTS
 class ClassName {
-    static fun funk() {
-        return 22
+    companion object {
+        fun funk() {
+            return 22
+        }
     }
     fun main() {
         ClassName.funk()
