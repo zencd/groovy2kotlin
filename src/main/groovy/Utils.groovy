@@ -103,15 +103,18 @@ class Utils {
         }
     }
 
-    static String getModifierString(final int mods) {
+    static String getModifierString(int mods, boolean allowFinal = true) {
         final def bit2string = [
                 //(Opcodes.ACC_PUBLIC): 'public', // omitting as everything is public in Kotlin by default
                 (Opcodes.ACC_PRIVATE)  : 'private',
                 (Opcodes.ACC_PROTECTED): 'protected',
                 (Opcodes.ACC_ABSTRACT) : 'abstract',
                 (Opcodes.ACC_STATIC)   : 'static',
-                (Opcodes.ACC_FINAL)    : 'final',
+                //(Opcodes.ACC_FINAL)    : 'final',
         ]
+        if (allowFinal) {
+            bit2string[Opcodes.ACC_FINAL] = 'final'
+        }
         final def words = []
         bit2string.each { mask, word ->
             if ((mods & mask) != 0) {
@@ -147,4 +150,7 @@ class Utils {
     //            tt == GroovyTokenTypes.VARIABLE_DEF || tt == GroovyTokenTypes.ANNOTATION_FIELD_DEF || tt == GroovyTokenTypes.ENUM_CONSTANT_DEF || tt == GroovyTokenTypes.CTOR_IDENT
     //}
 
+    static boolean isFinal(int mods) {
+        return (mods & Opcodes.ACC_FINAL) != 0
+    }
 }

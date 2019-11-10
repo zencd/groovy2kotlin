@@ -32,6 +32,7 @@ import static Utils.typeToKotlinString
 import static Utils.getModifierString
 import static Utils.getJavaDocCommentsBeforeNode
 import static Utils.getParametersText
+import static Utils.isFinal
 
 class GroovyToKotlin {
     ModuleNode module
@@ -91,13 +92,17 @@ class GroovyToKotlin {
     }
 
     void translate(FieldNode field) {
-        def t = typeToKotlinString(field.type)
         indent()
-        def mods = getModifierString(field.modifiers)
+        def mods = getModifierString(field.modifiers, false)
         if (mods) {
             append(mods + " ")
         }
-        append("val ${field.name}: $t")
+        def varOrVal = isFinal(field.modifiers) ? 'val' : 'var'
+        append("$varOrVal ${field.name}")
+        if (!field.dynamicTyped) {
+            def t = typeToKotlinString(field.type)
+            append(": $t")
+        }
         if (field.initialValueExpression != null) {
             append(" = ")
             translateExpr(field.initialValueExpression)

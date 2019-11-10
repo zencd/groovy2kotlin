@@ -51,7 +51,7 @@ class ClassName {
 }
 -------------------
 class ClassName {
-    private val field: String
+    private var field: String
 }""")
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
     }
@@ -65,7 +65,7 @@ final x = 'hello'
 }
 ---------------
 class ClassName {
-val x = 'hello'
+private val x = "hello"
 }
 """)
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
