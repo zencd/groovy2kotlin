@@ -53,13 +53,13 @@ class Utils {
             return "import " + packageName + "*"
         }
         if (isStar) {
-            return "import static " + typeName + ".*"
+            return "import " + typeName + ".*"
         }
         if (isStatic) {
             if (alias != null && alias.length() != 0 && !alias.equals(fieldName)) {
-                return "import static " + typeName + "." + fieldName + " as " + alias
+                return "import " + typeName + "." + fieldName + " as " + alias
             }
-            return "import static " + typeName + "." + fieldName
+            return "import " + typeName + "." + fieldName
         }
         if (alias == null || alias.length() == 0) {
             return "import " + typeName

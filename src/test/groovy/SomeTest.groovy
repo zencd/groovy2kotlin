@@ -98,8 +98,8 @@ class ClassName {
 ---------------
 import java.util.*
 import java.util.List
-import static java.util.Collections.*
-import static java.util.Collections.emptyList
+import java.util.Collections.*
+import java.util.Collections.emptyList
 $DEFAULT_IMPORTS
 class ClassName {
 }
