@@ -116,7 +116,6 @@ class GroovyToKotlin {
             translateField(field)
         }
         for (method in classNode.methods) {
-            out.newLineCrlf('')
             translateMethod(method)
         }
         out.pop()
@@ -152,7 +151,8 @@ class GroovyToKotlin {
 
     private void translateFieldImpl(FieldNode field) {
         out.indent()
-        def mods = getModifierString(field.modifiers, false, false)
+        // XXX we don't need private fields because a field is private in Groovy if no access modifier given
+        def mods = getModifierString(field.modifiers, false, false, false)
         if (mods) {
             out.append(mods + " ")
         }
@@ -188,6 +188,7 @@ class GroovyToKotlin {
     }
 
     private void translateMethodImpl(MethodNode method) {
+        out.newLineCrlf('') // empty line btw methods
         def rt2 = typeToKotlinString(method.returnType)
         def rt3 = (rt2 == 'Void') ? '' : ": ${rt2}" // todo improve checking
         out.indent()

@@ -220,7 +220,7 @@ $DEFAULT_IMPORTS
 class ClassName {
     companion object {
     }
-    private var field: Int = 11
+    var field: Int = 11
     fun main(): Int {
         return this.field
     }
@@ -311,7 +311,7 @@ $DEFAULT_IMPORTS
 class ClassName {
     companion object {
     }
-    private var field: String
+    var field: String
 }""")
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
     }

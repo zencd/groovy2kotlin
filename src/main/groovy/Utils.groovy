@@ -104,21 +104,14 @@ class Utils {
         }
     }
 
-    static String getModifierString(int mods, boolean allowFinal = true, boolean allowStatic = true) {
-        final def bit2string = [
-                //(Opcodes.ACC_PUBLIC): 'public', // omitting as everything is public in Kotlin by default
-                (Opcodes.ACC_PRIVATE)  : 'private',
-                (Opcodes.ACC_PROTECTED): 'protected',
-                (Opcodes.ACC_ABSTRACT) : 'abstract',
-                //(Opcodes.ACC_STATIC)   : 'static',
-                //(Opcodes.ACC_FINAL)    : 'final',
-        ]
-        if (allowStatic) {
-            bit2string[Opcodes.ACC_STATIC] = 'static'
-        }
-        if (allowFinal) {
-            bit2string[Opcodes.ACC_FINAL] = 'final'
-        }
+    static String getModifierString(int mods, boolean allowFinal = true, boolean allowStatic = true, boolean allowPrivate = true) {
+        final def bit2string = new LinkedHashMap<Integer, String>() // XXX an ordered map wanted here
+        if (allowPrivate) bit2string[Opcodes.ACC_PRIVATE] = 'private'
+        bit2string[Opcodes.ACC_PROTECTED] = 'protected'
+        bit2string[Opcodes.ACC_ABSTRACT] = 'abstract'
+        if (allowStatic) bit2string[Opcodes.ACC_STATIC] = 'static'
+        if (allowFinal) bit2string[Opcodes.ACC_FINAL] = 'final'
+
         final def words = []
         bit2string.each { mask, word ->
             if ((mods & mask) != 0) {
