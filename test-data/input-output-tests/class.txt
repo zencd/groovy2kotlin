@@ -1,0 +1,12 @@
+﻿class ClassName {
+}
+---------------
+import java.lang.*
+import java.util.*
+import java.io.*
+import java.net.*
+import java.math.BigInteger
+import java.math.BigDecimal
+
+class ClassName {
+}

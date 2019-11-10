@@ -1,0 +1,10 @@
+﻿package xxx
+class ClassName {
+}
+---------------
+package xxx
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+}

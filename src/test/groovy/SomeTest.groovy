@@ -15,21 +15,22 @@ class SomeTest {
             'import java.math.BigDecimal',
     ].join('\n')
 
-    //@Test
-    //void test_from_files() {
-    //    def files = new File("test-data/input-output-tests").listFiles()
-    //    files.findAll {
-    //        it.name.endsWith('.txt')
-    //    }.forEach {
-    //        testFromFile(it)
-    //    }
-    //}
+    @Test
+    @Disabled
+    void test_from_files() {
+        def files = new File("test-data/input-output-tests").listFiles()
+        files.findAll {
+            it.name.endsWith('.txt')
+        }.forEach {
+            testFromFile(it)
+        }
+    }
 
-    //void testFromFile(File file) {
-    //    def text = file.getText('utf-8')
-    //    def (String groovy, String kotlin) = splitGroovyAndKotlin(text)
-    //    assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
-    //}
+    void testFromFile(File file) {
+        def text = file.getText('utf-8')
+        def (String groovy, String kotlin) = splitGroovyAndKotlin(text)
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
 
     @Test
     void test_class() {
