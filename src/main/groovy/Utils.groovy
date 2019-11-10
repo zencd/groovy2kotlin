@@ -103,17 +103,20 @@ class Utils {
         }
     }
 
-    static String getModifierString(int mods, boolean allowFinal = true) {
+    static String getModifierString(int mods, boolean allowFinal = true, boolean allowStatic = true) {
         final def bit2string = [
                 //(Opcodes.ACC_PUBLIC): 'public', // omitting as everything is public in Kotlin by default
                 (Opcodes.ACC_PRIVATE)  : 'private',
                 (Opcodes.ACC_PROTECTED): 'protected',
                 (Opcodes.ACC_ABSTRACT) : 'abstract',
-                (Opcodes.ACC_STATIC)   : 'static',
+                //(Opcodes.ACC_STATIC)   : 'static',
                 //(Opcodes.ACC_FINAL)    : 'final',
         ]
         if (allowFinal) {
             bit2string[Opcodes.ACC_FINAL] = 'final'
+        }
+        if (allowStatic) {
+            bit2string[Opcodes.ACC_STATIC] = 'static'
         }
         final def words = []
         bit2string.each { mask, word ->
@@ -152,5 +155,9 @@ class Utils {
 
     static boolean isFinal(int mods) {
         return (mods & Opcodes.ACC_FINAL) != 0
+    }
+
+    static boolean isStatic(int mods) {
+        return (mods & Opcodes.ACC_STATIC) != 0
     }
 }

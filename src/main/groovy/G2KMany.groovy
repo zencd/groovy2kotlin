@@ -1,23 +1,8 @@
 import groovy.io.FileType
 import org.codehaus.groovy.ast.ModuleNode
 
-class SourceFile {
-    File dir
-    String relativePath
-    SourceFile(File dir, String relativePath) {
-        this.dir = dir
-        this.relativePath = relativePath
-    }
-    String getKotlinPathRelative() {
-        return relativePath.replace('.groovy', '.kt')
-    }
-    File getGroovyFile() {
-        return new File(dir, relativePath)
-    }
-    File getKotlinFile(File outputDir) {
-        return new File(outputDir, kotlinPathRelative)
-    }
-}
+import java.nio.charset.StandardCharsets
+
 
 class G2KMany {
     public static void main(String[] args) {
@@ -35,7 +20,7 @@ class G2KMany {
     }
 
     static void translate(File srcFile, File dst) {
-        def groovyText = srcFile.getText('utf-8')
+        def groovyText = srcFile.getText(StandardCharsets.UTF_8.name())
         def kotlinText = Main.toKotlin(groovyText)
         dst.parentFile.mkdirs()
         dst.write(kotlinText, 'utf-8')

@@ -35,11 +35,15 @@ import static Utils.getModifierString
 import static Utils.getJavaDocCommentsBeforeNode
 import static Utils.getParametersText
 import static Utils.isFinal
+import static Utils.isStatic
 
 class GroovyToKotlin {
     ModuleNode module
-    PrintStream out
+    //PrintStream out
     int indent = 0
+    CodeBuffer out
+
+    def classCompanions = new HashMap<ClassNode, CodeBuffer.CodePiece>()
 
     static DEFAULT_IMPORTS = [
             'import java.lang.*',
@@ -52,11 +56,10 @@ class GroovyToKotlin {
 
     SourceBuffer sbuf
 
-    GroovyToKotlin(ModuleNode module, PrintStream out, String groovyText) {
+    GroovyToKotlin(ModuleNode module, CodeBuffer out, String groovyText) {
         this.module = module
         this.out = out
-
-        sbuf = new SourceBuffer()
+        this.sbuf = new SourceBuffer()
         for (int i = 0; i < groovyText.length(); i++) {
             sbuf.write((int) groovyText.charAt(i))
         }
@@ -64,7 +67,7 @@ class GroovyToKotlin {
 
     void translateModule() {
         translateImports(module)
-        newLineCrlf("")
+        out.newLineCrlf("")
         for (cls in module.classes) {
             translate(cls)
         }
@@ -76,28 +79,37 @@ class GroovyToKotlin {
             def line = makeImportText(imp)
             def isGroovyPackage = line.startsWith('import groovy.')
             if (!isGroovyPackage) {
-                newLineCrlf(line)
+                out.newLineCrlf(line)
             }
         }
         for (def imp : DEFAULT_IMPORTS) {
-            newLineCrlf(imp)
+            out.newLineCrlf(imp)
         }
     }
 
     void translate(ClassNode classNode) {
         def classComments = getJavaDocCommentsBeforeNode(sbuf, classNode)
         translate(classNode.annotations)
-        newLineCrlf("class ${classNode.nameWithoutPackage} {")
-        push()
+        out.newLineCrlf("class ${classNode.nameWithoutPackage} {")
+        out.push()
+
+        out.newLineCrlf("companion object {")
+        def classCompanionPiece = out.addPiece('companion-piece')
+        assert !classCompanions.containsKey(classNode)
+        classCompanions[classNode] = classCompanionPiece
+        out.addPiece()
+        out.newLineCrlf("}")
+        classCompanionPiece.touched = false
+
         for (field in classNode.fields) {
             translate(field)
         }
         for (method in classNode.methods) {
-            newLineCrlf('')
+            out.newLineCrlf('')
             translateMethod(method)
         }
-        pop()
-        newLineCrlf("}")
+        out.pop()
+        out.newLineCrlf("}")
     }
 
     void translate(List<AnnotationNode> annos) {
@@ -107,62 +119,81 @@ class GroovyToKotlin {
     }
 
     void translate(AnnotationNode anno) {
-        newLineCrlf("@${anno.classNode.name}")
+        out.newLineCrlf("@${anno.classNode.name}")
     }
 
     void translate(FieldNode field) {
-        indent()
-        def mods = getModifierString(field.modifiers, false)
-        if (mods) {
-            append(mods + " ")
+        def impl = {
+            println("writing field to ${out.getCurrentPiece()}")
+            out.indent()
+            def mods = getModifierString(field.modifiers, false, false)
+            if (mods) {
+                out.append(mods + " ")
+            }
+            def varOrVal = isFinal(field.modifiers) ? 'val' : 'var'
+            out.append("$varOrVal ${field.name}")
+            if (!field.dynamicTyped) {
+                def t = typeToKotlinString(field.type)
+                out.append(": $t")
+            }
+            if (field.initialValueExpression != null) {
+                out.append(" = ")
+                translateExpr(field.initialValueExpression)
+            }
+            out.lineBreak()
         }
-        def varOrVal = isFinal(field.modifiers) ? 'val' : 'var'
-        append("$varOrVal ${field.name}")
-        if (!field.dynamicTyped) {
-            def t = typeToKotlinString(field.type)
-            append(": $t")
+
+        def piece = null
+        if (isStatic(field.modifiers)) {
+            piece = classCompanions[field.declaringClass]
         }
-        if (field.initialValueExpression != null) {
-            append(" = ")
-            translateExpr(field.initialValueExpression)
+        println("piece: $piece")
+
+        if (piece) {
+            out.pushPiece(piece)
+            piece.push()
+            impl()
+            piece.pop()
+            out.popPiece()
+        } else {
+            impl()
         }
-        lineBreak()
     }
 
     void translateMethod(MethodNode method) {
         def rt2 = typeToKotlinString(method.returnType)
         def rt3 = (rt2 == 'Void') ? '' : ": ${rt2}" // todo improve checking
-        indent()
+        out.indent()
         def mods = getModifierString(method.modifiers)
         if (mods) {
-            append(mods + " ")
+            out.append(mods + " ")
         }
-        append("fun ${method.name}(")
-        append(getParametersText(method.parameters))
-        append(")")
-        append(rt3)
+        out.append("fun ${method.name}(")
+        out.append(getParametersText(method.parameters))
+        out.append(")")
+        out.append(rt3)
         def code = method.code
         if (code == null) {
-            lineBreak()
+            out.lineBreak()
         } else if (code instanceof BlockStatement) {
-            append(" {")
-            lineBreak()
-            push()
+            out.append(" {")
+            out.lineBreak()
+            out.push()
             for (stmt in code.statements) {
                 translateStatement(stmt)
             }
-            pop()
-            newLineCrlf("}")
+            out.pop()
+            out.newLineCrlf("}")
         } else if (code instanceof ExpressionStatement) {
-            append(" {")
-            lineBreak()
-            push()
+            out.append(" {")
+            out.lineBreak()
+            out.push()
             translateStatement(code)
-            pop()
-            newLineCrlf("}")
+            out.pop()
+            out.newLineCrlf("}")
         } else {
-            lineBreak()
-            newLineCrlf("// unsupported ${code.class}")
+            out.lineBreak()
+            out.newLineCrlf("// unsupported ${code.class}")
         }
     }
 
@@ -171,11 +202,11 @@ class GroovyToKotlin {
         String dereference = expr.safe ? "?" : "";
 
         translateExpr(expr.objectExpression)
-        append(spread)
-        append(dereference)
-        append(".")
+        out.append(spread)
+        out.append(dereference)
+        out.append(".")
         if (expr.method instanceof ConstantExpression) {
-            append(expr.method.text)
+            out.append(expr.method.text)
         } else {
             translateExpr(expr.method)
         }
@@ -183,12 +214,12 @@ class GroovyToKotlin {
     }
 
     void translateExpr(ArgumentListExpression expr) {
-        append("(")
+        out.append("(")
         expr.expressions.eachWithIndex { arg, int i ->
-            appendIf(", ", i > 0)
+            out.appendIf(", ", i > 0)
             translateExpr(arg)
         }
-        append(")")
+        out.append(")")
     }
 
     /**
@@ -198,33 +229,33 @@ class GroovyToKotlin {
     void translateExpr(ConstructorCallExpression expr) {
         // todo see org.codehaus.groovy.ast.expr.ConstructorCallExpression.getText
         //append("new ")
-        append(expr.getType().getText())
-        append(expr.arguments.text)
+        out.append(expr.getType().getText())
+        out.append(expr.arguments.text)
     }
 
     void translateExpr(GStringExpression expr) {
-        append("\"${expr.verbatimText}\"")
+        out.append("\"${expr.verbatimText}\"")
     }
 
     void translateExpr(DeclarationExpression expr) {
         def left = (VariableExpression) expr.leftExpression
         if (left.dynamicTyped) {
-            append("val ${left.name} = ")
+            out.append("val ${left.name} = ")
         } else {
             def st = typeToKotlinString(left.originType)
-            append("val ${left.name}: $st = ")
+            out.append("val ${left.name}: $st = ")
         }
         translateExpr(expr.rightExpression)
     }
 
     void translateExpr(BinaryExpression expr) {
         translateExpr(expr.leftExpression)
-        append(" ${expr.operation.text} ")
+        out.append(" ${expr.operation.text} ")
         translateExpr(expr.rightExpression)
     }
 
     void translateExpr(VariableExpression expr) {
-        append(expr.name)
+        out.append(expr.name)
     }
 
     void translateExpr(ConstantExpression expr) {
@@ -232,14 +263,14 @@ class GroovyToKotlin {
         // todo improve checking for string/gstring
         def isString = expr.type == ClassHelper.STRING_TYPE
         if (isString) {
-            append("\"${expr.value}\"")
+            out.append("\"${expr.value}\"")
         } else {
-            append("${expr.value}")
+            out.append("${expr.value}")
         }
     }
 
     void translateExpr(NotExpression expr) {
-        append("!")
+        out.append("!")
         translateExpr(expr.expression)
     }
 
@@ -248,153 +279,112 @@ class GroovyToKotlin {
     }
 
     void translateExpr(MapExpression expr) {
-        appendLn('mapOf(')
-        push()
+        out.appendLn('mapOf(')
+        out.push()
         int cnt = 0
         for (MapEntryExpression item in expr.mapEntryExpressions) {
             def isLast = ++cnt >= expr.mapEntryExpressions.size()
-            indent()
+            out.indent()
             translateExpr(item.keyExpression)
-            append(' to ')
+            out.append(' to ')
             translateExpr(item.valueExpression)
             if (!isLast) {
-                append(',')
+                out.append(',')
             }
-            lineBreak()
+            out.lineBreak()
         }
-        pop()
-        newLine(')')
+        out.pop()
+        out.newLine(')')
     }
 
     void translateExpr(ListExpression expr) {
-        append('listOf(')
+        out.append('listOf(')
         expr.expressions.eachWithIndex { anExpr, int i ->
-            if (i > 0) append(', ')
+            if (i > 0) out.append(', ')
             translateExpr(anExpr)
         }
-        append(')')
+        out.append(')')
     }
 
     void translateExpr(ClosureListExpression expr) {
-        append("EXPR_NOT_IMPL(ClosureListExpression)")
+        out.append("EXPR_NOT_IMPL(ClosureListExpression)")
     }
 
     void translateExpr(AttributeExpression expr) {
         translateExpr(expr.objectExpression)
-        append(".")
+        out.append(".")
         def prop = expr.property
         if (prop instanceof ConstantExpression) {
-            append(prop.text)
+            out.append(prop.text)
         } else {
-            append("EXPECTING(ConstantExpression)")
+            out.append("EXPECTING(ConstantExpression)")
         }
     }
 
     void translateExpr(CastExpression expr) {
         def ty = typeToKotlinString(expr.getType())
-        append("($ty)")
+        out.append("($ty)")
         translateExpr(expr.expression)
     }
 
     void translateExpr(Expression expr) {
-        append("EXPR_NOT_IMPL(${expr.class.name})")
+        out.append("EXPR_NOT_IMPL(${expr.class.name})")
     }
 
     void translateStatement(ExpressionStatement stmt) {
-        indent()
+        out.indent()
         translateExpr(stmt.expression)
-        lineBreak()
+        out.lineBreak()
     }
 
     void translateStatement(IfStatement stmt, boolean first = true) {
         if (first) {
-            indent()
+            out.indent()
         }
-        append("if (")
+        out.append("if (")
         translateExpr(stmt.booleanExpression)
-        append(") ")
+        out.append(") ")
         translateStatement(stmt.ifBlock)
         def els = stmt.elseBlock
         if (els != null && els != EmptyStatement.INSTANCE) {
-            append(" else ")
+            out.append(" else ")
             //lineBreak()
             //indent()
             if (els instanceof IfStatement) {
                 translateStatement(els, false)
             } else if (els instanceof ExpressionStatement) {
-                lineBreak()
-                push()
+                out.lineBreak()
+                out.push()
                 translateStatement(els)
-                pop()
+                out.pop()
             } else {
                 translateStatement(els)
             }
             //newLineCrlf("}")
         }
         if (first) {
-            lineBreak()
+            out.lineBreak()
         }
     }
 
     void translateStatement(BlockStatement stmt) {
-        append("{")
-        push()
-        lineBreak()
+        out.append("{")
+        out.push()
+        out.lineBreak()
         for (aStmt in stmt.statements) {
             translateStatement(aStmt)
         }
-        pop()
-        newLine("}")
+        out.pop()
+        out.newLine("}")
     }
 
     void translateStatement(ReturnStatement stmt) {
-        newLine("return ")
+        out.newLine("return ")
         translateExpr(stmt.expression)
-        lineBreak()
+        out.lineBreak()
     }
 
     void translateStatement(Statement stmt) {
-        newLineCrlf("/* not implemented for: ${stmt.class.name} */")
-    }
-
-    private void newLineCrlf(String s) {
-        indent()
-        out.println(s)
-    }
-
-    private void newLine(String s) {
-        indent()
-        out.print(s)
-    }
-
-    private void indent() {
-        String strIndent = '    ' * indent
-        out.print(strIndent)
-    }
-
-    private void append(String s) {
-        out.print(s)
-    }
-
-    private void appendIf(String s, boolean condition) {
-        if (condition) {
-            out.print(s)
-        }
-    }
-
-    private void appendLn(String s) {
-        out.println(s)
-    }
-
-    private void lineBreak() {
-        out.println("")
-    }
-
-    private void push() {
-        indent++
-    }
-
-    private void pop() {
-        indent--
+        out.newLineCrlf("/* not implemented for: ${stmt.class.name} */")
     }
 }

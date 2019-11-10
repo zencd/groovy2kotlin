@@ -8,7 +8,9 @@ An utility converting [Groovy](http://groovy-lang.org/) sources to [Kotlin](http
 
 ## todo first
 
-- auto-import classes like File, URL
+- distinct classes and interfaces
+- extend/implement
+- Kotlin's `open` and `override`
 - preserve javadoc
 - move static members into the companion object
 - `Some.class` -> `Some::class.java`

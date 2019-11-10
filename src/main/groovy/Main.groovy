@@ -49,13 +49,29 @@ class Main {
         //main4()
     }
 
+    static void main3() {
+        //File srcFile = new File("src/Pacient.groovy")
+        //File srcFile = new File("src/examples/SiteSupportEx.txt")
+        //File srcFile = new File("groovy-samples/SaleItem.groovy")
+        //File srcFile = new File("groovy-samples/IfStatement.groovy")
+        //File srcFile = new File("groovy-samples/AttributeExpr.groovy")
+        File srcFile = new File("groovy-samples/StaticMembers.groovy")
+        //File srcFile = new File("C:\\projects\\sitewatch\\src\\main\\groovy\\watch\\db-example.groovy")
+        ModuleNode module = parseFile(srcFile)
+        String groovyText = srcFile.getText(StandardCharsets.UTF_8.name())
+        def cbuf = new CodeBuffer()
+        def g2k = new GroovyToKotlin(module, cbuf, groovyText)
+        g2k.translateModule()
+        println "---- $srcFile ----"
+        println(cbuf.composeFinalText())
+    }
+
     static String toKotlin(String groovyText) {
         ModuleNode module = parseFile(groovyText)
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos, true, "UTF-8")
-        def g2k = new GroovyToKotlin(module, ps, groovyText)
+        def cbuf = new CodeBuffer()
+        def g2k = new GroovyToKotlin(module, cbuf, groovyText)
         g2k.translateModule()
-        return new String(baos.toByteArray(), StandardCharsets.UTF_8)
+        return cbuf.composeFinalText()
     }
 
     static ModuleNode parseFile(String groovyText) {
@@ -83,20 +99,6 @@ class Main {
         AntlrParserPlugin plugin = (AntlrParserPlugin) new AntlrParserPluginFactory().createParserPlugin()
         Reduction cst = plugin.parseCST(sourceUnit, reader)
         return plugin.buildAST(sourceUnit, null, cst);
-    }
-
-    static void main3() {
-        //File srcFile = new File("src/Pacient.groovy")
-        //File srcFile = new File("src/examples/SiteSupportEx.txt")
-        //File srcFile = new File("groovy-samples/SaleItem.groovy")
-        //File srcFile = new File("groovy-samples/IfStatement.groovy")
-        File srcFile = new File("groovy-samples/AttributeExpr.groovy")
-        //File srcFile = new File("C:\\projects\\sitewatch\\src\\main\\groovy\\watch\\db-example.groovy")
-        ModuleNode module = parseFile(srcFile)
-        String groovyText = srcFile.getText('utf-8')
-        def g2k = new GroovyToKotlin(module, System.out, groovyText)
-        println "---- $srcFile ----"
-        g2k.translateModule()
     }
 
     static void main1() {
