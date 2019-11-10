@@ -1,8 +1,6 @@
 import groovyjarjarasm.asm.Opcodes
-import org.codehaus.groovy.antlr.GroovySourceAST
 import org.codehaus.groovy.antlr.LineColumn
 import org.codehaus.groovy.antlr.SourceBuffer
-import org.codehaus.groovy.antlr.parser.GroovyTokenTypes
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode

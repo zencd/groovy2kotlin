@@ -1,13 +1,10 @@
-import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.antlr.SourceBuffer
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
-import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
-import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.BooleanExpression
@@ -137,15 +134,25 @@ class GroovyToKotlin {
     }
 
     void translateExpr(MethodCallExpression expr) {
-        def m = (ConstantExpression) expr.method
-        def oe = expr.objectExpression
-        def args = (ArgumentListExpression) expr.arguments
-        append("${m.value}(")
-        int cnt = 0
-        for (arg in args.expressions) {
-            if (cnt++ > 0) {
-                append(", ")
-            }
+        String spread = expr.spreadSafe ? "*" : ""; // todo support it
+        String dereference = expr.safe ? "?" : "";
+
+        translateExpr(expr.objectExpression)
+        append(spread)
+        append(dereference)
+        append(".")
+        if (expr.method instanceof ConstantExpression) {
+            append(expr.method.text)
+        } else {
+            translateExpr(expr.method)
+        }
+        translateExpr(expr.arguments)
+    }
+
+    void translateExpr(ArgumentListExpression expr) {
+        append("(")
+        expr.expressions.eachWithIndex{ arg, int i ->
+            appendIf(", ", i > 0)
             translateExpr(arg)
         }
         append(")")
@@ -303,6 +310,12 @@ class GroovyToKotlin {
 
     private void append(String s) {
         out.print(s)
+    }
+
+    private void appendIf(String s, boolean condition) {
+        if (condition) {
+            out.print(s)
+        }
     }
 
     private void appendLn(String s) {
