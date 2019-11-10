@@ -173,7 +173,7 @@ class ClassName {
     }
 
     @Test
-    void invoking_method_of_this_class() {
+    void invoking_member_method_without_this() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
     void funk() { return 22 }
@@ -185,7 +185,26 @@ class ClassName {
         return 22
     }
     fun main() {
-        funk()
+        this.funk()
+    }
+}""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
+    void invoking_member_method_via_this() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+    void funk() { return 22 }
+    void main() { this.funk() }
+}
+-------------------
+class ClassName {
+    fun funk() {
+        return 22
+    }
+    fun main() {
+        this.funk()
     }
 }""")
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
