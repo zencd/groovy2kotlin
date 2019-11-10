@@ -15,6 +15,7 @@ An utility converting [Groovy](http://groovy-lang.org/) sources to [Kotlin](http
 - move static members into the companion object
 - `Some.class` -> `Some::class.java`
 - replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
+- translate `def` in formal params as`Any` probably, not `Object`
 
 ## todo requiring more analysis
 

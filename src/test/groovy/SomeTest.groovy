@@ -39,6 +39,27 @@ class ClassName {
     }
 
     @Test
+    void property_expression() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+    void main(def x) {
+        x.prop
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+    fun main(x: java.lang.Object) {
+        x.prop
+    }
+}
+""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
     @Disabled
     void test_from_files() {
         def files = new File("test-data/input-output-tests").listFiles()

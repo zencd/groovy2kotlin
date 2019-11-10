@@ -22,6 +22,7 @@ import org.codehaus.groovy.ast.expr.MapExpression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.NotExpression
 import org.codehaus.groovy.ast.expr.PostfixExpression
+import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.EmptyStatement
@@ -342,7 +343,7 @@ class GroovyToKotlin {
         if (prop instanceof ConstantExpression) {
             out.append(prop.text)
         } else {
-            out.append("EXPECTING(ConstantExpression)")
+            out.append("ERROR(expecting ConstantExpression)")
         }
     }
 
@@ -355,6 +356,21 @@ class GroovyToKotlin {
     void translateExpr(PostfixExpression expr) {
         translateExpr(expr.expression)
         out.append(expr.operation.text)
+    }
+
+    void translateExpr(PropertyExpression expr) {
+        def prop = expr.property
+        translateExpr(expr.objectExpression)
+        out.append('.')
+        if (prop instanceof ConstantExpression) {
+            // todo duplicated snippet
+            out.append(prop.text)
+        } else {
+            // translateExpr(expr.property)
+            out.append("ERROR(expecting ConstantExpression)")
+        }
+
+        int stop = 0
     }
 
     void translateExpr(Expression expr) {
