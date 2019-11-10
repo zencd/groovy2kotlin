@@ -9,6 +9,7 @@ import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.AttributeExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.BooleanExpression
+import org.codehaus.groovy.ast.expr.CastExpression
 import org.codehaus.groovy.ast.expr.ClosureListExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.ConstructorCallExpression
@@ -287,6 +288,12 @@ class GroovyToKotlin {
         } else {
             append("EXPECTING(ConstantExpression)")
         }
+    }
+
+    void translateExpr(CastExpression expr) {
+        def ty = typeToKotlinString(expr.getType())
+        append("($ty)")
+        translateExpr(expr.expression)
     }
 
     void translateExpr(Expression expr) {

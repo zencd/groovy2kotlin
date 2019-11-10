@@ -29,6 +29,25 @@ class ClassName {
     }
 
     @Test
+    void cast_expression() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+    int main() {
+        return 11 as int
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class ClassName {
+    fun main(): Int {
+        return (Int)11
+    }
+}
+""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
     void attribute_expression() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
