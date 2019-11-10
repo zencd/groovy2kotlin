@@ -6,7 +6,11 @@ import static org.junit.Assert.assertEquals
 
 class SomeTest {
 
-    static DEFAULT_IMPORTS = ["import java.io.*", "import java.net.*"].join('\n')
+    static DEFAULT_IMPORTS = [
+            "import java.util.*",
+            "import java.io.*",
+            "import java.net.*",
+    ].join('\n')
 
     @Test
     void test_class() {
@@ -35,7 +39,7 @@ $DEFAULT_IMPORTS
 class ClassName {
     private var field: Int = 11
     fun main(): Int {
-        return this.@field
+        return this.field
     }
 }
 """)

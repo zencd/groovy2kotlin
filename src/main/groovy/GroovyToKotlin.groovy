@@ -65,6 +65,7 @@ class GroovyToKotlin {
         for (imp in (allImports)) {
             newLineCrlf(makeImportText(imp))
         }
+        newLineCrlf('import java.util.*')
         newLineCrlf('import java.io.*')
         newLineCrlf('import java.net.*')
     }
@@ -266,7 +267,7 @@ class GroovyToKotlin {
 
     void translateExpr(AttributeExpression expr) {
         translateExpr(expr.objectExpression)
-        append(".@")
+        append(".")
         def prop = expr.property
         if (prop instanceof ConstantExpression) {
             append(prop.text)
