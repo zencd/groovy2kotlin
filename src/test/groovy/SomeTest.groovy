@@ -50,6 +50,11 @@ class SomeTest {
         testFromFile("try_catch_finally.txt")
     }
 
+    @Test
+    void "bitwise_expr"() {
+        testFromFile("bitwise_expr.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {

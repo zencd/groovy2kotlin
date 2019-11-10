@@ -10,4 +10,10 @@ class Temp {
             println("99")
         }
     }
+    void bitwise(x) {
+        x = 16 || 32
+        x = 16 && 32
+        x = 16 << 32
+        x = 16 >>> 32
+    }
 }

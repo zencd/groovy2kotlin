@@ -9,8 +9,11 @@ import org.codehaus.groovy.ast.Parameter
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.util.logging.Logger
 
 class Utils {
+    private static final Logger log = Logger.getLogger(this.name)
+
     private static final Pattern PREV_JAVADOC_COMMENT_PATTERN = Pattern.compile("(?s)/\\*\\*(.*?)\\*/");
 
     // todo make it non static
@@ -162,5 +165,27 @@ class Utils {
             s = s.substring(1);
         }
         return s;
+    }
+
+    static String translateOperator(String groovyOp) {
+        def map = [
+                '=': '=',
+                '==': '==',
+                '!=': '!=',
+                '||': 'or',
+                '&&': 'and',
+                '<<': 'shl',
+                '>>': 'shr',
+                '>>>': 'ushr',
+                '^': 'xor',
+                '~': 'inv',
+        ]
+        def res = map[groovyOp]
+        if (res) {
+            return res
+        } else {
+            log.warning("unrecognized groovy's binary op [$groovyOp]")
+            return groovyOp
+        }
     }
 }

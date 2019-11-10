@@ -1,0 +1,24 @@
+class Bitwise {
+    void bitwise(x) {
+        x = 16 || 32
+        x = 16 && 32
+        x = 16 << 32
+        x = 16 >> 32
+        x = 16 >>> 32
+        x = 16 ^ 32
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class Bitwise {
+    companion object {
+    }
+    fun bitwise(x: java.lang.Object) {
+        x = 16 or 32
+        x = 16 and 32
+        x = 16 shl 32
+        x = 16 shr 32
+        x = 16 ushr 32
+        x = 16 xor 32
+    }
+}

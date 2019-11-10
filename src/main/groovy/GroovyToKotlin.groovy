@@ -280,7 +280,8 @@ class GroovyToKotlin {
 
     void translateExpr(BinaryExpression expr) {
         translateExpr(expr.leftExpression)
-        out.append(" ${expr.operation.text} ")
+        def ktOp = Utils.translateOperator(expr.operation.text)
+        out.append(" ${ktOp} ")
         translateExpr(expr.rightExpression)
     }
 

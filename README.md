@@ -18,6 +18,8 @@ The author uses:
 - `Some.class` -> `Some::class.java`
 - replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
 - translate `def` in formal params as`Any` probably, not `Object`
+- bitwise
+    - `~16` => `16.inv()`
 - Standard functions unavailable in Kt:
     - `String.getBytes()` => `toByteArray()`
     - `String.replaceAll`
