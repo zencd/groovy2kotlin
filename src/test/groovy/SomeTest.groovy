@@ -29,6 +29,23 @@ class ClassName {
     }
 
     @Test
+    void package_use() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+package xxx
+class ClassName {
+}
+---------------
+package xxx
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+}
+""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
     void cast_expression() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {

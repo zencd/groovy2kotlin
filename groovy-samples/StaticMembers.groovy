@@ -1,3 +1,4 @@
 class StaticMembers {
-    static String name = "Jimi"
+    static String staticField = "Jimi"
+    static void staticMethod() {}
 }

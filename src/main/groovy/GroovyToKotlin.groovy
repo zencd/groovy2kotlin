@@ -66,6 +66,12 @@ class GroovyToKotlin {
     }
 
     void translateModule() {
+        if (module.hasPackage()) {
+            def pak = module.package.name
+            pak = pak.endsWith('.') ? pak.substring(0, pak.length() - 1) : pak // cutting the trailing dot; todo need a better solution
+            //out.appendLn("package ${pak}")
+            out.newLineCrlf("package ${pak}")
+        }
         translateImports(module)
         out.newLineCrlf("")
         for (cls in module.classes) {
@@ -124,7 +130,7 @@ class GroovyToKotlin {
 
     void translate(FieldNode field) {
         def impl = {
-            println("writing field to ${out.getCurrentPiece()}")
+            //println("writing field to ${out.getCurrentPiece()}")
             out.indent()
             def mods = getModifierString(field.modifiers, false, false)
             if (mods) {
@@ -147,7 +153,7 @@ class GroovyToKotlin {
         if (isStatic(field.modifiers)) {
             piece = classCompanions[field.declaringClass]
         }
-        println("piece: $piece")
+        //println("piece: $piece")
 
         if (piece) {
             out.pushPiece(piece)
@@ -161,10 +167,27 @@ class GroovyToKotlin {
     }
 
     void translateMethod(MethodNode method) {
+        def piece = null
+        if (isStatic(method.modifiers)) {
+            piece = classCompanions[method.declaringClass]
+        }
+
+        if (piece) {
+            out.pushPiece(piece)
+            piece.push()
+            translateMethodImpl(method)
+            piece.pop()
+            out.popPiece()
+        } else {
+            translateMethodImpl(method)
+        }
+    }
+
+    private void translateMethodImpl(MethodNode method) {
         def rt2 = typeToKotlinString(method.returnType)
         def rt3 = (rt2 == 'Void') ? '' : ": ${rt2}" // todo improve checking
         out.indent()
-        def mods = getModifierString(method.modifiers)
+        def mods = getModifierString(method.modifiers, false, false)
         if (mods) {
             out.append(mods + " ")
         }
