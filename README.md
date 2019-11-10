@@ -12,6 +12,7 @@ An utility converting [Groovy](http://groovy-lang.org/) sources to [Kotlin](http
 - preserve javadoc
 - move static members into the companion object
 - `Some.class` -> `Some::class.java`
+- replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
 
 ## todo requiring more analysis
 

@@ -21,6 +21,27 @@ class ClassName {
         assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
     }
 
+    @Test
+    void attribute_expression() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+    int field = 11
+    int main() {
+        return this.@field
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class ClassName {
+    private var field: Int = 11
+    fun main(): Int {
+        return this.@field
+    }
+}
+""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
     @Disabled("`this.` generated")
     @Test
     void call_function_without_braces() {

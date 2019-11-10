@@ -6,6 +6,7 @@ import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
+import org.codehaus.groovy.ast.expr.AttributeExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.BooleanExpression
 import org.codehaus.groovy.ast.expr.ClosureListExpression
@@ -214,7 +215,8 @@ class GroovyToKotlin {
     void translateExpr(ConstantExpression expr) {
         // todo use expr.constantName probably
         // todo improve checking for string/gstring
-        if (expr.type == ClassHelper.STRING_TYPE) {
+        def isString = expr.type == ClassHelper.STRING_TYPE
+        if (isString) {
             append("\"${expr.value}\"")
         } else {
             append("${expr.value}")
@@ -260,6 +262,17 @@ class GroovyToKotlin {
 
     void translateExpr(ClosureListExpression expr) {
         append("EXPR_NOT_IMPL(ClosureListExpression)")
+    }
+
+    void translateExpr(AttributeExpression expr) {
+        translateExpr(expr.objectExpression)
+        append(".@")
+        def prop = expr.property
+        if (prop instanceof ConstantExpression) {
+            append(prop.text)
+        } else {
+            append("EXPECTING(ConstantExpression)")
+        }
     }
 
     void translateExpr(Expression expr) {
