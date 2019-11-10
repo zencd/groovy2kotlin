@@ -57,6 +57,21 @@ class ClassName {
     }
 
     @Test
+    void list_expr() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+    def funk() { def x = [1, 2, 3] }
+}
+-------------------
+class ClassName {
+    fun funk(): java.lang.Object {
+        val x = listOf(1, 2, 3)
+    }
+}""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
     @Disabled
     void final_field_without_type() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""

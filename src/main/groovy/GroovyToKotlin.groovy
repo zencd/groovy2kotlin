@@ -238,7 +238,12 @@ class GroovyToKotlin {
     }
 
     void translateExpr(ListExpression expr) {
-        append("NOT_IMPL(ListExpression)")
+        append('listOf(')
+        expr.expressions.eachWithIndex { anExpr, int i ->
+            if (i > 0) append(', ')
+            translateExpr(anExpr)
+        }
+        append(')')
     }
 
     void translateExpr(ClosureListExpression expr) {
