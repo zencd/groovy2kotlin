@@ -1,4 +1,5 @@
 import groovyjarjarasm.asm.Opcodes
+import org.codehaus.groovy.antlr.SourceBuffer
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
@@ -34,9 +35,16 @@ class GroovyToKotlin {
     PrintStream out
     int indent = 0
 
-    GroovyToKotlin(ModuleNode module, PrintStream out) {
+    SourceBuffer sbuf
+
+    GroovyToKotlin(ModuleNode module, PrintStream out, String groovyText) {
         this.module = module
         this.out = out
+
+        sbuf = new SourceBuffer()
+        for (int i = 0; i < groovyText.length(); i++) {
+            sbuf.write((int)groovyText.charAt(i))
+        }
     }
 
     void translateModule() {
@@ -80,6 +88,7 @@ class GroovyToKotlin {
     }
 
     void translate(ClassNode classNode) {
+        def classComments = Utils.getJavaDocCommentsBeforeNode(sbuf, classNode)
         translate(classNode.annotations)
         newLineCrlf("class ${classNode.nameWithoutPackage} {")
         push()

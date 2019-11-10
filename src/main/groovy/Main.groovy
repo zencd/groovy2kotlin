@@ -53,7 +53,7 @@ class Main {
         ModuleNode module = parseFile(groovyText)
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos, true, "UTF-8")
-        def g2k = new GroovyToKotlin(module, ps)
+        def g2k = new GroovyToKotlin(module, ps, groovyText)
         g2k.translateModule()
         return new String(baos.toByteArray(), StandardCharsets.UTF_8)
     }
@@ -91,7 +91,8 @@ class Main {
         File srcFile = new File("groovy-samples/SaleItem.groovy")
         ModuleNode module = parseFile(srcFile)
         //println "module: $module"
-        def g2k = new GroovyToKotlin(module, System.out)
+        String groovyText = srcFile.getText('utf-8')
+        def g2k = new GroovyToKotlin(module, System.out, groovyText)
         println "---- $srcFile ----"
         g2k.translateModule()
     }

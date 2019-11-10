@@ -173,6 +173,44 @@ class ClassName {
     }
 
     @Test
+    void invoking_method_of_this_class() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+    void funk() { return 22 }
+    void main() { funk() }
+}
+-------------------
+class ClassName {
+    fun funk() {
+        return 22
+    }
+    fun main() {
+        funk()
+    }
+}""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
+    void invoking_static_method_with_class_specified() {
+        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
+class ClassName {
+    static void funk() { return 22 }
+    void main() { ClassName.funk() }
+}
+-------------------
+class ClassName {
+    static fun funk() {
+        return 22
+    }
+    fun main() {
+        ClassName.funk()
+    }
+}""")
+        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+    }
+
+    @Test
     void getModifierString() {
         assertEquals("", GroovyToKotlin.getModifierString(0))
         assertEquals("abstract", GroovyToKotlin.getModifierString(Opcodes.ACC_ABSTRACT))

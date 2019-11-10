@@ -1,5 +1,9 @@
 import groovy.transform.CompileStatic
 
+/**
+ * Some comment
+ * continued
+ */
 @CompileStatic
 class SaleItem implements Serializable {
 
