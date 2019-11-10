@@ -30,6 +30,11 @@ import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
 
+import static Utils.makeImportText
+import static Utils.typeToKotlinString
+import static Utils.getModifierString
+import static Utils.getJavaDocCommentsBeforeNode
+
 class GroovyToKotlin {
     ModuleNode module
     PrintStream out
@@ -62,33 +67,9 @@ class GroovyToKotlin {
         }
     }
 
-    public String makeImportText(ImportNode imp) {
-        String typeName = imp.getClassName();
-        def isStar = imp.isStar()
-        def isStatic = imp.isStatic()
-        def packageName = imp.getPackageName()
-        def alias = imp.getAlias()
-        def fieldName = imp.getFieldName()
-        if (isStar && !isStatic) {
-            return "import " + packageName + "*";
-        }
-        if (isStar) {
-            return "import static " + typeName + ".*";
-        }
-        if (isStatic) {
-            if (alias != null && alias.length() != 0 && !alias.equals(fieldName)) {
-                return "import static " + typeName + "." + fieldName + " as " + alias;
-            }
-            return "import static " + typeName + "." + fieldName;
-        }
-        if (alias == null || alias.length() == 0) {
-            return "import " + typeName;
-        }
-        return "import " + typeName;
-    }
 
     void translate(ClassNode classNode) {
-        def classComments = Utils.getJavaDocCommentsBeforeNode(sbuf, classNode)
+        def classComments = getJavaDocCommentsBeforeNode(sbuf, classNode)
         translate(classNode.annotations)
         newLineCrlf("class ${classNode.nameWithoutPackage} {")
         push()
@@ -159,17 +140,17 @@ class GroovyToKotlin {
      * todo see an impl: {@link org.codehaus.groovy.ast.AstToTextHelper#getParametersText}
      */
     static String getParametersText(Parameter[] parameters) {
-        if (parameters == null) return "";
-        if (parameters.length == 0) return "";
-        StringBuilder result = new StringBuilder();
-        int max = parameters.length;
+        if (parameters == null) return ""
+        if (parameters.length == 0) return ""
+        StringBuilder result = new StringBuilder()
+        int max = parameters.length
         for (int x = 0; x < max; x++) {
-            result.append(getParameterText(parameters[x]));
+            result.append(getParameterText(parameters[x]))
             if (x < (max - 1)) {
-                result.append(", ");
+                result.append(", ")
             }
         }
-        return result.toString();
+        return result.toString()
     }
 
     static String getParameterText(Parameter node) {
@@ -328,60 +309,6 @@ class GroovyToKotlin {
 
     void translateStatement(Statement stmt) {
         newLineCrlf("/* not implemented for: ${stmt.class.name} */")
-    }
-
-    static String getModifierString(final int mods) {
-        final def bit2string = [
-                //(Opcodes.ACC_PUBLIC): 'public', // omitting as everything is public in Kotlin by default
-                (Opcodes.ACC_PRIVATE)  : 'private',
-                (Opcodes.ACC_PROTECTED): 'protected',
-                (Opcodes.ACC_ABSTRACT) : 'abstract',
-                (Opcodes.ACC_STATIC)   : 'static',
-                (Opcodes.ACC_FINAL)    : 'final',
-        ]
-        final def words = []
-        bit2string.each { mask, word ->
-            if ((mods & mask) != 0) {
-                words.add(word)
-            }
-        }
-        return words ? words.join(' ') : ''
-    }
-
-    static String typeToKotlinString(ClassNode classNode) {
-        def clazz = classNode.clazz
-
-        def groovyTypeToKotlin = [
-                (ClassHelper.VOID_TYPE)      : 'Void',
-                (ClassHelper.STRING_TYPE)    : 'String',
-                (ClassHelper.GSTRING_TYPE)   : 'String',
-                (ClassHelper.boolean_TYPE)   : 'Boolean',
-                (ClassHelper.char_TYPE)      : 'Char',
-                (ClassHelper.byte_TYPE)      : 'Byte',
-                (ClassHelper.int_TYPE)       : 'Int',
-                (ClassHelper.long_TYPE)      : 'Long',
-                (ClassHelper.short_TYPE)     : 'Short',
-                (ClassHelper.double_TYPE)    : 'Double',
-                (ClassHelper.float_TYPE)     : 'Float',
-                (ClassHelper.Byte_TYPE)      : 'Byte',
-                (ClassHelper.Short_TYPE)     : 'Short',
-                (ClassHelper.Integer_TYPE)   : 'Integer',
-                (ClassHelper.Long_TYPE)      : 'Long',
-                (ClassHelper.Character_TYPE) : 'Character',
-                (ClassHelper.Float_TYPE)     : 'Float',
-                (ClassHelper.Double_TYPE)    : 'Double',
-                (ClassHelper.Boolean_TYPE)   : 'Boolean',
-                (ClassHelper.BigInteger_TYPE): 'BigInteger',
-                (ClassHelper.BigDecimal_TYPE): 'BigDecimal',
-                (ClassHelper.Number_TYPE)    : 'Number',
-        ]
-
-        def kotlinType = groovyTypeToKotlin[classNode]
-        if (kotlinType) {
-            return kotlinType
-        } else {
-            return classNode.toString()
-        }
     }
 
     private void newLineCrlf(String s) {

@@ -212,14 +212,14 @@ class ClassName {
 
     @Test
     void getModifierString() {
-        assertEquals("", GroovyToKotlin.getModifierString(0))
-        assertEquals("abstract", GroovyToKotlin.getModifierString(Opcodes.ACC_ABSTRACT))
-        assertEquals("", GroovyToKotlin.getModifierString(Opcodes.ACC_PUBLIC))
-        assertEquals("private", GroovyToKotlin.getModifierString(Opcodes.ACC_PRIVATE))
-        assertEquals("protected", GroovyToKotlin.getModifierString(Opcodes.ACC_PROTECTED))
-        assertEquals("static", GroovyToKotlin.getModifierString(Opcodes.ACC_STATIC))
-        assertEquals("final", GroovyToKotlin.getModifierString(Opcodes.ACC_FINAL))
-        assertEquals("static final", GroovyToKotlin.getModifierString(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC|Opcodes.ACC_FINAL))
+        assertEquals("", Utils.getModifierString(0))
+        assertEquals("abstract", Utils.getModifierString(Opcodes.ACC_ABSTRACT))
+        assertEquals("", Utils.getModifierString(Opcodes.ACC_PUBLIC))
+        assertEquals("private", Utils.getModifierString(Opcodes.ACC_PRIVATE))
+        assertEquals("protected", Utils.getModifierString(Opcodes.ACC_PROTECTED))
+        assertEquals("static", Utils.getModifierString(Opcodes.ACC_STATIC))
+        assertEquals("final", Utils.getModifierString(Opcodes.ACC_FINAL))
+        assertEquals("static final", Utils.getModifierString(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC|Opcodes.ACC_FINAL))
     }
 
     static def splitGroovyAndKotlin(String s) {
