@@ -1,7 +1,8 @@
 class Temp {
-    int age
-    String name
-    void main(List<String> args) {
-        String str
+    String main() {
+        println(1)
+        println(2)
+        def x = "x" + "z"
+        //"x" + "z"
     }
 }

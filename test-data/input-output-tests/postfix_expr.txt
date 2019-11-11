@@ -11,6 +11,6 @@ class ClassName {
     }
     fun main(): Int {
         val i: Int = 0
-        i++
+        return i++
     }
 }

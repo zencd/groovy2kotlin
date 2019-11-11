@@ -1,5 +1,5 @@
 class ClassName {
-    int main() {
+    void main() {
         true ? 1 : 2
         1 ?: 2
     }
@@ -9,7 +9,7 @@ $DEFAULT_IMPORTS
 class ClassName {
     companion object {
     }
-    fun main(): Int {
+    fun main() {
         if (true) 1 else 2
         1 ?: 2
     }

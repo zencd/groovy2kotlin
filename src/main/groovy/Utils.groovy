@@ -5,6 +5,7 @@ import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ImportNode
+import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
@@ -240,5 +241,10 @@ class Utils {
                 'each': 'forEach',
         ]
         return groovyToKotlinMethods[groovyMethod] ?: groovyMethod
+    }
+
+    static boolean isVoidMethod(MethodNode method) {
+        def typeStr = typeToKotlinString(method.returnType)
+        return typeStr == 'Void' // todo improve checking
     }
 }

@@ -93,7 +93,7 @@ class GroovyToKotlin {
         translateImports(module)
         out.newLineCrlf("")
         for (cls in module.classes) {
-            translate(cls)
+            translateClass(cls)
         }
     }
 
@@ -111,9 +111,9 @@ class GroovyToKotlin {
         }
     }
 
-    void translate(ClassNode classNode) {
+    void translateClass(ClassNode classNode) {
         def classComments = getJavaDocCommentsBeforeNode(sbuf, classNode)
-        translate(classNode.annotations)
+        translateAnnos(classNode.annotations)
         out.newLineCrlf("class ${classNode.nameWithoutPackage} {")
         out.push()
 
@@ -135,13 +135,13 @@ class GroovyToKotlin {
         out.newLineCrlf("}")
     }
 
-    void translate(List<AnnotationNode> annos) {
+    void translateAnnos(List<AnnotationNode> annos) {
         for (anno in annos) {
-            translate(anno)
+            translateAnno(anno)
         }
     }
 
-    void translate(AnnotationNode anno) {
+    void translateAnno(AnnotationNode anno) {
         out.newLineCrlf("@${anno.classNode.name}")
     }
 
@@ -203,7 +203,7 @@ class GroovyToKotlin {
     private void translateMethodImpl(MethodNode method) {
         out.newLineCrlf('') // empty line btw methods
         def rt2 = typeToKotlinString(method.returnType)
-        def rt3 = (rt2 == 'Void') ? '' : ": ${rt2}" // todo improve checking
+        def rt3 = Utils.isVoidMethod(method) ? '' : ": ${rt2}"
         out.indent()
         def mods = getModifierString(method.modifiers, false, false)
         if (mods) {
@@ -220,7 +220,8 @@ class GroovyToKotlin {
             out.append(" {")
             out.lineBreak()
             out.push()
-            for (stmt in code.statements) {
+            def stmts = Transformers.tryAddExplicitReturnToMethodBody(method)
+            for (stmt in stmts) {
                 translateStatement(stmt)
             }
             out.pop()
@@ -237,6 +238,10 @@ class GroovyToKotlin {
             out.newLineCrlf("// unsupported ${code.class}")
         }
     }
+
+    /////////////////////////////////////////////////
+    //// EXPRESSIONS
+    /////////////////////////////////////////////////
 
     @DynamicDispatch
     void translateExpr(MethodCallExpression expr) {
@@ -565,6 +570,10 @@ class GroovyToKotlin {
         assert expr != null
         out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
     }
+
+    /////////////////////////////////////////////////
+    //// STATEMENTS
+    /////////////////////////////////////////////////
 
     @DynamicDispatch
     void translateStatement(ExpressionStatement stmt) {
