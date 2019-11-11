@@ -1,0 +1,20 @@
+class ClassName {
+    String toString() { return "xxx" }
+    int hashCode() { return 123 }
+    boolean equals(Object o) { return false }
+}
+---------------
+$DEFAULT_IMPORTS
+class ClassName {
+    companion object {
+    }
+    override fun toString(): String {
+        return "xxx"
+    }
+    fun hashCode(): Int {
+        return 123
+    }
+    fun equals(o: Object): Boolean {
+        return false
+    }
+}

@@ -46,6 +46,7 @@ import java.util.logging.Logger
 
 import static Utils.getJavaDocCommentsBeforeNode
 import static Utils.getModifierString
+import static Utils.getMethodModifierString
 import static Utils.getParametersText
 import static Utils.isFinal
 import static Utils.isStatic
@@ -184,6 +185,12 @@ class GroovyToKotlin {
     }
 
     void translateMethod(MethodNode method) {
+        if (method.synthetic) {
+            log.warning("method is synthetic - deal with it: $method") // todo handle synthetic methods
+        }
+
+        Transformers.tryModifySignature(method)
+
         def piece = null
         if (isStatic(method.modifiers)) {
             piece = classCompanions[method.declaringClass]
@@ -205,7 +212,7 @@ class GroovyToKotlin {
         def rt2 = typeToKotlinString(method.returnType)
         def rt3 = Utils.isVoidMethod(method) ? '' : ": ${rt2}"
         out.indent()
-        def mods = getModifierString(method.modifiers, false, false)
+        def mods = getMethodModifierString(method)
         if (mods) {
             out.append(mods + " ")
         }

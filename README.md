@@ -33,7 +33,6 @@ Others may be supported but was not tested.
 
 ## todo 1
 
-- CompareToNullExpression
 - Range expression
 - Distinct classes and interfaces
 - Extend/implement
@@ -51,6 +50,10 @@ Others may be supported but was not tested.
     - `String.getBytes()` → `.toByteArray()`
     - `String.length()` → `.length`
     - `List.eachWithIndex` → `.forEachIndexed` (params swapped!)
+- Correct signatures:
+    - `equals` → `override fun equals(other: Any?): Boolean`
+    - `hashCode` → `override fun hashCode(): Int`
+    - `toString` → `override fun toString(): String`
 - Groovy's shortcuts:
     - `File.text`, `String.execute`, etc
 

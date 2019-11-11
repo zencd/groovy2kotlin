@@ -40,4 +40,12 @@ class Transformers {
             return []
         }
     }
+
+    static void tryModifySignature(MethodNode method) {
+        def typeStr = Utils.typeToKotlinString(method.returnType)
+        int numParams = Utils.getNumberOfFormalParams(method)
+        if (method.name == 'toString' && typeStr == 'String' && numParams == 0) {
+            method.putNodeMetaData(G2KConsts.OVERRIDING_METHOD, true)
+        }
+    }
 }

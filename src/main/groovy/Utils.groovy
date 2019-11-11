@@ -111,6 +111,12 @@ class Utils {
         }
     }
 
+    static String getMethodModifierString(MethodNode method) {
+        String javaMods = getModifierString(method.modifiers, false, false)
+        String override = method.getNodeMetaData(G2KConsts.OVERRIDING_METHOD) == true ? G2KConsts.KOTLIN_OVERRIDE_KEYWORD : ''
+        return [override, javaMods].findAll { it }.join(' ')
+    }
+
     static String getModifierString(int mods, boolean allowFinal = true, boolean allowStatic = true, boolean allowPrivate = true) {
         final def bit2string = new LinkedHashMap<Integer, String>() // XXX an ordered map wanted here
         if (allowPrivate) bit2string[Opcodes.ACC_PRIVATE] = 'private'
@@ -246,5 +252,9 @@ class Utils {
     static boolean isVoidMethod(MethodNode method) {
         def typeStr = typeToKotlinString(method.returnType)
         return typeStr == 'Void' // todo improve checking
+    }
+
+    static int getNumberOfFormalParams(MethodNode method) {
+        return method.parameters.length
     }
 }

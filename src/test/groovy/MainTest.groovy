@@ -85,6 +85,11 @@ class MainTest {
         testFromFile("unary_expr.txt")
     }
 
+    @Test
+    void "override"() {
+        testFromFile("override.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {
