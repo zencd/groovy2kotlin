@@ -17,6 +17,7 @@ import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.ConstructorCallExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.expr.ElvisOperatorExpression
+import org.codehaus.groovy.ast.expr.EmptyExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.GStringExpression
 import org.codehaus.groovy.ast.expr.ListExpression
@@ -27,6 +28,7 @@ import org.codehaus.groovy.ast.expr.NamedArgumentListExpression
 import org.codehaus.groovy.ast.expr.NotExpression
 import org.codehaus.groovy.ast.expr.PostfixExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
+import org.codehaus.groovy.ast.expr.RangeExpression
 import org.codehaus.groovy.ast.expr.TernaryExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
@@ -299,16 +301,24 @@ class GroovyToKotlin {
         out.append("\"${expr.verbatimText}\"")
     }
 
+    /**
+     * Local var declaration
+     */
     @DynamicDispatch
     void translateExpr(DeclarationExpression expr) {
+        def hasInitializer = expr.rightExpression != null && !(expr.rightExpression instanceof EmptyExpression)
+        def varOrVal = hasInitializer ? 'val' : 'var'
         def left = (VariableExpression) expr.leftExpression
         if (left.dynamicTyped) {
-            out.append("val ${left.name} = ")
+            out.append("$varOrVal ${left.name}")
         } else {
             def st = typeToKotlinString(left.originType)
-            out.append("val ${left.name}: $st = ")
+            out.append("$varOrVal ${left.name}: $st")
         }
-        translateExpr(expr.rightExpression)
+        if (hasInitializer) {
+            out.append(" = ")
+            translateExpr(expr.rightExpression)
+        }
     }
 
     @DynamicDispatch
@@ -534,6 +544,20 @@ class GroovyToKotlin {
     void translateExpr(ClassExpression expr) {
         String typeStr = typeToKotlinString(expr.type)
         out.append(typeStr)
+    }
+
+    /**
+     * Determines an empty initializer for statements like `String str`.
+     */
+    @DynamicDispatch
+    void translateExpr(EmptyExpression expr) {
+        log.warning("unreachable code reached: EmptyExpression expected to be detected earlier")
+        out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
+    }
+
+    @DynamicDispatch
+    void translateExpr(RangeExpression expr) {
+        out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
     }
 
     @DynamicDispatch

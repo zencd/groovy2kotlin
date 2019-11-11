@@ -1,6 +1,7 @@
 ﻿class ClassName {
     void main() {
         def i = 0
+        def localWithoutInitializer
     }
 }
 -------------------
@@ -10,5 +11,6 @@ class ClassName {
     }
     fun main() {
         val i = 0
+        var localWithoutInitializer
     }
 }

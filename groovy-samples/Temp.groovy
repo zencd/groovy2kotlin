@@ -2,7 +2,6 @@ class Temp {
     int age
     String name
     void main(List<String> args) {
-        if (!(args instanceof String)) {
-        }
+        String str
     }
 }
