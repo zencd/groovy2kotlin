@@ -1,0 +1,14 @@
+class Temp {
+    void main(String str) {
+        str[0]
+    }
+}
+------------
+$DEFAULT_IMPORTS
+class Temp {
+    companion object {
+    }
+    fun main(str: String) {
+        str[0]
+    }
+}

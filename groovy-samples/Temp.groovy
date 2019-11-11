@@ -2,8 +2,7 @@ class Temp {
     int age
     String name
     void main(List<String> args) {
-        args.each {
-            println(it)
-        }
+        def xxx = 'xxx-value'
+        xxx[123]
     }
 }

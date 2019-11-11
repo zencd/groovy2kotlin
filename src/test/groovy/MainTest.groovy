@@ -70,6 +70,11 @@ class MainTest {
         testFromFile("named_args.txt")
     }
 
+    @Test
+    void "binary_expr"() {
+        testFromFile("binary_expr.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {

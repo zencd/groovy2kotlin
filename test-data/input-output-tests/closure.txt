@@ -10,12 +10,7 @@ class Temp {
     }
 }
 ---------
-import java.lang.*
-import java.util.*
-import java.io.*
-import java.net.*
-import java.math.BigInteger
-import java.math.BigDecimal
+$DEFAULT_IMPORTS
 class Temp {
     companion object {
     }

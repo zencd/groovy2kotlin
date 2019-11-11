@@ -235,6 +235,7 @@ class GroovyToKotlin {
         }
     }
 
+    @DynamicDispatch
     void translateExpr(MethodCallExpression expr) {
         def singleClosureArg = Utils.tryFindSingleClosureArgument(expr)
 
@@ -265,6 +266,7 @@ class GroovyToKotlin {
         }
     }
 
+    @DynamicDispatch
     void translateExpr(ArgumentListExpression expr) {
         out.append("(")
         expr.expressions.eachWithIndex { arg, int i ->
@@ -278,6 +280,7 @@ class GroovyToKotlin {
      * {@link org.codehaus.groovy.ast.expr.ConstructorCallExpression#getText}
      * @param expr
      */
+    @DynamicDispatch
     void translateExpr(ConstructorCallExpression expr) {
         // todo see org.codehaus.groovy.ast.expr.ConstructorCallExpression.getText
         def tt = typeToKotlinString(expr.getType())
@@ -285,10 +288,12 @@ class GroovyToKotlin {
         translateExpr(expr.arguments)
     }
 
+    @DynamicDispatch
     void translateExpr(GStringExpression expr) {
         out.append("\"${expr.verbatimText}\"")
     }
 
+    @DynamicDispatch
     void translateExpr(DeclarationExpression expr) {
         def left = (VariableExpression) expr.leftExpression
         if (left.dynamicTyped) {
@@ -300,19 +305,38 @@ class GroovyToKotlin {
         translateExpr(expr.rightExpression)
     }
 
+    @DynamicDispatch
     void translateExpr(BinaryExpression expr) {
-        def left = expr.leftExpression
+        if (expr.operation.text == '[') {
+            translateIndexingExpr(expr)
+        } else {
+            translateRegularBinaryExpr(expr)
+        }
+    }
+
+    private void translateRegularBinaryExpr(BinaryExpression expr) {
         translateExpr(expr.leftExpression)
         def ktOp = Utils.translateOperator(expr.operation.text)
         out.append(" ${ktOp} ")
-        def meta = expr.getNodeMetaData()
         translateExpr(expr.rightExpression)
     }
 
+    /**
+     * Groovy devs thinks `a[0]` is a binary expression.
+     */
+    private void translateIndexingExpr(BinaryExpression expr) {
+        translateExpr(expr.leftExpression)
+        out.append("[")
+        translateExpr(expr.rightExpression)
+        out.append("]")
+    }
+
+    @DynamicDispatch
     void translateExpr(VariableExpression expr) {
         out.append(expr.name)
     }
 
+    @DynamicDispatch
     void translateExpr(ConstantExpression expr) {
         // todo use expr.constantName probably
         if (Utils.isString(expr.type)) {
@@ -322,15 +346,18 @@ class GroovyToKotlin {
         }
     }
 
+    @DynamicDispatch
     void translateExpr(NotExpression expr) {
         out.append("!")
         translateExpr(expr.expression)
     }
 
+    @DynamicDispatch
     void translateExpr(BooleanExpression expr) {
         translateExpr(expr.expression)
     }
 
+    @DynamicDispatch
     void translateExpr(MapExpression expr) {
         out.appendLn('mapOf(')
         out.push()
@@ -350,6 +377,7 @@ class GroovyToKotlin {
         out.newLine(')')
     }
 
+    @DynamicDispatch
     void translateExpr(ListExpression expr) {
         out.append('listOf(')
         expr.expressions.eachWithIndex { anExpr, int i ->
@@ -359,10 +387,12 @@ class GroovyToKotlin {
         out.append(')')
     }
 
+    @DynamicDispatch
     void translateExpr(ClosureListExpression expr) {
         out.append("EXPR_NOT_IMPL(ClosureListExpression)")
     }
 
+    @DynamicDispatch
     void translateExpr(AttributeExpression expr) {
         translateExpr(expr.objectExpression)
         out.append(".")
@@ -374,17 +404,20 @@ class GroovyToKotlin {
         }
     }
 
+    @DynamicDispatch
     void translateExpr(CastExpression expr) {
         def ty = typeToKotlinString(expr.getType())
         out.append("($ty)")
         translateExpr(expr.expression)
     }
 
+    @DynamicDispatch
     void translateExpr(PostfixExpression expr) {
         translateExpr(expr.expression)
         out.append(expr.operation.text)
     }
 
+    @DynamicDispatch
     void translateExpr(PropertyExpression expr) {
         def prop = expr.property
         translateExpr(expr.objectExpression)
@@ -400,6 +433,7 @@ class GroovyToKotlin {
         int stop = 0
     }
 
+    @DynamicDispatch
     void translateExpr(TernaryExpression expr) {
         out.append(' if (')
         translateExpr(expr.booleanExpression)
@@ -409,12 +443,14 @@ class GroovyToKotlin {
         translateExpr(expr.falseExpression)
     }
 
+    @DynamicDispatch
     void translateExpr(ElvisOperatorExpression expr) {
         translateExpr(expr.trueExpression)
         out.append(' ?: ')
         translateExpr(expr.falseExpression)
     }
 
+    @DynamicDispatch
     void translateExpr(ClosureExpression expr) {
         if (expr.parameterSpecified) {
             out.append('{ ')
@@ -442,6 +478,7 @@ class GroovyToKotlin {
     /**
      * Used inside a TupleExpression at least.
      */
+    @DynamicDispatch
     void translateExpr(NamedArgumentListExpression expr) {
         //translateExpr(expr as MapExpression)
         out.append('(')
@@ -462,6 +499,7 @@ class GroovyToKotlin {
      * At least describes named call arguments like `funk(a: 2, b: 3)` - including parenthesises.
      * Should be translated to `funk(a=2, b=3)`.
      */
+    @DynamicDispatch
     void translateExpr(TupleExpression expr) {
         NamedArgumentListExpression nale = null
         if (expr.expressions?.size() == 1) {
@@ -482,17 +520,20 @@ class GroovyToKotlin {
         }
     }
 
+    @DynamicDispatch
     void translateExpr(Expression expr) {
         assert expr != null
         out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
     }
 
+    @DynamicDispatch
     void translateStatement(ExpressionStatement stmt) {
         out.indent()
         translateExpr(stmt.expression)
         out.lineBreak()
     }
 
+    @DynamicDispatch
     void translateStatement(IfStatement stmt, boolean first = true) {
         if (first) {
             out.indent()
@@ -523,6 +564,7 @@ class GroovyToKotlin {
         }
     }
 
+    @DynamicDispatch
     void translateStatement(BlockStatement stmt) {
         out.append("{")
         out.push()
@@ -534,12 +576,14 @@ class GroovyToKotlin {
         out.newLine("}")
     }
 
+    @DynamicDispatch
     void translateStatement(ReturnStatement stmt) {
         out.newLine("return ")
         translateExpr(stmt.expression)
         out.lineBreak()
     }
 
+    @DynamicDispatch
     void translateStatement(ForStatement stmt) {
         def valName = stmt.variable.name
         out.newLine("for ($valName in ")
@@ -549,6 +593,7 @@ class GroovyToKotlin {
         out.lineBreak()
     }
 
+    @DynamicDispatch
     void translateStatement(CatchStatement stmt) {
         def name = stmt.variable.name
         def type = typeToKotlinString(stmt.variable.type)
@@ -556,6 +601,7 @@ class GroovyToKotlin {
         translateStatement(stmt.code)
     }
 
+    @DynamicDispatch
     void translateStatement(TryCatchStatement stmt) {
         def valName = stmt.tryStatement
         out.newLine("try ")
@@ -575,6 +621,7 @@ class GroovyToKotlin {
         out.lineBreak()
     }
 
+    @DynamicDispatch
     void translateStatement(Statement stmt) {
         out.newLineCrlf("/* not implemented for: ${stmt.class.name} */")
     }
