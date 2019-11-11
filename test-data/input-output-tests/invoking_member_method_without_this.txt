@@ -11,6 +11,6 @@ class ClassName {
         return 22
     }
     fun main() {
-        this.funk()
+        funk()
     }
 }

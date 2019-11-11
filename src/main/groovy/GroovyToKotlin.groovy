@@ -226,13 +226,14 @@ class GroovyToKotlin {
     }
 
     void translateExpr(MethodCallExpression expr) {
-        String spread = expr.spreadSafe ? "*" : ""; // todo support it
-        String dereference = expr.safe ? "?" : "";
-
-        translateExpr(expr.objectExpression)
-        out.append(spread)
-        out.append(dereference)
-        out.append(".")
+        if (!expr.implicitThis) {
+            String spread = expr.spreadSafe ? "*" : ""; // todo support it
+            String dereference = expr.safe ? "?" : "";
+            translateExpr(expr.objectExpression)
+            out.append(spread)
+            out.append(dereference)
+            out.append(".")
+        }
         if (expr.method instanceof ConstantExpression) {
             out.append(expr.method.text)
         } else {

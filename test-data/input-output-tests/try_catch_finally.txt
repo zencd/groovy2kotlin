@@ -17,13 +17,13 @@ class Temp {
     }
     fun main() {
         try {
-            this.println("0")
+            println("0")
         } catch (e: RuntimeException) {
-            this.println("1")
+            println("1")
         } catch (e: Exception) {
-            this.println("2")
+            println("2")
         } finally {
-            this.println("99")
+            println("99")
         }
     }
 }

@@ -84,20 +84,27 @@ class SomeTest {
         testFromFile("attribute_expression.txt")
     }
 
-    @Disabled("`this.` generated")
     @Test
-    void call_function_without_braces() {
+    void call_static() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
     void main() {
-        println "hi"
+        parse()
+    }
+    private static int parse() {
+        return 123
     }
 }
 ---------------
 $DEFAULT_IMPORTS
 class ClassName {
+    companion object {
+        private fun parse(): Int {
+            return 123
+        }
+    }
     fun main() {
-        println("hi")
+        parse()
     }
 }
 """)

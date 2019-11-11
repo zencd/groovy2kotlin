@@ -21,6 +21,7 @@ The author uses:
 - bitwise
     - `~16` => `16.inv()`
 - Standard functions unavailable in Kt:
+    - `File.size()` => `File.length()`
     - `String.getBytes()` => `toByteArray()`
     - `String.replaceAll`
 
