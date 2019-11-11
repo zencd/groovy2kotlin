@@ -48,6 +48,9 @@ import java.nio.charset.StandardCharsets
  * COMPILES SOURCES PRODUCING CompilationUnit
  * {@link org.codehaus.groovy.ast.builder.AstBuilder} calls vvv
  * {@link org.codehaus.groovy.ast.builder.AstStringCompiler#compile}
+ *
+ * A VISITOR WITH MANY IMPLS
+ * {@link org.codehaus.groovy.ast.GroovyCodeVisitor}
  */
 class Main {
     static void main(String[] args) {
@@ -58,6 +61,13 @@ class Main {
     }
 
     static void main3() {
+        def x = new File('.')
+        println(x)
+        x = 'xxx'
+        if (System.currentTimeMillis() > 1000) {
+            x = 1L
+        }
+        println(x)
         //File srcFile = new File("src/Pacient.groovy")
         //File srcFile = new File("src/examples/SiteSupportEx.txt")
         //File srcFile = new File("groovy-samples/SaleItem.groovy")
