@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 
 import static org.junit.Assert.assertEquals
 
-class SomeTest {
+class MainTest {
 
     static String DEFAULT_IMPORTS = [
             'import java.lang.*',
@@ -81,7 +81,7 @@ class SomeTest {
         def text = file.getText('utf-8')
         def (String groovy, String kotlin) = splitGroovyAndKotlin(text)
         kotlin = kotlin.replace('$DEFAULT_IMPORTS', DEFAULT_IMPORTS)
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+        assertGeneratedKotlin(kotlin, DevMain.toKotlin(groovy))
     }
 
     @Test
@@ -118,7 +118,7 @@ class ClassName {
     }
 }
 """)
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+        assertGeneratedKotlin(kotlin, DevMain.toKotlin(groovy))
     }
 
     @Test
@@ -134,7 +134,7 @@ class ClassName {
     @Test
     @Disabled
     void empty_module() {
-        assertGeneratedKotlin('', Main.toKotlin(''))
+        assertGeneratedKotlin('', DevMain.toKotlin(''))
     }
 
     @Test
@@ -159,7 +159,7 @@ class ClassName {
 private val x = "hello"
 }
 """)
-        assertGeneratedKotlin(kotlin, Main.toKotlin(groovy))
+        assertGeneratedKotlin(kotlin, DevMain.toKotlin(groovy))
     }
 
     @Test

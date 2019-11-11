@@ -51,7 +51,7 @@ import java.nio.charset.StandardCharsets
  * A VISITOR WITH MANY IMPLS
  * {@link org.codehaus.groovy.ast.GroovyCodeVisitor}
  */
-class Main {
+class DevMain {
     static void main(String[] args) {
         //main1()
         //main2()

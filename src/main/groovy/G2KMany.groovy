@@ -1,5 +1,4 @@
 import groovy.io.FileType
-import org.codehaus.groovy.ast.ModuleNode
 
 import java.nio.charset.StandardCharsets
 
@@ -21,7 +20,7 @@ class G2KMany {
 
     static void translate(File srcFile, File dst) {
         def groovyText = srcFile.getText(StandardCharsets.UTF_8.name())
-        def kotlinText = Main.toKotlin(groovyText)
+        def kotlinText = DevMain.toKotlin(groovyText)
         dst.parentFile.mkdirs()
         dst.write(kotlinText, 'utf-8')
     }

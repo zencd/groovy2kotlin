@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 import static org.junit.Assert.assertEquals
 
 @Disabled("not a test actually but added for purposes of development")
-class TempTest {
+class DevTest {
     @Test
     void investAstBuilder() {
         String source = """def f = new File("."); return f"""
