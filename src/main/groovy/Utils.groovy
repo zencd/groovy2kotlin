@@ -167,6 +167,10 @@ class Utils {
         return s;
     }
 
+    static boolean isString(ClassNode type) {
+        return type == ClassHelper.STRING_TYPE || type == ClassHelper.GSTRING_TYPE
+    }
+
     static String translateOperator(String groovyOp) {
         def map = [
                 '+': '+',

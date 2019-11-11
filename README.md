@@ -24,6 +24,7 @@ The author uses:
     - `File.size()` => `File.length()`
     - `String.getBytes()` => `toByteArray()`
     - `String.replaceAll`
+    - `String.length()` => `String.length`
 
 ## todo requiring more analysis
 

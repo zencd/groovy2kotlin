@@ -257,11 +257,9 @@ class GroovyToKotlin {
      */
     void translateExpr(ConstructorCallExpression expr) {
         // todo see org.codehaus.groovy.ast.expr.ConstructorCallExpression.getText
-        //append("new ")
-        //def tt = expr.getType().getText()
         def tt = typeToKotlinString(expr.getType())
         out.append(tt)
-        out.append(expr.arguments.text)
+        translateExpr(expr.arguments)
     }
 
     void translateExpr(GStringExpression expr) {
@@ -292,9 +290,7 @@ class GroovyToKotlin {
 
     void translateExpr(ConstantExpression expr) {
         // todo use expr.constantName probably
-        // todo improve checking for string/gstring
-        def isString = expr.type == ClassHelper.STRING_TYPE
-        if (isString) {
+        if (Utils.isString(expr.type)) {
             out.append("\"${expr.value}\"")
         } else {
             out.append("${expr.value}")
