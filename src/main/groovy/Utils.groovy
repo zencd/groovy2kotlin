@@ -6,10 +6,13 @@ import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.Parameter
+import org.codehaus.groovy.ast.expr.ArgumentListExpression
+import org.codehaus.groovy.ast.expr.ClosureExpression
+import org.codehaus.groovy.ast.expr.MethodCallExpression
 
+import java.util.logging.Logger
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import java.util.logging.Logger
 
 class Utils {
     private static final Logger log = Logger.getLogger(this.name)
@@ -202,5 +205,16 @@ class Utils {
             log.warning("unrecognized groovy's binary op [$groovyOp]")
             return groovyOp
         }
+    }
+
+    static ClosureExpression tryFindSingleClosureArgument(MethodCallExpression expr) {
+        def args = expr.arguments
+        if (args instanceof ArgumentListExpression && args.expressions.size() == 1) {
+            def single = args.expressions[0]
+            if (single instanceof ClosureExpression) {
+                return single
+            }
+        }
+        return null
     }
 }

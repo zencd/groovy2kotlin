@@ -242,7 +242,15 @@ class GroovyToKotlin {
         } else {
             translateExpr(expr.method)
         }
-        translateExpr(expr.arguments)
+
+        def closureArg = Utils.tryFindSingleClosureArgument(expr)
+        if (closureArg) {
+            // let's omit the `()`
+            out.append(' ')
+            translateExpr(closureArg)
+        } else {
+            translateExpr(expr.arguments)
+        }
     }
 
     void translateExpr(ArgumentListExpression expr) {

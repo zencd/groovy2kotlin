@@ -20,12 +20,12 @@ class Temp {
     companion object {
     }
     fun main(args: List<String>) {
-        args.each({
+        args.each {
             println(it)
-        })
-        args.eachWithIndex({ s, i: Int ->
+        }
+        args.eachWithIndex { s, i: Int ->
             println(s)
             println(s)
-        })
+        }
     }
 }
