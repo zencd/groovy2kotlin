@@ -46,6 +46,11 @@ class Transformers {
         int numParams = Utils.getNumberOfFormalParams(method)
         if (method.name == 'toString' && typeStr == 'String' && numParams == 0) {
             method.putNodeMetaData(G2KConsts.OVERRIDING_METHOD, true)
+            return
+        }
+        if (method.name == 'hashCode' && typeStr == 'Int' && numParams == 0) {
+            method.putNodeMetaData(G2KConsts.OVERRIDING_METHOD, true)
+            return
         }
     }
 }

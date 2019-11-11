@@ -11,7 +11,7 @@ class ClassName {
     override fun toString(): String {
         return "xxx"
     }
-    fun hashCode(): Int {
+    override fun hashCode(): Int {
         return 123
     }
     fun equals(o: Object): Boolean {
