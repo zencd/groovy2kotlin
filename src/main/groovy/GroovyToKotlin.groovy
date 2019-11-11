@@ -236,6 +236,8 @@ class GroovyToKotlin {
     }
 
     void translateExpr(MethodCallExpression expr) {
+        def singleClosureArg = Utils.tryFindSingleClosureArgument(expr)
+
         if (!expr.implicitThis) {
             String spread = expr.spreadSafe ? "*" : ""; // todo support it
             String dereference = expr.safe ? "?" : "";
@@ -245,16 +247,19 @@ class GroovyToKotlin {
             out.append(".")
         }
         if (expr.method instanceof ConstantExpression) {
-            out.append(expr.method.text)
+            String name = expr.method.text
+            if (singleClosureArg) {
+                name = Utils.tryRewriteMethodNameWithSingleClosureArg(name)
+            }
+            out.append(name)
         } else {
             translateExpr(expr.method)
         }
 
-        def closureArg = Utils.tryFindSingleClosureArgument(expr)
-        if (closureArg) {
+        if (singleClosureArg) {
             // let's omit the `()`
             out.append(' ')
-            translateExpr(closureArg)
+            translateExpr(singleClosureArg)
         } else {
             translateExpr(expr.arguments)
         }

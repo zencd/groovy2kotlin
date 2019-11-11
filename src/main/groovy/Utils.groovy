@@ -217,4 +217,17 @@ class Utils {
         }
         return null
     }
+
+    /**
+     * Try to rename some standard Groovy methods to Kotlin's analogs.
+     * Not a strict transformation while there is no type info available now.
+     * Example:
+     * List.each {} -> List.forEach {}
+     */
+    static String tryRewriteMethodNameWithSingleClosureArg(String groovyMethod) {
+        def groovyToKotlinMethods = [
+                'each': 'forEach',
+        ]
+        return groovyToKotlinMethods[groovyMethod] ?: groovyMethod
+    }
 }

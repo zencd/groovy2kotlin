@@ -49,7 +49,7 @@ Others maybe supported but was not tested.
     - `String.getBytes()` → `.toByteArray()`
     - `String.replaceAll`
     - `String.length()` → `.length`
-    - `List.each` → `.forEach`
+    - `List.eachWithIndex` → `.forEachIndexed` (params swapped!)
 - Groovy's shortcuts:
     - `File.text`, `String.execute`, etc
 
