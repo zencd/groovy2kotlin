@@ -1,9 +1,11 @@
-import groovy.transform.CompileStatic
-
-@CompileStatic
 class Temp {
-    void main() {
-        1 ? 2 : 3
-        1 ?: 2
+    void main(String[] args) {
+        args.each {
+            println(it)
+        }
+        args.eachWithIndex { s, int i ->
+            println(s)
+            println(s)
+        }
     }
 }

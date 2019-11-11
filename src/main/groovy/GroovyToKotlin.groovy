@@ -4,11 +4,13 @@ import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
+import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.AttributeExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.BooleanExpression
 import org.codehaus.groovy.ast.expr.CastExpression
+import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ClosureListExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.ConstructorCallExpression
@@ -391,6 +393,30 @@ class GroovyToKotlin {
         translateExpr(expr.trueExpression)
         out.append(' ?: ')
         translateExpr(expr.falseExpression)
+    }
+
+    void translateExpr(ClosureExpression expr) {
+        if (expr.parameterSpecified) {
+            out.append('{ ')
+            expr.parameters.eachWithIndex { Parameter param, int i ->
+                if (i > 0) out.append(', ')
+                out.append(param.name)
+                if (!param.dynamicTyped) {
+                    out.append(': ')
+                    out.append(typeToKotlinString(param.originType))
+                }
+            }
+            out.appendLn(' ->')
+            out.push()
+            def block = expr.code as BlockStatement
+            for (Statement aStmt : block.statements) {
+                translateStatement(aStmt)
+            }
+            out.pop()
+            out.newLine('}')
+        } else {
+            translateStatement(expr.code)
+        }
     }
 
     void translateExpr(Expression expr) {

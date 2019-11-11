@@ -60,6 +60,11 @@ class SomeTest {
         testFromFile("ternary_op.txt")
     }
 
+    @Test
+    void "closure"() {
+        testFromFile("closure.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {

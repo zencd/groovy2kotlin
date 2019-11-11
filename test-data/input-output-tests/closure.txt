@@ -1,0 +1,31 @@
+class Temp {
+    void main(List<String> args) {
+        args.each {
+            println(it)
+        }
+        args.eachWithIndex { s, int i ->
+            println(s)
+            println(s)
+        }
+    }
+}
+---------
+import java.lang.*
+import java.util.*
+import java.io.*
+import java.net.*
+import java.math.BigInteger
+import java.math.BigDecimal
+class Temp {
+    companion object {
+    }
+    fun main(args: List<String>) {
+        args.each({
+            println(it)
+        })
+        args.eachWithIndex({ s, i: Int ->
+            println(s)
+            println(s)
+        })
+    }
+}
