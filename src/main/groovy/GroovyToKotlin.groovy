@@ -10,6 +10,7 @@ import org.codehaus.groovy.ast.expr.AttributeExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.BooleanExpression
 import org.codehaus.groovy.ast.expr.CastExpression
+import org.codehaus.groovy.ast.expr.ClassExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ClosureListExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
@@ -353,8 +354,12 @@ class GroovyToKotlin {
 
     @DynamicDispatch
     void translateExpr(NotExpression expr) {
+        // XXX groovy parser omits parenthesis expression `()`, so let's add it by ourselves here
         out.append("!")
+        boolean surroundWithParenthesis = expr.expression instanceof BinaryExpression
+        if (surroundWithParenthesis) out.append("(")
         translateExpr(expr.expression)
+        if (surroundWithParenthesis) out.append(")")
     }
 
     @DynamicDispatch
@@ -523,6 +528,12 @@ class GroovyToKotlin {
             }
             out.append("EXPR_NOT_IMPLEMENTED('org.codehaus.groovy.ast.expr.TupleExpression')")
         }
+    }
+
+    @DynamicDispatch
+    void translateExpr(ClassExpression expr) {
+        String typeStr = typeToKotlinString(expr.type)
+        out.append(typeStr)
     }
 
     @DynamicDispatch

@@ -80,6 +80,11 @@ class MainTest {
         testFromFile("method_rewrite.txt")
     }
 
+    @Test
+    void "unary_expr"() {
+        testFromFile("unary_expr.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {
@@ -252,7 +257,7 @@ private val x = "hello"
     static String normalize(String s) {
         def list = Arrays.asList(s.split("\\r?\\n"))
         list = list.collect {
-            it.replace(' {2,}', ' ')
+            it.replaceAll(' {2,}', ' ')
         }.collect {
             it.trim()
         }.findAll {

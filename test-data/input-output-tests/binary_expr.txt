@@ -1,6 +1,7 @@
 class Temp {
     void main(String str) {
         str[0]
+        str instanceof String
     }
 }
 ------------
@@ -10,5 +11,6 @@ class Temp {
     }
     fun main(str: String) {
         str[0]
+        str is String
     }
 }

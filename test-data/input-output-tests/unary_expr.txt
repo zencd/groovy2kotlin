@@ -1,0 +1,16 @@
+class Temp {
+    void main() {
+        if (!true) nop()
+        if (!(1 == 2)) nop() // make sure the parenthesises stays correct, because the Groovy parser omits them
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class Temp {
+    companion object {
+    }
+    fun main() {
+        if (!true) nop()
+        if (!(1 == 2)) nop()
+    }
+}
