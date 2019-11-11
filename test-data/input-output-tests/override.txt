@@ -14,7 +14,7 @@ class ClassName {
     override fun hashCode(): Int {
         return 123
     }
-    fun equals(o: Object): Boolean {
+    override fun equals(o: Any?): Boolean {
         return false
     }
 }

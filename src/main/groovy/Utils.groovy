@@ -41,8 +41,9 @@ class Utils {
     }
 
     static String getParameterText(Parameter node) {
+        def predefinedKotlinType = node.getNodeMetaData(G2KConsts.AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
         String name = node.getName() == null ? "<unknown>" : node.getName()
-        String type = typeToKotlinString(node.getType())
+        String type = predefinedKotlinType ?: typeToKotlinString(node.getType())
         if (node.getInitialExpression() != null) {
             return "$name: $type = " + node.getInitialExpression().getText()
         }
@@ -113,7 +114,7 @@ class Utils {
 
     static String getMethodModifierString(MethodNode method) {
         String javaMods = getModifierString(method.modifiers, false, false)
-        String override = method.getNodeMetaData(G2KConsts.OVERRIDING_METHOD) == true ? G2KConsts.KOTLIN_OVERRIDE_KEYWORD : ''
+        String override = method.getNodeMetaData(G2KConsts.AST_NODE_META_OVERRIDING_METHOD) == true ? G2KConsts.KOTLIN_OVERRIDE_KEYWORD : ''
         return [override, javaMods].findAll { it }.join(' ')
     }
 

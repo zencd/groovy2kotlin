@@ -45,12 +45,18 @@ class Transformers {
         def typeStr = Utils.typeToKotlinString(method.returnType)
         int numParams = Utils.getNumberOfFormalParams(method)
         if (method.name == 'toString' && typeStr == 'String' && numParams == 0) {
-            method.putNodeMetaData(G2KConsts.OVERRIDING_METHOD, true)
-            return
+            method.putNodeMetaData(G2KConsts.AST_NODE_META_OVERRIDING_METHOD, true)
         }
-        if (method.name == 'hashCode' && typeStr == 'Int' && numParams == 0) {
-            method.putNodeMetaData(G2KConsts.OVERRIDING_METHOD, true)
-            return
+        else if (method.name == 'hashCode' && typeStr == 'Int' && numParams == 0) {
+            method.putNodeMetaData(G2KConsts.AST_NODE_META_OVERRIDING_METHOD, true)
+        }
+        else if (method.name == 'equals' && typeStr == 'Boolean' && numParams == 1) {
+            def param0 = method.parameters[0]
+            String paramType = Utils.typeToKotlinString(param0.type)
+            if (paramType == 'Object') {
+                method.putNodeMetaData(G2KConsts.AST_NODE_META_OVERRIDING_METHOD, true)
+                param0.putNodeMetaData(G2KConsts.AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING, 'Any?')
+            }
         }
     }
 }

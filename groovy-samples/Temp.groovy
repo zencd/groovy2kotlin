@@ -1,7 +1,5 @@
 class Temp {
-    String main() {
-    }
-    String toString() {
+    boolean equals(Object o) {
         return "xxx"
     }
 }

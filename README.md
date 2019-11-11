@@ -12,7 +12,7 @@ libs to parse source text into a well designed AST, then the tree is traversed a
 translated to Kotlin by `GroovyToKotlin.groovy`. Gonna add type inference later
 because it's required for certain transformations.
 
-| features | features
+| Covered | Covered
 |----------|------------- 
 | ✔ Control structures | ✔ Most of expressions
 | ✔ Classes | ✔ Bitwise expressions
@@ -41,30 +41,29 @@ Others may be supported but was not tested.
 - Probably translate `def` → `Any` in formal params, not `Object`
 - Kotlin disallows use of `Map`/`List` without generics specified explicitly
 - Groovy allows implicit conversions like `String s = 1L`
-- Groovy's regexps `/.+/`
-- Arrays: `String[]` → `Array<String>`
+- Groovy's regexps without quotes: `/.+/`
 - Mapping:
+    - `String[]` → `Array<String>`
     - `Some.class` → `Some::class.java`
     - `~16` → `16.inv()`
     - `File.size()` → `.length()`
     - `String.getBytes()` → `.toByteArray()`
     - `String.length()` → `.length`
     - `List.eachWithIndex` → `.forEachIndexed` (params swapped!)
-- Correct signatures:
-    - `equals` → `override fun equals(other: Any?): Boolean`
-    - `hashCode` → `override fun hashCode(): Int`
-    - `toString` → `override fun toString(): String`
 - Groovy's shortcuts:
     - `File.text`, `String.execute`, etc
 
 ## todo 2, requires type inference
 
 - Groovy's special use of bitwise operators on lists, streams, etc
-- Translate Groovy's implicit `return`
+- Translate Groovy's implicit `return` (solved for certain cases)
 - "Groovy truth" can't be translated straight
-- Kotlin's `open` and `override` (Kotlin is strict about their presence/absence)
+- Kotlin's `open` and `override` (a common, type-aware algorithm)
 
 ## done
 
 - `String.replaceAll` → `"aaa".replace("a", "x")`
 - local vars without an initializer
+- `equals` → `override fun equals(other: Any?): Boolean`
+- `hashCode` → `override fun hashCode(): Int`
+- `toString` → `override fun toString(): String`
