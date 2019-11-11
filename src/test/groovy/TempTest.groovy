@@ -24,6 +24,15 @@ class TempTest {
         def stop = 0
     }
 
+    @Test
+    void invest2() {
+        String source = """
+List<String> lis = new ArrayList<>()
+"""
+        def nodes = new AstBuilder().buildFromString(source)
+        def stop = 0
+    }
+
     //@Test
     //void xxx() {
     //    //URL[] urls = this.getExtraJarUrls(); // read JARs from a directory relative to the DSL script

@@ -55,6 +55,11 @@ class SomeTest {
         testFromFile("bitwise_expr.txt")
     }
 
+    @Test
+    void "ternary_op"() {
+        testFromFile("ternary_op.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {

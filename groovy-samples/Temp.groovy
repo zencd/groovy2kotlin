@@ -1,6 +1,9 @@
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class Temp {
     void main() {
-        //def f = new File('SOME_STRING')
-        //f.size()
+        1 ? 2 : 3
+        1 ?: 2
     }
 }

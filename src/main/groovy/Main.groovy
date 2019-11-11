@@ -14,7 +14,6 @@ import org.codehaus.groovy.antlr.treewalker.Visitor
 import org.codehaus.groovy.antlr.treewalker.VisitorAdapter
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.ResolveVisitor
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.runtime.ResourceGroovyMethods
 import org.codehaus.groovy.syntax.Reduction

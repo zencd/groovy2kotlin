@@ -1,6 +1,5 @@
 import org.codehaus.groovy.antlr.SourceBuffer
 import org.codehaus.groovy.ast.AnnotationNode
-import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.MethodNode
@@ -14,6 +13,7 @@ import org.codehaus.groovy.ast.expr.ClosureListExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.ConstructorCallExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
+import org.codehaus.groovy.ast.expr.ElvisOperatorExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.GStringExpression
 import org.codehaus.groovy.ast.expr.ListExpression
@@ -23,6 +23,7 @@ import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.NotExpression
 import org.codehaus.groovy.ast.expr.PostfixExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
+import org.codehaus.groovy.ast.expr.TernaryExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.CatchStatement
@@ -34,13 +35,13 @@ import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 
-import static Utils.makeImportText
-import static Utils.typeToKotlinString
-import static Utils.getModifierString
 import static Utils.getJavaDocCommentsBeforeNode
+import static Utils.getModifierString
 import static Utils.getParametersText
 import static Utils.isFinal
 import static Utils.isStatic
+import static Utils.makeImportText
+import static Utils.typeToKotlinString
 
 class GroovyToKotlin {
     ModuleNode module
@@ -278,9 +279,11 @@ class GroovyToKotlin {
     }
 
     void translateExpr(BinaryExpression expr) {
+        def left = expr.leftExpression
         translateExpr(expr.leftExpression)
         def ktOp = Utils.translateOperator(expr.operation.text)
         out.append(" ${ktOp} ")
+        def meta = expr.getNodeMetaData()
         translateExpr(expr.rightExpression)
     }
 
@@ -373,6 +376,21 @@ class GroovyToKotlin {
         }
 
         int stop = 0
+    }
+
+    void translateExpr(TernaryExpression expr) {
+        out.append(' if (')
+        translateExpr(expr.booleanExpression)
+        out.append(') ')
+        translateExpr(expr.trueExpression)
+        out.append(' else ')
+        translateExpr(expr.falseExpression)
+    }
+
+    void translateExpr(ElvisOperatorExpression expr) {
+        translateExpr(expr.trueExpression)
+        out.append(' ?: ')
+        translateExpr(expr.falseExpression)
     }
 
     void translateExpr(Expression expr) {
