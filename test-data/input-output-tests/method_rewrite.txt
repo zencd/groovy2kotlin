@@ -1,0 +1,14 @@
+class Temp {
+    void main(List<String> args) {
+        'aaa'.replaceAll('a', 'x')
+    }
+}
+---------------
+$DEFAULT_IMPORTS
+class Temp {
+    companion object {
+    }
+    fun main(args: List<String>) {
+        "aaa".replace("a", "x")
+    }
+}

@@ -207,6 +207,16 @@ class Utils {
         }
     }
 
+    static Integer getNumberOfActualParams(MethodCallExpression expr) {
+        def args = expr.arguments
+        if (args instanceof ArgumentListExpression) {
+            return args.expressions.size()
+        } else {
+            log.warning("expecting arguments as ArgumentListExpression")
+            return 0
+        }
+    }
+
     static ClosureExpression tryFindSingleClosureArgument(MethodCallExpression expr) {
         def args = expr.arguments
         if (args instanceof ArgumentListExpression && args.expressions.size() == 1) {

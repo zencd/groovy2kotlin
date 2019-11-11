@@ -47,7 +47,6 @@ Others maybe supported but was not tested.
     - `~16` → `16.inv()`
     - `File.size()` → `.length()`
     - `String.getBytes()` → `.toByteArray()`
-    - `String.replaceAll`
     - `String.length()` → `.length`
     - `List.eachWithIndex` → `.forEachIndexed` (params swapped!)
 - Groovy's shortcuts:
@@ -59,3 +58,7 @@ Others maybe supported but was not tested.
 - Translate Groovy's implicit `return`
 - "Groovy truth" can't be translated straight
 - Kotlin's `open` and `override` (Kotlin is strict about their presence/absence)
+
+## done
+
+`String.replaceAll` → `"aaa".replace("a", "x")`

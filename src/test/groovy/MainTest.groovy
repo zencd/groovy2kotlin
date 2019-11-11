@@ -75,6 +75,11 @@ class MainTest {
         testFromFile("binary_expr.txt")
     }
 
+    @Test
+    void "method_rewrite"() {
+        testFromFile("method_rewrite.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {

@@ -238,6 +238,7 @@ class GroovyToKotlin {
     @DynamicDispatch
     void translateExpr(MethodCallExpression expr) {
         def singleClosureArg = Utils.tryFindSingleClosureArgument(expr)
+        def numParams = Utils.getNumberOfActualParams(expr)
 
         if (!expr.implicitThis) {
             String spread = expr.spreadSafe ? "*" : ""; // todo support it
@@ -249,11 +250,15 @@ class GroovyToKotlin {
         }
         if (expr.method instanceof ConstantExpression) {
             String name = expr.method.text
+            if (name == 'replaceAll' && numParams == 2) {
+                name = 'replace' // Kotlin has no replaceAll(), but replace() looks the same
+            }
             if (singleClosureArg) {
                 name = Utils.tryRewriteMethodNameWithSingleClosureArg(name)
             }
             out.append(name)
         } else {
+            // no clue what is the case
             translateExpr(expr.method)
         }
 
