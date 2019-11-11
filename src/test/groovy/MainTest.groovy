@@ -65,6 +65,11 @@ class MainTest {
         testFromFile("closure.txt")
     }
 
+    @Test
+    void "named_args"() {
+        testFromFile("named_args.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {

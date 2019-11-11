@@ -22,10 +22,12 @@ import org.codehaus.groovy.ast.expr.ListExpression
 import org.codehaus.groovy.ast.expr.MapEntryExpression
 import org.codehaus.groovy.ast.expr.MapExpression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
+import org.codehaus.groovy.ast.expr.NamedArgumentListExpression
 import org.codehaus.groovy.ast.expr.NotExpression
 import org.codehaus.groovy.ast.expr.PostfixExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.TernaryExpression
+import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.CatchStatement
@@ -37,6 +39,8 @@ import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 
+import java.util.logging.Logger
+
 import static Utils.getJavaDocCommentsBeforeNode
 import static Utils.getModifierString
 import static Utils.getParametersText
@@ -46,6 +50,9 @@ import static Utils.makeImportText
 import static Utils.typeToKotlinString
 
 class GroovyToKotlin {
+
+    private static final Logger log = Logger.getLogger(this.name)
+
     ModuleNode module
     //PrintStream out
     int indent = 0
@@ -427,8 +434,52 @@ class GroovyToKotlin {
         }
     }
 
+    /**
+     * Used inside a TupleExpression at least.
+     */
+    void translateExpr(NamedArgumentListExpression expr) {
+        //translateExpr(expr as MapExpression)
+        out.append('(')
+        expr.mapEntryExpressions.eachWithIndex { MapEntryExpression entry, int i ->
+            if (!(entry.keyExpression instanceof ConstantExpression)) {
+                log.warning("expecting ConstantExpression. not ${entry.keyExpression?.class?.name}")
+            }
+            if (i > 0) out.append(', ')
+            out.append(entry.keyExpression.text)
+            out.append('=')
+            translateExpr(entry.valueExpression)
+            int stop = 0
+        }
+        out.append(')')
+    }
+
+    /**
+     * At least describes named call arguments like `funk(a: 2, b: 3)` - including parenthesises.
+     * Should be translated to `funk(a=2, b=3)`.
+     */
+    void translateExpr(TupleExpression expr) {
+        NamedArgumentListExpression nale = null
+        if (expr.expressions?.size() == 1) {
+            def firstExpr = expr.expressions[0]
+            if (firstExpr instanceof NamedArgumentListExpression) {
+                nale = firstExpr
+            }
+        }
+
+        if (nale) {
+            translateExpr(nale as NamedArgumentListExpression)
+        } else {
+            log.warning("expecting a single NamedArgumentListExpression expression")
+            expr.expressions.eachWithIndex { Expression anExpr, int i ->
+                if (i > 0) out.append(', ')
+            }
+            out.append("EXPR_NOT_IMPLEMENTED('org.codehaus.groovy.ast.expr.TupleExpression')")
+        }
+    }
+
     void translateExpr(Expression expr) {
-        out.append("EXPR_NOT_IMPL(${expr.class.name})")
+        assert expr != null
+        out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
     }
 
     void translateStatement(ExpressionStatement stmt) {

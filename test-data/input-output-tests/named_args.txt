@@ -1,0 +1,18 @@
+class Temp {
+    int age
+    String name
+    void main(List<String> args) {
+        new Temp(age: 21, name: "Jo")
+    }
+}
+-----------
+$DEFAULT_IMPORTS
+class Temp {
+    companion object {
+    }
+    var age: Int
+    var name: String
+    fun main(args: List<String>) {
+        Temp(age=21, name="Jo")
+    }
+}

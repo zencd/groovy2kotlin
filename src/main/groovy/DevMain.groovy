@@ -60,13 +60,6 @@ class DevMain {
     }
 
     static void main3() {
-        def x = new File('.')
-        println(x)
-        x = 'xxx'
-        if (System.currentTimeMillis() > 1000) {
-            x = 1L
-        }
-        println(x)
         //File srcFile = new File("src/Pacient.groovy")
         //File srcFile = new File("src/examples/SiteSupportEx.txt")
         //File srcFile = new File("groovy-samples/SaleItem.groovy")

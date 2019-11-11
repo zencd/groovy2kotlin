@@ -1,11 +1,7 @@
 class Temp {
-    void main(String[] args) {
-        args.each {
-            println(it)
-        }
-        args.eachWithIndex { s, int i ->
-            println(s)
-            println(s)
-        }
+    int age
+    String name
+    void main(List<String> args) {
+        new Temp(age: 21, name: "Jo")
     }
 }

@@ -14,9 +14,9 @@ because it's required for certain transformations.
 
 | features | features
 |----------|------------- 
-| ✔ Control structures | ✔ Expressions
+| ✔ Control structures | ✔ Most of expressions
 | ✔ Classes | ✔ Bitwise expressions
-| ✔ Closures | ✔ Static members grouped within a `companion object`
+| ✔ Closures | ✔ Static members grouped within companion
 | ✔ Groovy's implicit imports |
 
 ## requirements
@@ -41,6 +41,7 @@ Others maybe supported but was not tested.
 - Kotlin disallows use of `Map`/`List` without generics specified explicitly
 - Groovy allows implicit conversions like `String s = 1L`
 - Groovy's regexps `/.+/`
+- Arrays: `String[]` → `Array<String>`
 - Mapping:
     - `Some.class` → `Some::class.java`
     - `~16` → `16.inv()`
