@@ -1,7 +1,7 @@
 class Bitwise {
     void bitwise(x) {
-        x = 16 || 32
-        x = 16 && 32
+        x = 16 | 32
+        x = 16 & 32
         x = 16 << 32
         x = 16 >> 32
         x = 16 >>> 32
