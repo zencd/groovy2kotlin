@@ -1,5 +1,6 @@
 class Temp {
     int main() {
-        new File('SOME_STRING').size()
+        def f = new File('SOME_STRING')
+        f.size()
     }
 }

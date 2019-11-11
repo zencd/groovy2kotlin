@@ -44,6 +44,10 @@ import java.nio.charset.StandardCharsets
  *
  * SOME CLASS RESOLVER
  * {@link org.codehaus.groovy.control.ResolveVisitor}
+ *
+ * COMPILES SOURCES PRODUCING CompilationUnit
+ * {@link org.codehaus.groovy.ast.builder.AstBuilder} calls vvv
+ * {@link org.codehaus.groovy.ast.builder.AstStringCompiler#compile}
  */
 class Main {
     static void main(String[] args) {
