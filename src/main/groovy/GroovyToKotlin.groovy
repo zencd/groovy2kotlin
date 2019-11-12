@@ -171,14 +171,17 @@ class GroovyToKotlin {
             out.append(mods + " ")
         }
         def varOrVal = isFinal(field.modifiers) ? 'val' : 'var'
+        def fieldType = field.type
         out.append("$varOrVal ${field.name}")
         if (!field.dynamicTyped) {
-            def t = typeToKotlinString(field.type)
+            def t = typeToKotlinString(fieldType)
             out.append(": $t")
         }
         if (field.initialValueExpression != null) {
             out.append(" = ")
-            def xxx = field.initialValueExpression
+            if (Utils.isArray(fieldType)) {
+                field.initialValueExpression.putNodeMetaData(G2KConsts.AST_NODE_META_PRODUCE_ARRAY, true)
+            }
             translateExpr(field.initialValueExpression)
         }
         out.lineBreak()

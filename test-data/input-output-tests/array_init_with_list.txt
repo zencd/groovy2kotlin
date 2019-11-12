@@ -1,6 +1,7 @@
 class Temp {
+    int[] field = [1,2,3]
     void main() {
-        String[] res = [ 'xxx' ]
+        String[] local = [ 'xxx' ]
     }
 }
 ------------
@@ -8,8 +9,8 @@ $DEFAULT_IMPORTS
 class Temp {
     companion object {
     }
-
+    var field: Array<Int> = arrayOf(1, 2, 3)
     fun main() {
-        val res: Array<String> = arrayOf("xxx")
+        val local: Array<String> = arrayOf("xxx")
     }
 }
