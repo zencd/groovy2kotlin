@@ -1,0 +1,18 @@
+class Temp {
+    static def obj = new ArrayList<String>() {
+        String toString() {
+            return "xxx"
+        }
+    }
+}
+------------
+$DEFAULT_IMPORTS
+open class Temp {
+    companion object {
+        var obj = object : ArrayList<String>() {
+            override fun toString(): String {
+                return "xxx"
+            }
+        }
+    }
+}

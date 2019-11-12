@@ -3,6 +3,7 @@ import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
+import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.Parameter
@@ -96,7 +97,10 @@ class GroovyToKotlin {
         translateImports(module)
         out.newLineCrlf("")
         for (cls in module.classes) {
-            translateClass(cls)
+            if (!Utils.isAnonymous(cls)) {
+                // anonymous classes gonna be emitted on demand
+                translateClass(cls)
+            }
         }
     }
 
@@ -132,10 +136,14 @@ class GroovyToKotlin {
 
         def classOrInterface = classNode.interface ? "interface" : "class"
 
-        out.newLineCrlf("${modStrPadded}${classOrInterface} ${classNode.nameWithoutPackage}${extendPadded} {")
-        out.push()
+        out.newLine("${modStrPadded}${classOrInterface} ${classNode.nameWithoutPackage}${extendPadded} ")
+        translateClassBody(classNode)
+    }
 
-        if (!classNode.interface) {
+    private void translateClassBody(ClassNode classNode) {
+        out.appendLn("{")
+        out.push()
+        if (!classNode.interface && !Utils.isAnonymous(classNode)) {
             out.newLineCrlf("companion object {")
             def classCompanionPiece = out.addPiece('companion-piece')
             assert !classCompanions.containsKey(classNode)
@@ -363,9 +371,20 @@ class GroovyToKotlin {
     @DynamicDispatch
     void translateExpr(ConstructorCallExpression expr) {
         // todo see org.codehaus.groovy.ast.expr.ConstructorCallExpression.getText
-        def tt = typeToKotlinString(expr.getType())
-        out.append(tt)
-        translateExpr(expr.arguments)
+        def grType = expr.getType()
+        if (grType instanceof InnerClassNode) {
+            def sc = grType.superClass
+            def scKtType = typeToKotlinString(sc)
+            append("object : ")
+            append(scKtType)
+            translateExpr(expr.arguments)
+            append(" ")
+            translateClassBody(grType)
+        } else {
+            def ktType = typeToKotlinString(grType)
+            append(ktType)
+            translateExpr(expr.arguments)
+        }
     }
 
     @DynamicDispatch

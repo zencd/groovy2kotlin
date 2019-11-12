@@ -33,7 +33,7 @@ Others may be supported but was not tested.
 
 ## Todo 1
 
-- Anonymous class instantiation looks too internal: `x = watch.Utils$1()`
+- Nested, inner classes
 - Preserve javadoc (there is a way)
 - Replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
 - Probably translate `def` → `Any` in formal params, not `Object`
@@ -74,3 +74,4 @@ Others may be supported but was not tested.
 - ✔ Distinct classes and interfaces
 - ✔ Kotlin disallows use of `Map`/`List` without generics specified explicitly
 - ✔ Groovy operator `in`
+- ✔ anonymous classes 

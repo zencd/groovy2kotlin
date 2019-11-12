@@ -1,5 +1,7 @@
-class Temp {
-    void main() {
-        1 in []
+class Temp1 {
+    static def obj = new ArrayList<String>() {
+        String toString() {
+            return "xxx"
+        }
     }
 }

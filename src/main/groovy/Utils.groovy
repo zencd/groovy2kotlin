@@ -5,6 +5,7 @@ import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ImportNode
+import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
@@ -266,6 +267,10 @@ class Utils {
             return expr.value == null
         }
         return false
+    }
+
+    static boolean isAnonymous(ClassNode classNode) {
+        return classNode instanceof InnerClassNode && classNode.anonymous
     }
 
     static String tryCutFromEnd(String s, String pattern) {
