@@ -1,5 +1,4 @@
 class Temp {
-    boolean equals(Object o) {
-        return "xxx"
+    void main(String[] o) {
     }
 }

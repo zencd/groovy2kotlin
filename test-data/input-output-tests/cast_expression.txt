@@ -1,6 +1,7 @@
 ﻿class ClassName {
     int main() {
-        return 11 as int
+        11 as int
+        (int)22
     }
 }
 ---------------
@@ -9,6 +10,7 @@ class ClassName {
     companion object {
     }
     fun main(): Int {
-        return (Int)11
+        11 as Int
+        22 as int
     }
 }

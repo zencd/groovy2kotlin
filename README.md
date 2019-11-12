@@ -33,6 +33,7 @@ Others may be supported but was not tested.
 
 ## todo 1
 
+- Generated fields `var url: String` must be initialized
 - Range expression
 - Distinct classes and interfaces
 - Extend/implement
@@ -50,6 +51,7 @@ Others may be supported but was not tested.
     - `String.getBytes()` → `.toByteArray()`
     - `String.length()` → `.length`
     - `List.eachWithIndex` → `.forEachIndexed` (params swapped!)
+    - `a.is(b)` → `a === b`
 - Groovy's shortcuts:
     - `File.text`, `String.execute`, etc
 

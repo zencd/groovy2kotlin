@@ -1,0 +1,14 @@
+class Temp {
+    void main(String[] o) {
+        String[][] arr = null
+    }
+}
+------------
+$DEFAULT_IMPORTS
+class Temp {
+    companion object {
+    }
+    fun main(o: Array<String>) {
+        val arr: Array<Array<String>> = null
+    }
+}

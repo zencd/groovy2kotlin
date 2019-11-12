@@ -76,7 +76,9 @@ class Utils {
     }
 
     static String typeToKotlinString(ClassNode classNode) {
-        def clazz = classNode.clazz
+        if (classNode.componentType != null) {
+            return "Array<${typeToKotlinString(classNode.componentType)}>"
+        }
 
         def groovyTypeToKotlin = [
                 (ClassHelper.VOID_TYPE)   : 'Void',
@@ -106,10 +108,10 @@ class Utils {
         def kotlinType = groovyTypeToKotlin[classNode]
         if (kotlinType) {
             return kotlinType
-        } else {
-            def s = classNode.toString()
-            return s.replace(' <', '<') // todo lame solution
         }
+
+        def s = classNode.toString()
+        return s.replace(' <', '<') // todo lame solution
     }
 
     static String getMethodModifierString(MethodNode method) {

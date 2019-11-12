@@ -90,6 +90,11 @@ class MainTest {
         testFromFile("override.txt")
     }
 
+    @Test
+    void "arrays"() {
+        testFromFile("arrays.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {
