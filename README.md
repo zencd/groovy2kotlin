@@ -12,11 +12,11 @@ libs to parse source text into a well designed AST, then the tree is traversed a
 translated to Kotlin. It's planned to add type inference to AST to allow more
 sophisticated transformations.
 
-| Covered | Covered
+| Covered  | Covered
 |----------|------------- 
 | ✔ Control structures | ✔ Expressions
-| ✔ Classes | ✔ Bitwise expressions
-| ✔ Closures | ✔ Static members grouped within companion
+| ✔ Classes            | ✔ Bitwise expressions
+| ✔ Closures           | ✔ Static members grouped within companion
 | ✔ Groovy's implicit imports | ✔ Groovy's standard functions (WIP)
 
 ## Requirements
@@ -38,7 +38,7 @@ Others may be supported but was not tested.
 
 - `BulkProcessor.groovy` - converts a directory with Groovy files recursively
 - `GroovyToKotlin.groovy` - the translator engine
-- `test-data/input-output-tests` - a set of input/expected tests showing how the things gets translated
+- `test-data/input-output-tests` - a set of input/output tests showing how the things gets translated
 
 ## Todo 1
 
@@ -49,9 +49,8 @@ Others may be supported but was not tested.
 - Groovy allows implicit conversions like `String s = 1L`
 - Groovy regexps without quotes: `/.+/`
 - Groovy regex operator `==~`
-- Groovy regex operator `<=>`
+- Groovy comparison operator `<=>`
 - Mapping:
-    - `String[]` → `Array<String>`
     - `Some.class` → `Some::class.java`
     - `~16` → `16.inv()`
     - `File.size()` → `.length()`
@@ -85,3 +84,4 @@ Others may be supported but was not tested.
 - ✔ Groovy operator `in`
 - ✔ anonymous classes 
 - ✔ Inner classes: static and non-static
+- ✔ String[]` → `Array<String>`
