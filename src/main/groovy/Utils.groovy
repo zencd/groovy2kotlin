@@ -106,6 +106,16 @@ class Utils {
         ]
 
         def kotlinType = groovyTypeToKotlin[classNode]
+
+        if (!kotlinType && classNode.genericsTypes == null) {
+            // Kotlin prohibits non-generics List and Map
+            // so rewriting them to List<Any> and Map<Any,Any>
+            kotlinType = [
+                    'List': 'List<Any>',
+                    'Map': 'Map<Any, Any>',
+            ].get(classNode.name)
+        }
+
         if (kotlinType) {
             return kotlinType
         }

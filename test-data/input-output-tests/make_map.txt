@@ -8,7 +8,7 @@ $DEFAULT_IMPORTS
 class ClassName {
     companion object {
     }
-    fun makeMap(): Map {
+    fun makeMap(): Map<Any, Any> {
         return mapOf(
             "name" to 11,
             "age" to 22

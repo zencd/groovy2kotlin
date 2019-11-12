@@ -7,19 +7,19 @@ but a significant amount of work can be saved for free.
 
 Started 2019-11-08 by [zencd](https://github.com/zencd) in order to convert a project of mine
 because I've not found any existing tools (and it's easy to write one).
-The current implementation is very simple: it uses Groovy's internal
+The current implementation is simple: it uses Groovy's internal
 libs to parse source text into a well designed AST, then the tree is traversed and
 translated to Kotlin by `GroovyToKotlin.groovy`. Gonna add type inference later
 because it's required for certain transformations.
 
 | Covered | Covered
 |----------|------------- 
-| ✔ Control structures | ✔ Most of expressions
+| ✔ Control structures | ✔ Expressions
 | ✔ Classes | ✔ Bitwise expressions
 | ✔ Closures | ✔ Static members grouped within companion
 | ✔ Groovy's implicit imports | ✔ Groovy's standard functions (WIP)
 
-## requirements
+## Requirements
 
 - JDK 1.8 (for running the tool)
 - Groovy 2.5.8 (for running the tool)
@@ -27,11 +27,11 @@ because it's required for certain transformations.
 
 Others may be supported but was not tested.
 
-## using the tool
+## Use
 
     git clone "https://github.com/zencd/groovy2kotlin"
 
-## todo 1
+## Todo 1
 
 - Generated fields `var url: String` must be initialized
 - Range expression
@@ -56,18 +56,18 @@ Others may be supported but was not tested.
 - Groovy's shortcuts:
     - `File.text`, `String.execute`, etc
 
-## todo 2, requires type inference
+## Todo 2, requires type inference
 
 - Groovy's special use of bitwise operators on lists, streams, etc
 - Translate Groovy's implicit `return` (solved for certain cases)
 - "Groovy truth" can't be translated straight
 - Kotlin's `open` and `override` (a common, type-aware algorithm)
 
-## done
+## Some history
 
-- `String.replaceAll` → `"aaa".replace("a", "x")`
-- local vars without an initializer
-- `equals` → `override fun equals(other: Any?): Boolean`
-- `hashCode` → `override fun hashCode(): Int`
-- `toString` → `override fun toString(): String`
-- `String[] res = [ 'xxx' ]`
+- ✔ `String.replaceAll` → `"aaa".replace("a", "x")`
+- ✔ local vars without an initializer
+- ✔ `equals` → `override fun equals(other: Any?): Boolean`
+- ✔ `hashCode` → `override fun hashCode(): Int`
+- ✔ `toString` → `override fun toString(): String`
+- ✔ `String[] res = [...]` → `res = arrayOf(...)`
