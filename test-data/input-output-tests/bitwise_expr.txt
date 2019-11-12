@@ -10,7 +10,7 @@ class Bitwise {
 }
 ---------------
 $DEFAULT_IMPORTS
-class Bitwise {
+open class Bitwise {
     companion object {
     }
     fun bitwise(x: java.lang.Object) {

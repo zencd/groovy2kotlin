@@ -3,7 +3,7 @@ public static final def ERRORS = new ArrayList<ErrorInfo>()
 }
 ---------------
 $DEFAULT_IMPORTS
-class ClassName {
+open class ClassName {
     companion object {
         val ERRORS = ArrayList<ErrorInfo>()
     }

@@ -6,7 +6,7 @@
     }
 }---------------
 $DEFAULT_IMPORTS
-class ForLoop {
+open class ForLoop {
     companion object {
     }
     fun main() {

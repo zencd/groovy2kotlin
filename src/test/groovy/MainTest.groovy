@@ -130,30 +130,13 @@ class MainTest {
     }
 
     @Test
+    void "interface"() {
+        testFromFile("interface.txt")
+    }
+
+    @Test
     void call_static() {
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-    void main() {
-        parse()
-    }
-    private static int parse() {
-        return 123
-    }
-}
----------------
-$DEFAULT_IMPORTS
-class ClassName {
-    companion object {
-        private fun parse(): Int {
-            return 123
-        }
-    }
-    fun main() {
-        parse()
-    }
-}
-""")
-        assertGeneratedKotlin(kotlin, DevMain.toKotlin(groovy))
+        testFromFile("call_static.txt")
     }
 
     @Test

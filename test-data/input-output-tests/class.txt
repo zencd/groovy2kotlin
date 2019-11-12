@@ -1,8 +1,22 @@
-﻿class ClassName {
+﻿class Simplest {
+    void main() {
+    }
+}
+class Temp extends ArrayList implements Serializable, Closeable {
+    void main() {
+    }
 }
 ---------------
 $DEFAULT_IMPORTS
-class ClassName {
+open class Simplest {
     companion object {
+    }
+    fun main() {
+    }
+}
+open class Temp : ArrayList(), Serializable, Closeable {
+    companion object {
+    }
+    fun main() {
     }
 }

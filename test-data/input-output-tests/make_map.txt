@@ -5,7 +5,7 @@
 }
 -------------------
 $DEFAULT_IMPORTS
-class ClassName {
+open class ClassName {
     companion object {
     }
     fun makeMap(): Map<Any, Any> {

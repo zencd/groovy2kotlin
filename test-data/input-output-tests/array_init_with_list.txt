@@ -6,7 +6,7 @@ class Temp {
 }
 ------------
 $DEFAULT_IMPORTS
-class Temp {
+open class Temp {
     companion object {
     }
     var field: Array<Int>? = arrayOf(1, 2, 3)

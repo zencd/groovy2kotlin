@@ -4,7 +4,7 @@
 }
 -------------------
 $DEFAULT_IMPORTS
-class ClassName {
+open class ClassName {
     companion object {
     }
     fun funk(a: Int, b: Int) {

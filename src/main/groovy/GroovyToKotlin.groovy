@@ -1,5 +1,6 @@
 import org.codehaus.groovy.antlr.SourceBuffer
 import org.codehaus.groovy.ast.AnnotationNode
+import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.MethodNode
@@ -62,6 +63,7 @@ class GroovyToKotlin {
     int indent = 0
     CodeBuffer out
 
+    // todo use node's meta map
     def classCompanions = new HashMap<ClassNode, CodeBuffer.CodePiece>()
 
     static DEFAULT_IMPORTS = [
@@ -115,16 +117,33 @@ class GroovyToKotlin {
     void translateClass(ClassNode classNode) {
         def classComments = getJavaDocCommentsBeforeNode(sbuf, classNode)
         translateAnnos(classNode.annotations)
-        out.newLineCrlf("class ${classNode.nameWithoutPackage} {")
+
+        def modStr = Utils.getClassModifierString(classNode)
+        def modStrPadded = modStr ? "$modStr " : ""
+
+        List<String> extendList = []
+        if (classNode.superClass && !classNode.interface && classNode.superClass != ClassHelper.OBJECT_TYPE) {
+            extendList.add("${classNode.superClass.name}()")
+        }
+        for (ClassNode iface : classNode.interfaces) {
+            extendList.add(iface.name)
+        }
+        def extendPadded = extendList ? " : ${extendList.join(', ')}" : ""
+
+        def classOrInterface = classNode.interface ? "interface" : "class"
+
+        out.newLineCrlf("${modStrPadded}${classOrInterface} ${classNode.nameWithoutPackage}${extendPadded} {")
         out.push()
 
-        out.newLineCrlf("companion object {")
-        def classCompanionPiece = out.addPiece('companion-piece')
-        assert !classCompanions.containsKey(classNode)
-        classCompanions[classNode] = classCompanionPiece
-        out.addPiece()
-        out.newLineCrlf("}")
-        classCompanionPiece.touched = false
+        if (!classNode.interface) {
+            out.newLineCrlf("companion object {")
+            def classCompanionPiece = out.addPiece('companion-piece')
+            assert !classCompanions.containsKey(classNode)
+            classCompanions[classNode] = classCompanionPiece
+            out.addPiece()
+            out.newLineCrlf("}")
+            classCompanionPiece.touched = false
+        }
 
         for (field in classNode.fields) {
             translateField(field)

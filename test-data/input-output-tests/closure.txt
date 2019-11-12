@@ -11,7 +11,7 @@ class Temp {
 }
 ---------
 $DEFAULT_IMPORTS
-class Temp {
+open class Temp {
     companion object {
     }
     fun main(args: List<String>) {

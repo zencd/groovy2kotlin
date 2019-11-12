@@ -3,7 +3,7 @@
 }
 -------------------
 $DEFAULT_IMPORTS
-class ClassName {
+open class ClassName {
     companion object {
     }
     fun funk(): java.lang.Object {

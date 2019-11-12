@@ -1,0 +1,8 @@
+interface Interface {
+    void nop()
+}
+------------
+$DEFAULT_IMPORTS
+interface Interface {
+    fun nop()
+}

@@ -10,7 +10,7 @@ import java.util.List
 import java.util.Collections.*
 import java.util.Collections.emptyList
 $DEFAULT_IMPORTS
-class ClassName {
+open class ClassName {
     companion object {
     }
 }

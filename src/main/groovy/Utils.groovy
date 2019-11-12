@@ -128,17 +128,24 @@ class Utils {
         return s.replace(' <', '<') // todo lame solution
     }
 
+    static String getClassModifierString(ClassNode classNode) {
+        String javaMods = getModifierString(classNode.modifiers, false, false, true, false)
+        String open = isFinal(classNode.modifiers) || classNode.interface ? null : 'open'
+        return [open, javaMods].findAll { it }.join(' ')
+    }
+
     static String getMethodModifierString(MethodNode method) {
-        String javaMods = getModifierString(method.modifiers, false, false)
+        boolean allowAbstract = !method.declaringClass.interface
+        String javaMods = getModifierString(method.modifiers, false, false, true, allowAbstract)
         String override = method.getNodeMetaData(G2KConsts.AST_NODE_META_OVERRIDING_METHOD) == true ? G2KConsts.KOTLIN_OVERRIDE_KEYWORD : ''
         return [override, javaMods].findAll { it }.join(' ')
     }
 
-    static String getModifierString(int mods, boolean allowFinal = true, boolean allowStatic = true, boolean allowPrivate = true) {
+    static String getModifierString(int mods, boolean allowFinal = true, boolean allowStatic = true, boolean allowPrivate = true, boolean allowAbstract = true) {
         final def bit2string = new LinkedHashMap<Integer, String>() // XXX an ordered map wanted here
         if (allowPrivate) bit2string[Opcodes.ACC_PRIVATE] = 'private'
         bit2string[Opcodes.ACC_PROTECTED] = 'protected'
-        bit2string[Opcodes.ACC_ABSTRACT] = 'abstract'
+        if (allowAbstract) bit2string[Opcodes.ACC_ABSTRACT] = 'abstract'
         if (allowStatic) bit2string[Opcodes.ACC_STATIC] = 'static'
         if (allowFinal) bit2string[Opcodes.ACC_FINAL] = 'final'
 

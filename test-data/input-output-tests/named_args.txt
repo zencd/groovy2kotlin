@@ -7,7 +7,7 @@ class Temp {
 }
 -----------
 $DEFAULT_IMPORTS
-class Temp {
+open class Temp {
     companion object {
     }
     var age: Int? = 0

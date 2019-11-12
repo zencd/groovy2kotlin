@@ -4,7 +4,7 @@ class ClassName {
 -------------------
 $DEFAULT_IMPORTS
 @Deprecated
-class ClassName {
+open class ClassName {
     companion object {
     }
 }
