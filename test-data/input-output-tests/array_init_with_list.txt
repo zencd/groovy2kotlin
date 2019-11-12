@@ -9,7 +9,7 @@ $DEFAULT_IMPORTS
 class Temp {
     companion object {
     }
-    var field: Array<Int> = arrayOf(1, 2, 3)
+    var field: Array<Int>? = arrayOf(1, 2, 3)
     fun main() {
         val local: Array<String> = arrayOf("xxx")
     }

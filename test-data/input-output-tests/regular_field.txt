@@ -6,5 +6,5 @@ $DEFAULT_IMPORTS
 class ClassName {
     companion object {
     }
-    var field: String
+    var field: String? = null
 }

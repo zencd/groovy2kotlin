@@ -170,14 +170,30 @@ class GroovyToKotlin {
         if (mods) {
             out.append(mods + " ")
         }
-        def varOrVal = isFinal(field.modifiers) ? 'val' : 'var'
+        def varOrVal
+        def optional
+        if (isFinal(field.modifiers)) {
+            varOrVal = 'val'
+            optional = false
+        } else {
+            varOrVal = 'var'
+            optional = true
+        }
         def fieldType = field.type
         out.append("$varOrVal ${field.name}")
+        def kotlinType = null
         if (!field.dynamicTyped) {
-            def t = typeToKotlinString(fieldType)
-            out.append(": $t")
+            kotlinType = typeToKotlinString(fieldType, optional)
+            out.append(": $kotlinType")
         }
-        if (field.initialValueExpression != null) {
+        if (field.initialValueExpression == null) {
+            if (optional) {
+                def initialValue = Utils.makeDefaultInitialValue(kotlinType)
+                if (initialValue) {
+                    out.append(" = ${ initialValue}")
+                }
+            }
+        } else {
             out.append(" = ")
             if (Utils.isArray(fieldType)) {
                 field.initialValueExpression.putNodeMetaData(G2KConsts.AST_NODE_META_PRODUCE_ARRAY, true)

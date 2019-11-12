@@ -285,4 +285,37 @@ class Utils {
         }
         return false
     }
+
+    static String tryCutFromEnd(String s, String pattern) {
+        if (s && pattern && s.endsWith(pattern)) {
+            return s.substring(0, s.length() - pattern.length());
+        } else {
+            return s
+        }
+    }
+
+    static String makeDefaultInitialValue(String kotlinType) {
+        // todo string comparison is lame
+        kotlinType = tryCutFromEnd(kotlinType, '?')
+        String defValForObjects = "null"
+        def KT_TYPE_TO_INITIAL_VALUE = [
+                "String": defValForObjects,
+                "Boolean": "false",
+                "Byte": "0",
+                "Short": "0",
+                "Int": "0",
+                "Integer": "0",
+                "Long": "0L",
+                "BigInteger": "0",
+                "BigDecimal": "0",
+                "Number": "0",
+                "Float": "0F",
+                "Double": "0",
+        ]
+        if (KT_TYPE_TO_INITIAL_VALUE.containsKey(kotlinType)) {
+            return KT_TYPE_TO_INITIAL_VALUE[kotlinType]
+        } else {
+            defValForObjects
+        }
+    }
 }
