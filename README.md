@@ -5,8 +5,8 @@ An utility converting [Groovy](http://groovy-lang.org/) sources to [Kotlin](http
 The result of translation isn't 100% Kotlin-correct and it's required from the user to fix the rest manually,
 but a significant amount of work can be saved for free.
 
-Started 2019-11-08 by [zencd](https://github.com/zencd) in order to convert a project of mine
-because I've not found any existing tools (and it's easy to write one).
+Started Nov 2019 by [zencd](https://github.com/zencd) in order to convert a project of mine
+because I've not found any existing tools (and it's easy to write one by myself).
 The current implementation is simple: it uses Groovy's internal
 libs to parse source text into a well designed AST, then the tree is traversed and
 translated to Kotlin. It's planned to add type inference to AST to allow more
