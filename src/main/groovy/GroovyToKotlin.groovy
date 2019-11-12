@@ -97,8 +97,9 @@ class GroovyToKotlin {
         translateImports(module)
         out.newLineCrlf("")
         for (cls in module.classes) {
-            if (!Utils.isAnonymous(cls)) {
+            if (!Utils.isInner(cls)) {
                 // anonymous classes gonna be emitted on demand
+                // inner/nested classes gonna be emitted inside the outer class
                 translateClass(cls)
             }
         }
@@ -136,7 +137,8 @@ class GroovyToKotlin {
 
         def classOrInterface = classNode.interface ? "interface" : "class"
 
-        out.newLine("${modStrPadded}${classOrInterface} ${classNode.nameWithoutPackage}${extendPadded} ")
+        def emittedClassName = Utils.getClassDeclarationName(classNode)
+        out.newLine("${modStrPadded}${classOrInterface} ${emittedClassName}${extendPadded} ")
         translateClassBody(classNode)
     }
 
@@ -151,6 +153,12 @@ class GroovyToKotlin {
             out.addPiece()
             out.newLineCrlf("}")
             classCompanionPiece.touched = false
+        }
+
+        for (InnerClassNode anInnerClass : classNode.innerClasses) {
+            if (!anInnerClass.anonymous) {
+                translateClass(anInnerClass)
+            }
         }
 
         for (field in classNode.fields) {

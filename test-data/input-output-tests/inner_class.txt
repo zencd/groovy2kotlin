@@ -1,0 +1,26 @@
+class Temp {
+    static class InnerStatic {
+        void main() {}
+    }
+    class InnerNonStatic {
+        void main() {}
+    }
+}
+------------
+$DEFAULT_IMPORTS
+open class Temp {
+    companion object {
+    }
+    open static class InnerStatic {
+        companion object {
+        }
+        fun main() {
+        }
+    }
+    open class InnerNonStatic {
+        companion object {
+        }
+        fun main() {
+        }
+    }
+}

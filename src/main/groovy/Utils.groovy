@@ -104,7 +104,7 @@ class Utils {
     }
 
     static String getClassModifierString(ClassNode classNode) {
-        String javaMods = getModifierString(classNode.modifiers, false, false, true, false)
+        String javaMods = getModifierString(classNode.modifiers, false, true, true, false)
         String open = isFinal(classNode.modifiers) || classNode.interface ? null : 'open'
         return [open, javaMods].findAll { it }.join(' ')
     }
@@ -271,6 +271,27 @@ class Utils {
 
     static boolean isAnonymous(ClassNode classNode) {
         return classNode instanceof InnerClassNode && classNode.anonymous
+    }
+
+    static boolean isInner(ClassNode classNode) {
+        return classNode instanceof InnerClassNode
+    }
+
+    /**
+     * For "foo.bar.Name" returns "Name".
+     * For "foo.bar.Name$Inner" returns "Inner".
+     */
+    static String getClassDeclarationName(ClassNode classNode) {
+        if (isInner(classNode)) {
+            def s = classNode.nameWithoutPackage
+            def dollar = s.lastIndexOf('$')
+            if (dollar >= 0) {
+                s = s.substring(dollar + 1)
+            }
+            return s
+        } else {
+            return classNode.nameWithoutPackage
+        }
     }
 
     static String tryCutFromEnd(String s, String pattern) {

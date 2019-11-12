@@ -33,7 +33,7 @@ Others may be supported but was not tested.
 
 ## Todo 1
 
-- Nested, inner classes
+- import static things like `import pack.Classe.Companion.staticMethod`
 - Preserve javadoc (there is a way)
 - Replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
 - Probably translate `def` → `Any` in formal params, not `Object`
@@ -75,3 +75,4 @@ Others may be supported but was not tested.
 - ✔ Kotlin disallows use of `Map`/`List` without generics specified explicitly
 - ✔ Groovy operator `in`
 - ✔ anonymous classes 
+- ✔ Inner classes: static and non-static

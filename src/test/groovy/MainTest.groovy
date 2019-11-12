@@ -236,6 +236,11 @@ private val x = "hello"
     }
 
     @Test
+    void "inner_class"() {
+        testFromFile("inner_class.txt")
+    }
+
+    @Test
     void getModifierString() {
         assertEquals("", Utils.getModifierString(0))
         assertEquals("abstract", Utils.getModifierString(Opcodes.ACC_ABSTRACT))
