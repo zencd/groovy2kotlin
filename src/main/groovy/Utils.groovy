@@ -9,6 +9,8 @@ import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
+import org.codehaus.groovy.ast.expr.ConstantExpression
+import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 
 import java.util.logging.Logger
@@ -75,9 +77,11 @@ class Utils {
         return "import " + typeName
     }
 
-    static String typeToKotlinString(ClassNode classNode) {
+    static String typeToKotlinString(ClassNode classNode, boolean optional = false) {
+        String optionalStr = optional ? '?' : ''
+
         if (classNode.componentType != null) {
-            return "Array<${typeToKotlinString(classNode.componentType)}>"
+            return "Array<${typeToKotlinString(classNode.componentType)}>${optionalStr}"
         }
 
         def groovyTypeToKotlin = [
@@ -117,10 +121,10 @@ class Utils {
         }
 
         if (kotlinType) {
-            return kotlinType
+            return kotlinType + optionalStr
         }
 
-        def s = classNode.toString()
+        def s = classNode.toString() + optionalStr
         return s.replace(' <', '<') // todo lame solution
     }
 
@@ -273,5 +277,12 @@ class Utils {
 
     static boolean isArray(ClassNode type) {
         return type.componentType != null
+    }
+
+    static boolean isNullConstant(Expression expr) {
+        if (expr instanceof ConstantExpression) {
+            return expr.value == null
+        }
+        return false
     }
 }

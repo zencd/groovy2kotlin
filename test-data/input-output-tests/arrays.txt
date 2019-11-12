@@ -9,6 +9,6 @@ class Temp {
     companion object {
     }
     fun main(o: Array<String>) {
-        val arr: Array<Array<String>> = null
+        var arr: Array<Array<String>>? = null
     }
 }
