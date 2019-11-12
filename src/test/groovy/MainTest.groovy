@@ -226,6 +226,11 @@ private val x = "hello"
     }
 
     @Test
+    void "range"() {
+        testFromFile("range.txt")
+    }
+
+    @Test
     void getModifierString() {
         assertEquals("", Utils.getModifierString(0))
         assertEquals("abstract", Utils.getModifierString(Opcodes.ACC_ABSTRACT))

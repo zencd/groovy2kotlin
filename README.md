@@ -33,17 +33,13 @@ Others may be supported but was not tested.
 
 ## Todo 1
 
-- Generated fields `var url: String` must be initialized
-- Range expression
-- Distinct classes and interfaces
-- Extend/implement
+- Anonymous class instantiation looks too internal: `x = watch.Utils$1()`
 - Preserve javadoc (there is a way)
 - Replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
 - Probably translate `def` → `Any` in formal params, not `Object`
-- Kotlin disallows use of `Map`/`List` without generics specified explicitly
 - Groovy allows implicit conversions like `String s = 1L`
-- Groovy's regexps without quotes: `/.+/`
-- Groovy's regex operator `==~`
+- Groovy regexps without quotes: `/.+/`
+- Groovy regex operator `==~`
 - Mapping:
     - `String[]` → `Array<String>`
     - `Some.class` → `Some::class.java`
@@ -71,3 +67,9 @@ Others may be supported but was not tested.
 - ✔ `hashCode` → `override fun hashCode(): Int`
 - ✔ `toString` → `override fun toString(): String`
 - ✔ `String[] res = [...]` → `res = arrayOf(...)`
+- ✔ Range expression
+- ✔ Extend/implement
+- ✔ Generated fields `var url: String` must be initialized
+- ✔ Distinct classes and interfaces
+- ✔ Kotlin disallows use of `Map`/`List` without generics specified explicitly
+- ✔ Groovy operator `in`

@@ -1,0 +1,16 @@
+class Temp {
+    void main() {
+        5..10
+        5..<10
+    }
+}
+------------------
+$DEFAULT_IMPORTS
+open class Temp {
+    companion object {
+    }
+    fun main() {
+        (5..10)
+        (5..<10)
+    }
+}

@@ -202,6 +202,7 @@ class Utils {
                 '^': 'xor',
                 '~': 'inv',
                 'instanceof': 'is',
+                'in': 'in',
         ]
         def res = map[groovyOp]
         if (res) {

@@ -88,7 +88,8 @@ class GroovyToKotlin {
     void translateModule() {
         if (module.hasPackage()) {
             def pak = module.package.name
-            pak = pak.endsWith('.') ? pak.substring(0, pak.length() - 1) : pak // cutting the trailing dot; todo need a better solution
+            // cutting the trailing dot; todo need a better solution
+            pak = pak.endsWith('.') ? pak.substring(0, pak.length() - 1) : pak
             //out.appendLn("package ${pak}")
             out.newLineCrlf("package ${pak}")
         }
@@ -208,7 +209,7 @@ class GroovyToKotlin {
             if (optional) {
                 def initialValue = Utils.makeDefaultInitialValue(kotlinType)
                 if (initialValue) {
-                    out.append(" = ${ initialValue}")
+                    out.append(" = ${initialValue}")
                 }
             }
         } else {
@@ -643,9 +644,16 @@ class GroovyToKotlin {
         out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
     }
 
+    /**
+     * Not sure if "..<" is ok in Kotlin but we'd better produce incorrect code than correct but wrong.
+     */
     @DynamicDispatch
     void translateExpr(RangeExpression expr) {
-        out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
+        append("(")
+        translateExpr(expr.from)
+        append(!expr.isInclusive() ? "..<" : "..")
+        translateExpr(expr.to)
+        append(")")
     }
 
     @DynamicDispatch
@@ -742,7 +750,8 @@ class GroovyToKotlin {
             translateStatement(c)
         }
         if (stmt.finallyStatement && stmt.finallyStatement != EmptyStatement.INSTANCE) {
-            def fs = (stmt.finallyStatement as BlockStatement).statements[0] // XXX a strange structure provided by Groovy
+            def fs = (stmt.finallyStatement as BlockStatement).statements[0]
+            // XXX a strange structure provided by Groovy
             out.append(" finally ")
             translateStatement(fs)
             out.append("")
@@ -756,5 +765,9 @@ class GroovyToKotlin {
     @DynamicDispatch
     void translateStatement(Statement stmt) {
         out.newLineCrlf("/* not implemented for: ${stmt.class.name} */")
+    }
+
+    private void append(String s) {
+        out.append(s)
     }
 }

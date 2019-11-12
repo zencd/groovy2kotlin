@@ -2,6 +2,7 @@ class Temp {
     void main(String str) {
         str[0]
         str instanceof String
+        1 in [1,2]
     }
 }
 ------------
@@ -12,5 +13,6 @@ open class Temp {
     fun main(str: String) {
         str[0]
         str is String
+        1 in listOf(1, 2)
     }
 }
