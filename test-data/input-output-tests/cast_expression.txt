@@ -1,5 +1,5 @@
 ﻿class ClassName {
-    int main() {
+    void main() {
         11 as int
         (int)22
     }
@@ -9,8 +9,8 @@ $DEFAULT_IMPORTS
 class ClassName {
     companion object {
     }
-    fun main(): Int {
+    fun main() {
         11 as Int
-        22 as int
+        22 as Int
     }
 }

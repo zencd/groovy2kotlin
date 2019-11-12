@@ -439,8 +439,9 @@ class GroovyToKotlin {
     @DynamicDispatch
     void translateExpr(CastExpression expr) {
         def ty = typeToKotlinString(expr.getType())
-        out.append("($ty)")
+        out.append("(")
         translateExpr(expr.expression)
+        out.append(" as $ty)")
     }
 
     @DynamicDispatch
