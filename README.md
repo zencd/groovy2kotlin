@@ -84,4 +84,4 @@ Others may be supported but was not tested.
 - ✔ Groovy operator `in`
 - ✔ anonymous classes 
 - ✔ Inner classes: static and non-static
-- ✔ String[]` → `Array<String>`
+- ✔ `String[]` → `Array<String>`
