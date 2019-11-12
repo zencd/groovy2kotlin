@@ -9,8 +9,9 @@ Started 2019-11-08 by [zencd](https://github.com/zencd) in order to convert a pr
 because I've not found any existing tools (and it's easy to write one).
 The current implementation is simple: it uses Groovy's internal
 libs to parse source text into a well designed AST, then the tree is traversed and
-translated to Kotlin by `GroovyToKotlin.groovy`. Gonna add type inference later
-because it's required for certain transformations.
+translated to Kotlin. It's planned to add type inference to AST to allow more
+sophisticated transformations.
+
 
 | Covered | Covered
 |----------|------------- 
