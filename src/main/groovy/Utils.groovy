@@ -12,6 +12,7 @@ import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
+import org.codehaus.groovy.ast.expr.TupleExpression
 
 import java.util.logging.Logger
 import java.util.regex.Matcher
@@ -215,10 +216,10 @@ class Utils {
 
     static Integer getNumberOfActualParams(MethodCallExpression expr) {
         def args = expr.arguments
-        if (args instanceof ArgumentListExpression) {
+        if (args instanceof TupleExpression) {
             return args.expressions.size()
         } else {
-            log.warning("expecting arguments as ArgumentListExpression")
+            log.warning("expecting arguments as a TupleExpression")
             return 0
         }
     }

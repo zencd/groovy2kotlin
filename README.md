@@ -40,6 +40,7 @@ Others may be supported but was not tested.
 - Groovy allows implicit conversions like `String s = 1L`
 - Groovy regexps without quotes: `/.+/`
 - Groovy regex operator `==~`
+- Groovy regex operator `<=>`
 - Mapping:
     - `String[]` → `Array<String>`
     - `Some.class` → `Some::class.java`
