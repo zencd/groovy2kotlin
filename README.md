@@ -69,3 +69,4 @@ Others may be supported but was not tested.
 - `equals` → `override fun equals(other: Any?): Boolean`
 - `hashCode` → `override fun hashCode(): Int`
 - `toString` → `override fun toString(): String`
+- `String[] res = [ 'xxx' ]`

@@ -1,4 +1,5 @@
 class Temp {
-    void main(String[] o) {
+    void main() {
+        String[] res = [ 'xxx' ]
     }
 }

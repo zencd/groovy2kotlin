@@ -10,7 +10,7 @@ class ClassName {
     companion object {
     }
     fun main() {
-        11 as Int
-        22 as Int
+        (11 as Int)
+        (22 as Int)
     }
 }

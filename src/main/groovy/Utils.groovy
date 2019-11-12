@@ -260,4 +260,8 @@ class Utils {
     static int getNumberOfFormalParams(MethodNode method) {
         return method.parameters.length
     }
+
+    static boolean isArray(ClassNode type) {
+        return type.componentType != null
+    }
 }

@@ -1,0 +1,15 @@
+class Temp {
+    void main() {
+        String[] res = [ 'xxx' ]
+    }
+}
+------------
+$DEFAULT_IMPORTS
+class Temp {
+    companion object {
+    }
+
+    fun main() {
+        val res: Array<String> = arrayOf("xxx")
+    }
+}

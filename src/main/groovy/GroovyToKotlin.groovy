@@ -321,14 +321,18 @@ class GroovyToKotlin {
         def hasInitializer = expr.rightExpression != null && !(expr.rightExpression instanceof EmptyExpression)
         def varOrVal = hasInitializer ? 'val' : 'var'
         def left = (VariableExpression) expr.leftExpression
+        final leftType = left.originType
         if (left.dynamicTyped) {
             out.append("$varOrVal ${left.name}")
         } else {
-            def st = typeToKotlinString(left.originType)
+            def st = typeToKotlinString(leftType)
             out.append("$varOrVal ${left.name}: $st")
         }
         if (hasInitializer) {
             out.append(" = ")
+            if (Utils.isArray(leftType)) {
+                expr.rightExpression.putNodeMetaData(G2KConsts.AST_NODE_META_PRODUCE_ARRAY, true)
+            }
             translateExpr(expr.rightExpression)
         }
     }
@@ -411,7 +415,9 @@ class GroovyToKotlin {
 
     @DynamicDispatch
     void translateExpr(ListExpression expr) {
-        out.append('listOf(')
+        def forceArray = expr.getNodeMetaData(G2KConsts.AST_NODE_META_PRODUCE_ARRAY) == true
+        def function = forceArray ? 'arrayOf' : 'listOf'
+        out.append("${function}(")
         expr.expressions.eachWithIndex { anExpr, int i ->
             if (i > 0) out.append(', ')
             translateExpr(anExpr)

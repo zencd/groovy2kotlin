@@ -125,6 +125,11 @@ class MainTest {
     }
 
     @Test
+    void "array_init_with_list"() {
+        testFromFile("array_init_with_list.txt")
+    }
+
+    @Test
     void call_static() {
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
