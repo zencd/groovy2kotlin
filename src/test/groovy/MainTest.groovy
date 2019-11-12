@@ -206,8 +206,8 @@ private val x = "hello"
     }
 
     @Test
-    void "method_with_args"() {
-        testFromFile("method_with_args.txt")
+    void "method_params"() {
+        testFromFile("method_params.txt")
     }
 
     @Test

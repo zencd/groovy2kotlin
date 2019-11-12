@@ -25,33 +25,6 @@ class Utils {
     // todo make it non static
     static lastLineCol = new LineColumn(1, 1)
 
-    /**
-     * todo see an impl: {@link org.codehaus.groovy.ast.AstToTextHelper#getParametersText}
-     */
-    static String getParametersText(Parameter[] parameters) {
-        if (parameters == null) return ""
-        if (parameters.length == 0) return ""
-        StringBuilder result = new StringBuilder()
-        int max = parameters.length
-        for (int x = 0; x < max; x++) {
-            result.append(getParameterText(parameters[x]))
-            if (x < (max - 1)) {
-                result.append(", ")
-            }
-        }
-        return result.toString()
-    }
-
-    static String getParameterText(Parameter node) {
-        def predefinedKotlinType = node.getNodeMetaData(G2KConsts.AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
-        String name = node.getName() == null ? "<unknown>" : node.getName()
-        String type = predefinedKotlinType ?: typeToKotlinString(node.getType())
-        if (node.getInitialExpression() != null) {
-            return "$name: $type = " + node.getInitialExpression().getText()
-        }
-        return "${name}: ${type}"
-    }
-
     static String makeImportText(ImportNode imp) {
         String typeName = imp.getClassName();
         def isStar = imp.isStar()

@@ -1,5 +1,5 @@
 ﻿class ClassName {
-    void funk(int a, int b) {
+    void funk(int normalParam, String defaultParam = "x") {
     }
 }
 -------------------
@@ -7,6 +7,6 @@ $DEFAULT_IMPORTS
 open class ClassName {
     companion object {
     }
-    fun funk(a: Int, b: Int) {
+    fun funk(normalParam: Int, defaultParam: String = "x") {
     }
 }

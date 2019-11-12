@@ -48,7 +48,6 @@ import java.util.logging.Logger
 import static Utils.getJavaDocCommentsBeforeNode
 import static Utils.getModifierString
 import static Utils.getMethodModifierString
-import static Utils.getParametersText
 import static Utils.isFinal
 import static Utils.isStatic
 import static Utils.makeImportText
@@ -255,7 +254,8 @@ class GroovyToKotlin {
             out.append(mods + " ")
         }
         out.append("fun ${method.name}(")
-        out.append(getParametersText(method.parameters))
+        translateMethodParams(method.parameters)
+        //out.append(getParametersText(method.parameters))
         out.append(")")
         out.append(rt3)
         def code = method.code
@@ -281,6 +281,27 @@ class GroovyToKotlin {
         } else {
             out.lineBreak()
             out.newLineCrlf("// unsupported ${code.class}")
+        }
+    }
+
+    private void translateMethodParams(Parameter[] parameters) {
+        if (parameters == null) return
+        if (parameters.length == 0) return
+        parameters.eachWithIndex { Parameter param, int i ->
+            if (i > 0) out.append(", ")
+            translateMethodParam(param)
+        }
+    }
+
+    private void translateMethodParam(Parameter node) {
+        def predefinedKotlinType = node.getNodeMetaData(G2KConsts.AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
+        String name = node.getName() == null ? "<unknown>" : node.getName()
+        String type = predefinedKotlinType ?: typeToKotlinString(node.getType())
+        if (node.getInitialExpression() == null) {
+            out.append("${name}: ${type}")
+        } else {
+            out.append("$name: $type = ")
+            translateExpr(node.getInitialExpression())
         }
     }
 

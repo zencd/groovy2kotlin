@@ -1,4 +1,4 @@
-class Temp /*extends ArrayList implements Serializable*/ {
-    void main() {
+class Temp {
+    void main(String normal, String defaultParam = "x") {
     }
 }
