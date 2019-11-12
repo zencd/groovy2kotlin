@@ -1,0 +1,36 @@
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+mainClassName = 'g2k.Main'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.5.8'
+    testCompile 'junit:junit:4.11'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task uberjar(type: Jar, dependsOn: [':compileJava', ':compileGroovy']) {
+    from files(sourceSets.main.output.classesDirs)
+    from configurations.runtime.asFileTree.files.collect { zipTree(it) }
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
+task runit(type: JavaExec, dependsOn: 'classes') {
+    main = mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    //args 'runit'
+}

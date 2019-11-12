@@ -24,13 +24,14 @@ sophisticated transformations.
 
 - JDK 1.8 (for running the tool)
 - Groovy 2.5.8 (for running the tool)
-- Kotlin 1.3 (produced code)
+- Kotlin 1.3 (produced code level)
 
 Others may be supported but was not tested.
 
 ## Use
 
     git clone "https://github.com/zencd/groovy2kotlin"
+    ./gradlew test
 
 ## Todo 1
 
