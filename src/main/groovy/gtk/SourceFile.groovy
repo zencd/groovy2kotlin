@@ -1,3 +1,5 @@
+package gtk
+
 class SourceFile {
     File dir
     String relativePath

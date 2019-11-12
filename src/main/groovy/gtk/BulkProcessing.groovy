@@ -1,13 +1,21 @@
+package gtk
+
 import groovy.io.FileType
 
 import java.nio.charset.StandardCharsets
 
 
-class G2KMany {
+class BulkProcessing {
     public static void main(String[] args) {
-        def DIR1 = new File('C:/projects/sitewatch/src/main/groovy')
-        def OUT_DIR = new File('C:/projects/kotlin-generated/src/main/kotlin')
-        def groovyFiles = listAllGroovyFiles(DIR1)
+        def DIR1 = 'C:/projects/sitewatch/src/main/groovy'
+        def OUT_DIR = 'C:/projects/kotlin-generated/src/main/kotlin'
+        process(DIR1, OUT_DIR)
+    }
+
+    static void process(String srcDir, String outDir) {
+        def SRC_DIR1 = new File(srcDir)
+        def OUT_DIR = new File(outDir)
+        def groovyFiles = listAllGroovyFiles(SRC_DIR1)
         groovyFiles.each {
             def gf = it.groovyFile
             def kf = it.getKotlinFile(OUT_DIR)

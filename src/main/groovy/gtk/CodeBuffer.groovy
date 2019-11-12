@@ -1,3 +1,5 @@
+package gtk
+
 class CodeBuffer {
     static class CodePiece implements CodeAppender {
         private final def buf = new StringBuilder()

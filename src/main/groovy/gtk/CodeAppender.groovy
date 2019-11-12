@@ -1,3 +1,4 @@
+package gtk
 // todo looks useless now
 interface CodeAppender {
     void newLineCrlf(String s)

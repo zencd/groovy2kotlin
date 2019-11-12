@@ -1,3 +1,5 @@
+package gtk
+
 import groovyjarjarantlr.CommonAST
 import groovyjarjarantlr.collections.AST
 import org.codehaus.groovy.antlr.AntlrASTProcessor

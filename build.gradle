@@ -1,7 +1,12 @@
 apply plugin: 'groovy'
 apply plugin: 'application'
 
-mainClassName = 'g2k.Main'
+mainClassName = 'gtk.Main'
+
+jar {
+    baseName = 'groovy2kotlin'
+    version = '0.0.1'
+}
 
 repositories {
     mavenLocal()
@@ -29,8 +34,8 @@ task uberjar(type: Jar, dependsOn: [':compileJava', ':compileGroovy']) {
     }
 }
 
-task runit(type: JavaExec, dependsOn: 'classes') {
+task exec(type: JavaExec, dependsOn: [':classes']) {
     main = mainClassName
     classpath = sourceSets.main.runtimeClasspath
-    //args 'runit'
+    args = ["src", "dst"]
 }

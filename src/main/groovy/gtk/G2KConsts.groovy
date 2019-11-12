@@ -1,3 +1,5 @@
+package gtk
+
 class G2KConsts {
     private static final String AST_NODE_META_PREFIX = 'AST_NODE_META_GROOVY2KOTLIN'
 

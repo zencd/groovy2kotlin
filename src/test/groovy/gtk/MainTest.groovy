@@ -1,4 +1,8 @@
+package gtk
+
 import groovyjarjarasm.asm.Opcodes
+import gtk.DevMain
+import gtk.Utils
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 

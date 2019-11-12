@@ -1,3 +1,5 @@
+package gtk
+
 import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.antlr.LineColumn
 import org.codehaus.groovy.antlr.SourceBuffer
@@ -7,7 +9,6 @@ import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
-import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression

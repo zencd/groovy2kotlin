@@ -1,3 +1,5 @@
+package gtk
+
 import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.builder.AstBuilder

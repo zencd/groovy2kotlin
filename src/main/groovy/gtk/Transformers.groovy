@@ -1,3 +1,5 @@
+package gtk
+
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement

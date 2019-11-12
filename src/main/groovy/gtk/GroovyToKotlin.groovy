@@ -1,3 +1,5 @@
+package gtk
+
 import org.codehaus.groovy.antlr.SourceBuffer
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
