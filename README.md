@@ -43,6 +43,7 @@ Others may be supported but was not tested.
 - Kotlin disallows use of `Map`/`List` without generics specified explicitly
 - Groovy allows implicit conversions like `String s = 1L`
 - Groovy's regexps without quotes: `/.+/`
+- Groovy's regex operator `==~`
 - Mapping:
     - `String[]` → `Array<String>`
     - `Some.class` → `Some::class.java`

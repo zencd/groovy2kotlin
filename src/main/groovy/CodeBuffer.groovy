@@ -33,8 +33,12 @@ class CodeBuffer {
         }
 
         void newLineCrlf(String s) {
-            indent()
-            println(s)
+            if (s) {
+                indent()
+                println(s)
+            } else {
+                lineBreak()
+            }
         }
 
         void newLine(String s) {
