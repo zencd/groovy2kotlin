@@ -12,7 +12,6 @@ libs to parse source text into a well designed AST, then the tree is traversed a
 translated to Kotlin. It's planned to add type inference to AST to allow more
 sophisticated transformations.
 
-
 | Covered | Covered
 |----------|------------- 
 | ✔ Control structures | ✔ Expressions
@@ -32,8 +31,14 @@ Others may be supported but was not tested.
 
     git clone "https://github.com/zencd/groovy2kotlin"
     cd groovy2kotlin
-    ./gradlew test jar
+    gradlew test jar
     groovy -cp build\libs\groovy2kotlin-0.0.1.jar -e="gtk.BulkProcessor.process('/groovy-project', '/output')"
+
+# Structure
+
+- `BulkProcessor.groovy` - converts a directory with Groovy files recursively
+- `GroovyToKotlin.groovy` - the translator engine
+- `test-data/input-output-tests` - a set of input/expected tests showing how the things gets translated
 
 ## Todo 1
 
