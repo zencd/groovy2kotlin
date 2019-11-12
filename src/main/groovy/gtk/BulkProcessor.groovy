@@ -5,7 +5,7 @@ import groovy.io.FileType
 import java.nio.charset.StandardCharsets
 
 
-class BulkProcessing {
+class BulkProcessor {
     public static void main(String[] args) {
         def DIR1 = 'C:/projects/sitewatch/src/main/groovy'
         def OUT_DIR = 'C:/projects/kotlin-generated/src/main/kotlin'

@@ -37,5 +37,5 @@ task uberjar(type: Jar, dependsOn: [':compileJava', ':compileGroovy']) {
 task exec(type: JavaExec, dependsOn: [':classes']) {
     main = mainClassName
     classpath = sourceSets.main.runtimeClasspath
-    args = ["src", "dst"]
+    //args = ["src", "dst"]
 }

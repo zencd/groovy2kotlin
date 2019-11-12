@@ -31,7 +31,9 @@ Others may be supported but was not tested.
 ## Use
 
     git clone "https://github.com/zencd/groovy2kotlin"
-    ./gradlew test
+    cd groovy2kotlin
+    ./gradlew test jar
+    groovy -cp build\libs\groovy2kotlin-0.0.1.jar -e="gtk.BulkProcessor.process('/groovy-project', '/output')"
 
 ## Todo 1
 
