@@ -739,11 +739,19 @@ class GroovyToKotlin {
 
     @DynamicDispatch
     void translateStatement(WhileStatement stmt) {
+        translateLabelsForStatement(stmt)
         out.newLine("while (")
         translateExpr(stmt.booleanExpression)
         out.append(") ")
         translateStatement(stmt.loopBlock)
         out.lineBreak()
+    }
+
+    void translateLabelsForStatement(Statement stmt) {
+        // todo `statementLabels` belongs to the root class Statement - probably do it before EVERY statement
+        for (String label : stmt.statementLabels) {
+            out.newLineCrlf("@${label}")
+        }
     }
 
     @DynamicDispatch
@@ -803,8 +811,13 @@ class GroovyToKotlin {
         out.lineBreak()
     }
 
+    /**
+     * The Groovy's for loop.
+     * for(;;) => while (true)
+     */
     @DynamicDispatch
     void translateStatement(ForStatement stmt) {
+        translateLabelsForStatement(stmt)
         def valName = stmt.variable.name
         out.newLine("for (")
         if (stmt.collectionExpression instanceof ClosureListExpression) {
