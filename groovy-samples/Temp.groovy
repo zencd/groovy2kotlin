@@ -3,7 +3,7 @@ class Temp {
     { println("instance init") }
     public Temp(int i) { println(1) }
     public Temp() { println(1) }
-    public void someMethod() { println(1) }
+    public void someMethod() throws RuntimeException, Exception { println(1) }
 }
 
 /*

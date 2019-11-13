@@ -281,6 +281,9 @@ class GroovyToKotlin {
     private void translateMethodImpl(MethodNode method) {
         out.newLineCrlf('') // empty line btw methods
         translateAnnos(method.annotations)
+        for (ClassNode aThrows : method.exceptions) {
+            out.newLineCrlf("@Throws(${aThrows.name}::class)")
+        }
         def rt2 = typeToKotlinString(method.returnType)
         def rt3 = Utils.isVoidMethod(method) ? '' : ": ${rt2}"
         out.indent()

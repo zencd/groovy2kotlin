@@ -10,6 +10,8 @@ class Annos {
     @Documented
     @CompileStatic
     void method() {}
+
+    void throwsSome() throws RuntimeException {}
 }
 --------------
 $DEFAULT_IMPORTS
@@ -28,5 +30,9 @@ open class Annos {
     @Documented
     // TODO groovy2kotlin: @CompileStatic
     fun method() {
+    }
+
+    @Throws(RuntimeException::class)
+    fun throwsSome() {
     }
 }

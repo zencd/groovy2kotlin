@@ -44,7 +44,6 @@ Others may be supported but was not tested.
 
 ## Todo 1
 
-- `throws`
 - instance/class initializers
 - Bug: the `{}` braces lost: `${call()}"` → `"$call"`
 - Do import static things like this: `import pack.Classe.Companion.staticMethod`
@@ -99,3 +98,4 @@ Others may be supported but was not tested.
 - ✔ Groovy regexps without quotes: `/.+/`
 - ✔ while loop
 - ✔ The `for(;;)` loop
+- ✔ `throws`
