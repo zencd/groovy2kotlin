@@ -4,7 +4,10 @@ import groovy.io.FileType
 
 import java.nio.charset.StandardCharsets
 
-
+/**
+ * Processes multiple files.
+ * @see #process
+ */
 class BulkProcessor {
     public static void main(String[] args) {
         def DIR1 = 'C:/projects/sitewatch/src/main/groovy'

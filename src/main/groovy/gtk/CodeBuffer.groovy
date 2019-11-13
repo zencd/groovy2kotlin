@@ -1,7 +1,14 @@
 package gtk
 
+/**
+ * Output buffer used to emit Kotlin code to.
+ * Consists of multiple chunks (pieces) who are joined at the end.
+ */
 class CodeBuffer {
-    static class CodePiece implements CodeAppender {
+    /**
+     * A piece of emitted code.
+     */
+    static class CodePiece {
         private final def buf = new StringBuilder()
         private int indent
         private final String name

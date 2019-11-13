@@ -1,5 +1,8 @@
 package gtk
 
+/**
+ * Project constants.
+ */
 interface GtkConsts {
     static final String AST_NODE_META_PREFIX = 'AST_NODE_META_GROOVY2KOTLIN'
 

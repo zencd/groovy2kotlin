@@ -24,6 +24,9 @@ import java.util.logging.Logger
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+/**
+ * Utils specific to the project.
+ */
 class GtkUtils {
     private static final Logger log = Logger.getLogger(this.name)
 

@@ -1,5 +1,8 @@
 package gtk
 
+/**
+ * Descriptor for an input Groovy file.
+ */
 class SourceFile {
     File dir
     String relativePath

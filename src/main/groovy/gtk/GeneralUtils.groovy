@@ -2,6 +2,9 @@ package gtk
 
 import java.util.regex.Pattern
 
+/**
+ * Common use utils.
+ */
 class GeneralUtils {
 
     private static final Pattern SINGLE_BACKSLASH = Pattern.compile('\\\\')
