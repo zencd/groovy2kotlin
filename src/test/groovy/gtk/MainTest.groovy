@@ -99,6 +99,11 @@ class MainTest {
         testFromFile("arrays.txt")
     }
 
+    @Test
+    void "strings"() {
+        testFromFile("strings.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {

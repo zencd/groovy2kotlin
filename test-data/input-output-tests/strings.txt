@@ -1,0 +1,18 @@
+class Strings {
+    static void main() {
+        def jString = '\\d\\d'
+        def gString = "\\d\\d"
+        def regex = /[-]?\d\d+/
+    }
+}
+-----------
+$DEFAULT_IMPORTS
+open class Strings {
+    companion object {
+        fun main() {
+            val jString = "\\d\\d"
+            val gString = "\\d\\d"
+            val regex = "[-]?\\d\\d+"
+        }
+    }
+}

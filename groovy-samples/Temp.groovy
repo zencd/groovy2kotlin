@@ -1,8 +1,6 @@
-class Temp1 {
-    static class InnerStatic {
-        void main() {}
-    }
-    class InnerNonStatic {
-        void main() {}
+class Temp {
+    static void main(String[] args) {
+        def s = '\\d\\d'
+        def r = /[-]?\d\d+/
     }
 }

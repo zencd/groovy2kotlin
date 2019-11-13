@@ -471,7 +471,12 @@ class GroovyToKotlin {
     void translateExpr(ConstantExpression expr) {
         // todo use expr.constantName probably
         if (Utils.isString(expr.type)) {
-            out.append("\"${expr.value}\"")
+            if (expr.value != null) {
+                out.append("\"${Utils.escapeAsJavaStringContent((String)expr.value)}\"")
+            } else {
+                // XXX not sure what is the case here
+                out.append("\"${expr.value}\"")
+            }
         } else {
             out.append("${expr.value}")
         }

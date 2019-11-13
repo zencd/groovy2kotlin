@@ -34,13 +34,13 @@ Others may be supported but was not tested.
     git clone "https://github.com/zencd/groovy2kotlin"
     cd groovy2kotlin
     gradlew test jar
-    groovy -cp build\libs\groovy2kotlin-0.0.1.jar -e="gtk.BulkProcessor.process('/groovy-project', '/output')"
+    groovy -cp build/libs/groovy2kotlin-0.0.1.jar -e="gtk.BulkProcessor.process('/groovy-project', '/output')"
 
 # Structure
 
 - `BulkProcessor.groovy` - converts a directory with Groovy files recursively
 - `GroovyToKotlin.groovy` - the translator engine
-- `test-data/input-output-tests` - a set of input/output tests showing how the things gets translated
+- `test-data/input-output-tests/` - a set of input/output tests showing how the things gets translated
 
 ## Todo 1
 

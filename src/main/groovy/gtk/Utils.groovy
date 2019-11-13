@@ -264,10 +264,7 @@ class Utils {
     }
 
     static boolean isNullConstant(Expression expr) {
-        if (expr instanceof ConstantExpression) {
-            return expr.value == null
-        }
-        return false
+        return (expr instanceof ConstantExpression) && expr.isNullExpression()
     }
 
     static boolean isAnonymous(ClassNode classNode) {
@@ -326,5 +323,12 @@ class Utils {
         } else {
             defValForObjects
         }
+    }
+
+    private static final Pattern SINGLE_BACKSLASH = Pattern.compile('\\\\')
+    private static final String TWO_BACKSLASHES = '\\\\\\\\'
+
+    static String escapeAsJavaStringContent(String s) {
+        return s.replaceAll(SINGLE_BACKSLASH, TWO_BACKSLASHES)
     }
 }

@@ -52,6 +52,10 @@ import java.nio.charset.StandardCharsets
  *
  * A VISITOR WITH MANY IMPLS
  * {@link org.codehaus.groovy.ast.GroovyCodeVisitor}
+ *
+ * TRANSFORMERS
+ * {@link org.codehaus.groovy.ast.expr.ExpressionTransformer}
+ * {@link org.codehaus.groovy.ast.expr.Expression#transformExpression}
  */
 class DevMain {
     static void main(String[] args) {
