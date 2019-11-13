@@ -170,6 +170,12 @@ class GroovyToKotlin {
         for (field in classNode.fields) {
             translateField(field)
         }
+        for (def objInit  : classNode.objectInitializerStatements) {
+            out.newLineCrlf("// TODO instance initializer omitted")
+        }
+        for (method in classNode.declaredConstructors) {
+            translateMethod(method)
+        }
         for (method in classNode.methods) {
             translateMethod(method)
         }
@@ -282,7 +288,16 @@ class GroovyToKotlin {
         if (mods) {
             out.append(mods + " ")
         }
-        out.append("fun ${method.name}(")
+
+        def isConstructor = '<init>' == method.name
+        def name = method.name
+
+        if (isConstructor) {
+            out.append("constructor(")
+        } else {
+            out.append("fun ${method.name}(")
+        }
+
         translateMethodParams(method.parameters)
         //out.append(getParametersText(method.parameters))
         out.append(")")

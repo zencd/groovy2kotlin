@@ -1,4 +1,13 @@
 class Temp {
+    //static { println("static init") }
+    { println("instance init") }
+    public Temp(int i) { println(1) }
+    public Temp() { println(1) }
+    public void someMethod() { println(1) }
+}
+
+/*
+class Temp {
     static void for_in() {
         for (xxx in [1, 2, 3]) {
             println(xxx)
@@ -43,4 +52,4 @@ class Temp {
     static void loop_break_labeled() {
         label: while (false) {break label}
     }
-}
+}*/
