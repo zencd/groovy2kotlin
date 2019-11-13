@@ -45,13 +45,13 @@ Others may be supported but was not tested.
 ## Todo 1
 
 - Bug: the `{}` braces lost: `${call()}"` → `"$call"`
-- The `for(;;)` loop
 - Do import static things like this: `import pack.Classe.Companion.staticMethod`
 - Preserve javadoc (there is a way)
 - Replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
 - Probably translate `def` → `Any` in formal params, not `Object`
 - Groovy allows implicit conversions like `String s = 1L`
 - Groovy comparison operator `<=>`
+- static inner classes can't be translated with modifier `static`
 - `List` mapping:
     - `eachWithIndex` → `forEachIndexed` (params swapped!)
     - `collect` → `map`
@@ -69,7 +69,7 @@ Others may be supported but was not tested.
     - `~16` → `16.inv()`
     - `a.is(b)` → `a === b`
 
-## Todo 2, requires type inference
+## Todo 2
 
 - Groovy's special use of bitwise operators on lists, streams, etc
 - Translate Groovy's implicit `return` (solved for certain cases)
@@ -96,3 +96,4 @@ Others may be supported but was not tested.
 - ✔ Groovy regex operator `==~`
 - ✔ Groovy regexps without quotes: `/.+/`
 - ✔ while loop
+- ✔ The `for(;;)` loop

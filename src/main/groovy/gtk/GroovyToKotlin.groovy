@@ -184,7 +184,11 @@ class GroovyToKotlin {
     }
 
     void translateAnno(AnnotationNode anno) {
-        out.newLineCrlf("@${anno.classNode.name}")
+        if (Utils.isEnabled(anno)) {
+            out.newLineCrlf("@${anno.classNode.name}")
+        } else {
+            out.newLineCrlf("// TODO groovy2kotlin: @${anno.classNode.name}")
+        }
     }
 
     void translateField(FieldNode field) {
@@ -205,6 +209,7 @@ class GroovyToKotlin {
     }
 
     private void translateFieldImpl(FieldNode field) {
+        translateAnnos(field.annotations)
         out.indent()
         // XXX we don't need private fields because a field is private in Groovy if no access modifier given
         def mods = getModifierString(field.modifiers, false, false, false)
@@ -268,6 +273,7 @@ class GroovyToKotlin {
     }
 
     private void translateMethodImpl(MethodNode method) {
+        translateAnnos(method.annotations)
         out.newLineCrlf('') // empty line btw methods
         def rt2 = typeToKotlinString(method.returnType)
         def rt3 = Utils.isVoidMethod(method) ? '' : ": ${rt2}"

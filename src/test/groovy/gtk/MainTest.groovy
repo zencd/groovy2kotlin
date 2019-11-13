@@ -100,6 +100,11 @@ class MainTest {
     }
 
     @Test
+    void "annotations"() {
+        testFromFile("annotations.txt")
+    }
+
+    @Test
     void "strings"() {
         testFromFile("strings.txt")
     }

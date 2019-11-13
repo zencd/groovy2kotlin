@@ -1,0 +1,32 @@
+@CompileStatic
+@Deprecated
+@Documented
+class Annos {
+    @Deprecated
+    @Documented
+    int field
+
+    @Deprecated
+    @Documented
+    @CompileStatic
+    void method() {}
+}
+--------------
+$DEFAULT_IMPORTS
+// TODO groovy2kotlin: @CompileStatic
+@Deprecated
+@Documented
+open class Annos {
+    companion object {
+    }
+
+    @Deprecated
+    @Documented
+    var field: Int? = 0
+
+    @Deprecated
+    @Documented
+    // TODO groovy2kotlin: @CompileStatic
+    fun method() {
+    }
+}

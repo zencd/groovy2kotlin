@@ -1,9 +1,11 @@
 package gtk
 
+import groovy.transform.CompileStatic
 import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.antlr.LineColumn
 import org.codehaus.groovy.antlr.SourceBuffer
 import org.codehaus.groovy.ast.ASTNode
+import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ImportNode
@@ -332,7 +334,19 @@ class Utils {
         return s.replaceAll(SINGLE_BACKSLASH, TWO_BACKSLASHES)
     }
 
-    static boolean isForeverForLoop() {
-
+    static {
+        addDisabledAnno(CompileStatic.class)
     }
+
+    private static final Set<String> ALL_DISABLED_ANNO_CLASSES = []
+
+    private static void addDisabledAnno(Class anno) {
+        ALL_DISABLED_ANNO_CLASSES.add(anno.name)
+        ALL_DISABLED_ANNO_CLASSES.add(anno.simpleName)
+    }
+
+    static boolean isEnabled(AnnotationNode anno) {
+        return !(anno.classNode.name in ALL_DISABLED_ANNO_CLASSES)
+    }
+
 }
