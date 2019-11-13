@@ -36,11 +36,13 @@ Others may be supported but was not tested.
     gradlew test jar
     groovy -cp build/libs/groovy2kotlin-0.0.1.jar -e="gtk.BulkProcessor.process('/groovy-project', '/output')"
 
-# Structure
+## Structure
 
 - `BulkProcessor.groovy` - converts a directory with Groovy files recursively
 - `GroovyToKotlin.groovy` - the translator engine
 - `test-data/input-output-tests/` - a set of input/output tests showing how the things gets translated
+
+## Example
 
 ![demo.png](demo.png)
 
