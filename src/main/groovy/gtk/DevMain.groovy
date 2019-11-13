@@ -60,6 +60,10 @@ import java.nio.charset.StandardCharsets
  * TRANSFORMERS
  * {@link org.codehaus.groovy.ast.expr.ExpressionTransformer}
  * {@link org.codehaus.groovy.ast.expr.Expression#transformExpression}
+ *
+ * {@link org.codehaus.groovy.transform.sc.StaticCompileTransformation} forced by CompileStatic
+ * {@link org.codehaus.groovy.transform.StaticTypesTransformation} forced by TypeChecked
+ * {@link org.codehaus.groovy.transform.stc.StaticTypesMarker#INFERRED_TYPE}
  */
 class DevMain {
     static void main(String[] args) {

@@ -103,6 +103,11 @@ class MainTest {
     }
 
     @Test
+    void "assign_to_tuple"() {
+        testFromFile("assign_to_tuple.txt")
+    }
+
+    @Test
     void "annotations"() {
         testFromFile("annotations.txt")
     }

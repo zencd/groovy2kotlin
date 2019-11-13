@@ -1,9 +1,11 @@
 package gtk
 
 import groovyjarjarasm.asm.Opcodes
+import gtk.inf.Inferer
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.builder.AstBuilder
 import org.codehaus.groovy.ast.expr.VariableExpression
+import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer
@@ -35,9 +37,14 @@ class DevTest {
     @Test
     void invest2() {
         String source = """
-List<String> lis = new ArrayList<>()
+def x = 1 * 2
 """
         def nodes = new AstBuilder().buildFromString(source)
+        assert nodes.size() == 1
+        def root = nodes[0]
+        def inferer = new Inferer()
+        inferer.init()
+        inferer.inferModule(root as BlockStatement)
         def stop = 0
     }
 

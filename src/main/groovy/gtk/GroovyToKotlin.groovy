@@ -476,17 +476,27 @@ class GroovyToKotlin implements GtkConsts {
             varOrVal = 'val'
             optional = false
         }
-        def left = (VariableExpression) expr.leftExpression
-        final leftType = left.originType
-        if (left.dynamicTyped) {
-            out.append("$varOrVal ${left.name}")
-        } else {
-            def st = typeToKotlinString(leftType, optional)
-            out.append("$varOrVal ${left.name}: $st")
+
+        boolean leftIsArray = false
+        if (expr.leftExpression instanceof VariableExpression) {
+            def left = expr.leftExpression as VariableExpression
+            final leftType = left.originType
+            leftIsArray = GtkUtils.isArray(leftType)
+            if (left.dynamicTyped) {
+                out.append("$varOrVal ${left.name}")
+            } else {
+                def st = typeToKotlinString(leftType, optional)
+                out.append("$varOrVal ${left.name}: $st")
+            }
+        } else if (expr.leftExpression instanceof ArgumentListExpression) {
+            // def (a, b) = [1, 2]
+            out.append("$varOrVal ")
+            translateExpr(expr.leftExpression as ArgumentListExpression)
         }
+
         if (hasInitializer) {
             out.append(" = ")
-            if (GtkUtils.isArray(leftType)) {
+            if (leftIsArray) {
                 rightExpr.putNodeMetaData(AST_NODE_META_PRODUCE_ARRAY, true)
             }
             translateExpr(rightExpr)
@@ -540,6 +550,9 @@ class GroovyToKotlin implements GtkConsts {
     @DynamicDispatch
     void translateExpr(VariableExpression expr) {
         out.append(expr.name)
+        if (!expr.dynamicTyped) {
+            out.append(": ${typeToKotlinString(expr.type)}")
+        }
     }
 
     @DynamicDispatch

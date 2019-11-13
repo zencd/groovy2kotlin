@@ -48,8 +48,8 @@ Others may be supported but was not tested.
 
 ## Todo 1
 
-- instance/class initializers (partially supported now)
-- Bug: the `{}` braces lost: `${call()}"` → `"$call"`
+- Groovy scripts (statements outside any classes)
+- Instance/class initializers (partially supported now)
 - Do import static things like this: `import pack.Classe.Companion.staticMethod`
 - Preserve javadoc (there is a way)
 - Replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
@@ -103,3 +103,5 @@ Others may be supported but was not tested.
 - ✔ while loop
 - ✔ The `for(;;)` loop
 - ✔ `throws`
+- ✔ Bug: the `{}` braces lost: `${call()}"` → `"$call"`
+- ✔ Assignment to tuple: `def (x, y) = [1, 2]`

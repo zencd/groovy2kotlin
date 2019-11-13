@@ -1,6 +1,6 @@
 class Temp {
-    void xxx() {
-        def a = 1, b = 2
-        println("aaa_${a.toString()}_${b}_")
+    void main() {
+        def (a, b) = [1, 2]
+        def (String c, int d) = [1, 2]
     }
 }

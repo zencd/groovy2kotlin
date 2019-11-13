@@ -1,0 +1,16 @@
+class Temp {
+    void main() {
+        def (a, b) = [1, 2]
+        def (String c, int d) = [1, 2]
+    }
+}
+-------------
+$DEFAULT_IMPORTS
+open class Temp {
+    companion object {
+    }
+    fun main() {
+        val (a, b) = listOf(1, 2)
+        val (c: String, d: Integer) = listOf(1, 2)
+    }
+}
