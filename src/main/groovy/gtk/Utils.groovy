@@ -17,6 +17,8 @@ import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
+import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.Statement
 
 import java.util.logging.Logger
 import java.util.regex.Matcher
@@ -347,6 +349,20 @@ class Utils {
 
     static boolean isEnabled(AnnotationNode anno) {
         return !(anno.classNode.name in ALL_DISABLED_ANNO_CLASSES)
+    }
+
+    /**
+     * By some reason groovy parser can produce a tree like this: `{{...}}`.
+     * Noticed for <init> and <clinit>.
+     * This method tries to reduce such nesting.
+     */
+    static Statement tryReduceUselessBlockNesting(Statement stmt) {
+        if (stmt instanceof BlockStatement) {
+            if (stmt.statements.size() == 1 && stmt.statements[0] instanceof BlockStatement) {
+                return stmt.statements[0] as BlockStatement
+            }
+        }
+        return stmt
     }
 
 }

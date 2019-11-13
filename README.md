@@ -48,7 +48,7 @@ Others may be supported but was not tested.
 
 ## Todo 1
 
-- instance/class initializers
+- instance/class initializers (partially supported now)
 - Bug: the `{}` braces lost: `${call()}"` → `"$call"`
 - Do import static things like this: `import pack.Classe.Companion.staticMethod`
 - Preserve javadoc (there is a way)

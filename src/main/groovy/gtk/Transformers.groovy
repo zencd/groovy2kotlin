@@ -20,10 +20,10 @@ class Transformers {
      * Kotlin does not allow it (in regular methods)
      * so let's add a `return` at the end of such methods at least (a simple solution).
      */
-    static List<Statement> tryAddExplicitReturnToMethodBody(MethodNode method) {
+    static List<Statement> tryAddExplicitReturnToMethodBody(MethodNode method, BlockStatement code) {
         def isVoid = Utils.isVoidMethod(method)
-        def code = method.code
-        if (code instanceof BlockStatement) {
+        //def code = method.code
+        //if (code instanceof BlockStatement) {
             List<Statement> stmts = []
             def originalStatements = code.statements
             originalStatements.eachWithIndex { Statement aStmt, int i ->
@@ -37,10 +37,10 @@ class Transformers {
                 stmts.add(aStmt)
             }
             return stmts
-        } else {
-            log.warning("unreachable code reached: method.code expected to be a BlockStatement")
-            return []
-        }
+        //} else {
+        //    log.warning("unreachable code reached: method.code expected to be a BlockStatement")
+        //    return []
+        //}
     }
 
     static void tryModifySignature(MethodNode method) {

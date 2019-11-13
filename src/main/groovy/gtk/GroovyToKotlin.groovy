@@ -171,7 +171,13 @@ class GroovyToKotlin {
             translateField(field)
         }
         for (def objInit  : classNode.objectInitializerStatements) {
-            out.newLineCrlf("// TODO instance initializer omitted")
+            objInit = Utils.tryReduceUselessBlockNesting(objInit)
+            out.newLineCrlf("/*")
+            out.newLineCrlf("TODO groovy2kotlin: instance initializer not translated")
+            out.indent()
+            translateStatement(objInit)
+            out.lineBreak()
+            out.newLineCrlf("*/")
         }
         for (method in classNode.declaredConstructors) {
             translateMethod(method)
@@ -257,7 +263,7 @@ class GroovyToKotlin {
 
     void translateMethod(MethodNode method) {
         if (method.synthetic) {
-            log.warning("method is synthetic - deal with it: $method") // todo handle synthetic methods
+            // <clinit> methods are synthetic at least
         }
 
         Transformers.tryModifySignature(method)
@@ -284,6 +290,15 @@ class GroovyToKotlin {
         for (ClassNode aThrows : method.exceptions) {
             out.newLineCrlf("@Throws(${aThrows.name}::class)")
         }
+        def isConstructor = '<init>' == method.name
+        def isStaticBlock = '<clinit>' == method.name
+        def name = method.name
+
+        if (isStaticBlock) {
+            out.newLineCrlf("/*")
+            out.newLineCrlf("TODO groovy2kotlin: static initializers can't be converted currently")
+        }
+
         def rt2 = typeToKotlinString(method.returnType)
         def rt3 = Utils.isVoidMethod(method) ? '' : ": ${rt2}"
         out.indent()
@@ -291,9 +306,6 @@ class GroovyToKotlin {
         if (mods) {
             out.append(mods + " ")
         }
-
-        def isConstructor = '<init>' == method.name
-        def name = method.name
 
         if (isConstructor) {
             out.append("constructor(")
@@ -305,14 +317,14 @@ class GroovyToKotlin {
         //out.append(getParametersText(method.parameters))
         out.append(")")
         out.append(rt3)
-        def code = method.code
+        def code = Utils.tryReduceUselessBlockNesting(method.code)
         if (code == null) {
             out.lineBreak()
         } else if (code instanceof BlockStatement) {
             out.append(" {")
             out.lineBreak()
             out.push()
-            def stmts = Transformers.tryAddExplicitReturnToMethodBody(method)
+            def stmts = Transformers.tryAddExplicitReturnToMethodBody(method, code)
             for (stmt in stmts) {
                 translateStatement(stmt)
             }
@@ -328,6 +340,10 @@ class GroovyToKotlin {
         } else {
             out.lineBreak()
             out.newLineCrlf("// unsupported ${code.class}")
+        }
+
+        if (isStaticBlock) {
+            out.newLineCrlf("*/")
         }
     }
 

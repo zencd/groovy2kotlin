@@ -1,0 +1,33 @@
+class Temp {
+    static { println("static init") }
+    { println("instance init") }
+    Temp(int i) { println("constructor 1") }
+    Temp() { println("constructor 2") }
+}
+------------
+$DEFAULT_IMPORTS
+open class Temp {
+    companion object {
+        /*
+        TODO groovy2kotlin: static initializers can't be converted currently
+        fun <clinit>() {
+        println("static init")
+        }
+        */
+    }
+
+    /*
+    TODO groovy2kotlin: instance initializer not translated
+    {
+    println("instance init")
+    }
+    */
+
+    constructor(i: Int) {
+        println("constructor 1")
+    }
+
+    constructor() {
+        println("constructor 2")
+    }
+}
