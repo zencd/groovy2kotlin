@@ -42,6 +42,8 @@ Others may be supported but was not tested.
 - `GroovyToKotlin.groovy` - the translator engine
 - `test-data/input-output-tests/` - a set of input/output tests showing how the things gets translated
 
+![demo.png](demo.png)
+
 ## Todo 1
 
 - instance/class initializers
