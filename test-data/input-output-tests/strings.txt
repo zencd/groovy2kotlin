@@ -1,8 +1,9 @@
 class Strings {
     static void main() {
-        def jString = '\\d\\d'
-        def gString = "\\d\\d"
+        def jStringEscape = '\\d\\d'
+        def gStringEscape = "\\d\\d"
         def regex = /[-]?\d\d+/
+        def gString = "$a$b${toString()}text$c\\d"
     }
 }
 -----------
@@ -10,9 +11,10 @@ $DEFAULT_IMPORTS
 open class Strings {
     companion object {
         fun main() {
-            val jString = "\\d\\d"
-            val gString = "\\d\\d"
+            val jStringEscape = "\\d\\d"
+            val gStringEscape = "\\d\\d"
             val regex = "[-]?\\d\\d+"
+            val gString = "${a}${b}${toString()}text${c}\\d"
         }
     }
 }

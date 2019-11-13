@@ -16,6 +16,12 @@ import static org.junit.Assert.assertEquals
 @Disabled("not a test actually but added for purposes of development")
 class DevTest {
     @Test
+    void xxxx() {
+        String.metaClass.'xxx' = { return "yah" }
+        println("zzz".xxx())
+    }
+
+    @Test
     void investAstBuilder() {
         String source = """def f = new File("."); return f"""
         def nodes = new AstBuilder().buildFromString(source)

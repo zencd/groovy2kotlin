@@ -60,6 +60,9 @@ import static GtkUtils.isStatic
 import static GtkUtils.makeImportText
 import static GtkUtils.typeToKotlinString
 
+/**
+ * The core code of the translator.
+ */
 class GroovyToKotlin implements GtkConsts {
 
     private static final Logger log = Logger.getLogger(this.name)
@@ -443,7 +446,17 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(GStringExpression expr) {
-        out.append("\"${expr.verbatimText}\"")
+        out.append('"')
+        for (int i = 0; i < expr.strings.size(); i++) {
+            def constPart = GeneralUtils.escapeAsJavaStringContent(expr.strings[i].text)
+            out.append(constPart)
+            if (i < expr.values.size()) {
+                out.append('${')
+                translateExpr(expr.values[i])
+                out.append('}')
+            }
+        }
+        out.append('"')
     }
 
     /**
