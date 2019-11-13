@@ -25,8 +25,8 @@ class MainTest {
     }
 
     @Test
-    void "for_loop"() {
-        testFromFile("for_loop.txt")
+    void "loops"() {
+        testFromFile("loops.txt")
     }
 
     @Test

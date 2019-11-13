@@ -9,6 +9,7 @@ import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.Parameter
+import org.codehaus.groovy.ast.VariableScope
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.AttributeExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
@@ -739,7 +740,7 @@ class GroovyToKotlin {
 
     @DynamicDispatch
     void translateStatement(WhileStatement stmt) {
-        translateLabelsForStatement(stmt)
+        emitLabelsForStatement(stmt)
         out.newLine("while (")
         translateExpr(stmt.booleanExpression)
         out.append(") ")
@@ -747,7 +748,7 @@ class GroovyToKotlin {
         out.lineBreak()
     }
 
-    void translateLabelsForStatement(Statement stmt) {
+    void emitLabelsForStatement(Statement stmt) {
         // todo `statementLabels` belongs to the root class Statement - probably do it before EVERY statement
         for (String label : stmt.statementLabels) {
             out.newLineCrlf("@${label}")
@@ -817,18 +818,69 @@ class GroovyToKotlin {
      */
     @DynamicDispatch
     void translateStatement(ForStatement stmt) {
-        translateLabelsForStatement(stmt)
+        emitLabelsForStatement(stmt)
+        if (stmt.collectionExpression instanceof ClosureListExpression) {
+            transFor3(stmt, stmt.collectionExpression as ClosureListExpression)
+        } else {
+            transLoopInList(stmt)
+        }
+    }
+
+    /**
+     * Translate `for (x in list)`.
+     */
+    private void transLoopInList(ForStatement stmt) {
         def valName = stmt.variable.name
         out.newLine("for (")
-        if (stmt.collectionExpression instanceof ClosureListExpression) {
-            translateExpr(stmt.collectionExpression)
-        } else {
-            // ListExpression at least
-            out.append("$valName in ")
-            translateExpr(stmt.collectionExpression)
-        }
+        out.append("$valName in ")
+        translateExpr(stmt.collectionExpression)
         out.append(") ")
         translateStatement(stmt.loopBlock)
+        out.lineBreak()
+    }
+
+    /**
+     * Translate `for (a;b;c)`.
+     */
+    private void transFor3(ForStatement stmt, ClosureListExpression threeExpressions) {
+        def initExpr = threeExpressions.expressions.get(0)
+        if (initExpr instanceof EmptyExpression) {
+            initExpr = null // mark it as non existing
+        }
+
+        def checkExpr = threeExpressions.expressions.get(1)
+        if (checkExpr instanceof EmptyExpression) {
+            checkExpr = null
+        }
+
+        def updateExpr = threeExpressions.expressions.get(2)
+        if (updateExpr instanceof EmptyExpression) {
+            updateExpr = null
+        }
+
+        if (initExpr) {
+            translateStatement(new ExpressionStatement(initExpr))
+        }
+        out.newLine("while (")
+        if (checkExpr) {
+            translateExpr(checkExpr)
+        } else {
+            out.append("true")
+        }
+        out.append(") ")
+        def block = stmt.loopBlock
+        if (block instanceof BlockStatement) {
+            if (updateExpr) {
+                block.getStatements().add(new ExpressionStatement(updateExpr))
+            }
+            translateStatement(block)
+        } else {
+            if (updateExpr) {
+                VariableScope noScope = null
+                block = new BlockStatement([block, new ExpressionStatement(updateExpr)], noScope)
+            }
+            translateStatement(block)
+        }
         out.lineBreak()
     }
 

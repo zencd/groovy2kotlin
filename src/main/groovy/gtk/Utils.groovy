@@ -331,4 +331,8 @@ class Utils {
     static String escapeAsJavaStringContent(String s) {
         return s.replaceAll(SINGLE_BACKSLASH, TWO_BACKSLASHES)
     }
+
+    static boolean isForeverForLoop() {
+
+    }
 }
