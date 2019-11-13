@@ -440,6 +440,8 @@ class GroovyToKotlin {
     void translateExpr(BinaryExpression expr) {
         if (expr.operation.text == '[') {
             translateIndexingExpr(expr)
+        } else if (expr.operation.text == '==~') {
+            translateMatchOperator(expr)
         } else {
             translateRegularBinaryExpr(expr)
         }
@@ -450,6 +452,22 @@ class GroovyToKotlin {
         def ktOp = Utils.translateOperator(expr.operation.text)
         out.append(" ${ktOp} ")
         translateExpr(expr.rightExpression)
+    }
+
+    /**
+     * Groovy's match operator `==~` (it returns a boolean).
+     * Translates:
+     *      inputStr ==~ patternStr
+     * into:
+     *      patternStr.toRegex().matches(inputStr)
+     */
+    private void translateMatchOperator(BinaryExpression expr) {
+        def pattern = expr.rightExpression
+        def input = expr.leftExpression
+        translateExpr(pattern)
+        append('.toRegex().matches(')
+        translateExpr(input)
+        append(')')
     }
 
     /**

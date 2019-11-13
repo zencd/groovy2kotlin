@@ -50,7 +50,6 @@ Others may be supported but was not tested.
 - Probably translate `def` → `Any` in formal params, not `Object`
 - Groovy allows implicit conversions like `String s = 1L`
 - Groovy regexps without quotes: `/.+/`
-- Groovy regex operator `==~`
 - Groovy comparison operator `<=>`
 - Mapping:
     - `Some.class` → `Some::class.java`
@@ -60,6 +59,7 @@ Others may be supported but was not tested.
     - `String.length()` → `.length`
     - `List.eachWithIndex` → `.forEachIndexed` (params swapped!)
     - `a.is(b)` → `a === b`
+    - `Number.intValue()` → `.toInt()` etc
 - Groovy's shortcuts:
     - `File.text`, `String.execute`, etc
 
@@ -87,3 +87,4 @@ Others may be supported but was not tested.
 - ✔ anonymous classes 
 - ✔ Inner classes: static and non-static
 - ✔ `String[]` → `Array<String>`
+- ✔ Groovy regex operator `==~`
