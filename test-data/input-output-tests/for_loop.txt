@@ -1,15 +1,28 @@
 ﻿class ForLoop {
-    void main() {
+    void for_in() {
         for (xxx in [1, 2, 3]) {
             println(xxx)
         }
     }
-}---------------
+    void for_ever() {
+        for (;;) {}
+    }
+    void for3() {
+        for (int i = 0; i < 3; i++) {}
+    }
+    void for_continue() {
+        for (;;) continue
+    }
+    void for_break() {
+        for (;;) break
+    }
+}
+---------------
 $DEFAULT_IMPORTS
 open class ForLoop {
     companion object {
     }
-    fun main() {
+    fun for_in() {
         for (xxx in listOf(1, 2, 3)) {
             println(xxx)
         }

@@ -45,6 +45,7 @@ import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
+import org.codehaus.groovy.ast.stmt.WhileStatement
 
 import java.util.logging.Logger
 
@@ -717,6 +718,15 @@ class GroovyToKotlin {
     /////////////////////////////////////////////////
     //// STATEMENTS
     /////////////////////////////////////////////////
+
+    @DynamicDispatch
+    void translateStatement(WhileStatement stmt) {
+        out.newLine("while (")
+        translateExpr(stmt.booleanExpression)
+        out.append(") ")
+        translateStatement(stmt.loopBlock)
+        out.lineBreak()
+    }
 
     @DynamicDispatch
     void translateStatement(ExpressionStatement stmt) {

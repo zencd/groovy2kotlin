@@ -44,24 +44,30 @@ Others may be supported but was not tested.
 
 ## Todo 1
 
-- import static things like `import pack.Classe.Companion.staticMethod`
+- Bug: the `{}` braces lost: `${call()}"` → `"$call"`
+- The `for(;;)` loop
+- Do import static things like this: `import pack.Classe.Companion.staticMethod`
 - Preserve javadoc (there is a way)
 - Replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
 - Probably translate `def` → `Any` in formal params, not `Object`
 - Groovy allows implicit conversions like `String s = 1L`
-- Groovy regexps without quotes: `/.+/`
 - Groovy comparison operator `<=>`
-- Mapping:
+- `List` mapping:
+    - `eachWithIndex` → `forEachIndexed` (params swapped!)
+    - `collect` → `map`
+- `File` mapping:
+    - `size()` → `length()`
+    - `File.text`
+- `String` mapping:
+    - `getBytes()` → `toByteArray()`
+    - `length()` → `length` attr
+    - `String.execute()`
+- `Number` mapping:
+    - `intValue()` → `.toInt()` etc
+- Other mappings:
     - `Some.class` → `Some::class.java`
     - `~16` → `16.inv()`
-    - `File.size()` → `.length()`
-    - `String.getBytes()` → `.toByteArray()`
-    - `String.length()` → `.length`
-    - `List.eachWithIndex` → `.forEachIndexed` (params swapped!)
     - `a.is(b)` → `a === b`
-    - `Number.intValue()` → `.toInt()` etc
-- Groovy's shortcuts:
-    - `File.text`, `String.execute`, etc
 
 ## Todo 2, requires type inference
 
@@ -73,7 +79,7 @@ Others may be supported but was not tested.
 ## Some history
 
 - ✔ `String.replaceAll` → `"aaa".replace("a", "x")`
-- ✔ local vars without an initializer
+- ✔ Local vars without an initializer
 - ✔ `equals` → `override fun equals(other: Any?): Boolean`
 - ✔ `hashCode` → `override fun hashCode(): Int`
 - ✔ `toString` → `override fun toString(): String`
@@ -84,7 +90,9 @@ Others may be supported but was not tested.
 - ✔ Distinct classes and interfaces
 - ✔ Kotlin disallows use of `Map`/`List` without generics specified explicitly
 - ✔ Groovy operator `in`
-- ✔ anonymous classes 
+- ✔ Anonymous classes 
 - ✔ Inner classes: static and non-static
 - ✔ `String[]` → `Array<String>`
 - ✔ Groovy regex operator `==~`
+- ✔ Groovy regexps without quotes: `/.+/`
+- ✔ while loop

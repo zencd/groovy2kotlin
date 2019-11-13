@@ -23,6 +23,10 @@ import org.codehaus.groovy.syntax.Reduction
 import java.nio.charset.StandardCharsets
 
 /**
+ * A little developer's helper.
+ *
+ * SOME USEFUL LINKS BELOW
+ *
  * LOW-LEVEL
  * {@link org.codehaus.groovy.tools.groovydoc.GroovyRootDocBuilder#parseGroovy}
  * {@link org.codehaus.groovy.tools.groovydoc.SimpleGroovyClassDocAssembler} - its visitor
