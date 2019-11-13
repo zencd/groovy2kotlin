@@ -44,7 +44,7 @@ Others may be supported but was not tested.
 
 ## Example
 
-![demo.png](demo.png)
+![demo comparison](demo2.png)
 
 ## Todo 1
 
