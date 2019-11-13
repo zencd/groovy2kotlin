@@ -37,7 +37,9 @@ import org.codehaus.groovy.ast.expr.TernaryExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.BreakStatement
 import org.codehaus.groovy.ast.stmt.CatchStatement
+import org.codehaus.groovy.ast.stmt.ContinueStatement
 import org.codehaus.groovy.ast.stmt.EmptyStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ForStatement
@@ -536,6 +538,19 @@ class GroovyToKotlin {
         out.newLine(')')
     }
 
+    /**
+     * Describes `(;;)` in a for loop.
+     * Maybe used in some other cases.
+     * @param expr
+     */
+    @DynamicDispatch
+    void translateExpr(ClosureListExpression expr) {
+        expr.expressions.eachWithIndex { Expression anExpr, int i ->
+            if (i > 0) out.append('; ')
+            translateExpressionAwareOfEmpty(anExpr)
+        }
+    }
+
     @DynamicDispatch
     void translateExpr(ListExpression expr) {
         def forceArray = expr.getNodeMetaData(G2KConsts.AST_NODE_META_PRODUCE_ARRAY) == true
@@ -548,9 +563,12 @@ class GroovyToKotlin {
         out.append(')')
     }
 
-    @DynamicDispatch
-    void translateExpr(ClosureListExpression expr) {
-        out.append("EXPR_NOT_IMPL(ClosureListExpression)")
+    void translateExpressionAwareOfEmpty(Expression expr) {
+        if (expr instanceof EmptyExpression) {
+            // nop
+        } else {
+            translateExpr(expr)
+        }
     }
 
     @DynamicDispatch
@@ -788,8 +806,14 @@ class GroovyToKotlin {
     @DynamicDispatch
     void translateStatement(ForStatement stmt) {
         def valName = stmt.variable.name
-        out.newLine("for ($valName in ")
-        translateExpr(stmt.collectionExpression)
+        out.newLine("for (")
+        if (stmt.collectionExpression instanceof ClosureListExpression) {
+            translateExpr(stmt.collectionExpression)
+        } else {
+            // ListExpression at least
+            out.append("$valName in ")
+            translateExpr(stmt.collectionExpression)
+        }
         out.append(") ")
         translateStatement(stmt.loopBlock)
         out.lineBreak()
@@ -822,6 +846,30 @@ class GroovyToKotlin {
         //out.append(") ")
         //translateStatement(stmt.loopBlock)
         out.lineBreak()
+    }
+
+    /**
+     * Translate:
+     *     label: while (false) {continue label}
+     * into:
+     *     label@ while (false) {continue@label}
+     */
+    @DynamicDispatch
+    void translateStatement(ContinueStatement stmt) {
+        def labelPadded = stmt.label ? "@$stmt.label" : ""
+        out.newLineCrlf("continue${labelPadded}")
+    }
+
+    /**
+     * Translate:
+     *     label: while (false) {break label}
+     * into:
+     *     label@ while (false) {break@label}
+     */
+    @DynamicDispatch
+    void translateStatement(BreakStatement stmt) {
+        def labelPadded = stmt.label ? "@$stmt.label" : ""
+        out.newLineCrlf("break${labelPadded}")
     }
 
     @DynamicDispatch
