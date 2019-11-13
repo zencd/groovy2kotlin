@@ -52,15 +52,15 @@ import org.codehaus.groovy.ast.stmt.WhileStatement
 
 import java.util.logging.Logger
 
-import static Utils.getJavaDocCommentsBeforeNode
-import static Utils.getModifierString
-import static Utils.getMethodModifierString
-import static Utils.isFinal
-import static Utils.isStatic
-import static Utils.makeImportText
-import static Utils.typeToKotlinString
+import static GtkUtils.getJavaDocCommentsBeforeNode
+import static GtkUtils.getModifierString
+import static GtkUtils.getMethodModifierString
+import static GtkUtils.isFinal
+import static GtkUtils.isStatic
+import static GtkUtils.makeImportText
+import static GtkUtils.typeToKotlinString
 
-class GroovyToKotlin {
+class GroovyToKotlin implements GtkConsts {
 
     private static final Logger log = Logger.getLogger(this.name)
 
@@ -103,7 +103,7 @@ class GroovyToKotlin {
         translateImports(module)
         out.newLineCrlf("")
         for (cls in module.classes) {
-            if (!Utils.isInner(cls)) {
+            if (!GtkUtils.isInner(cls)) {
                 // anonymous classes gonna be emitted on demand
                 // inner/nested classes gonna be emitted inside the outer class
                 translateClass(cls)
@@ -129,7 +129,7 @@ class GroovyToKotlin {
         def classComments = getJavaDocCommentsBeforeNode(sbuf, classNode)
         translateAnnos(classNode.annotations)
 
-        def modStr = Utils.getClassModifierString(classNode)
+        def modStr = GtkUtils.getClassModifierString(classNode)
         def modStrPadded = modStr ? "$modStr " : ""
 
         List<String> extendList = []
@@ -143,7 +143,7 @@ class GroovyToKotlin {
 
         def classOrInterface = classNode.interface ? "interface" : "class"
 
-        def emittedClassName = Utils.getClassDeclarationName(classNode)
+        def emittedClassName = GtkUtils.getClassDeclarationName(classNode)
         out.newLine("${modStrPadded}${classOrInterface} ${emittedClassName}${extendPadded} ")
         translateClassBody(classNode)
     }
@@ -151,7 +151,7 @@ class GroovyToKotlin {
     private void translateClassBody(ClassNode classNode) {
         out.appendLn("{")
         out.push()
-        if (!classNode.interface && !Utils.isAnonymous(classNode)) {
+        if (!classNode.interface && !GtkUtils.isAnonymous(classNode)) {
             out.newLineCrlf("companion object {")
             def classCompanionPiece = out.addPiece('companion-piece')
             assert !classCompanions.containsKey(classNode)
@@ -171,7 +171,7 @@ class GroovyToKotlin {
             translateField(field)
         }
         for (def objInit  : classNode.objectInitializerStatements) {
-            objInit = Utils.tryReduceUselessBlockNesting(objInit)
+            objInit = GtkUtils.tryReduceUselessBlockNesting(objInit)
             out.newLineCrlf("/*")
             out.newLineCrlf("TODO groovy2kotlin: instance initializer not translated")
             out.indent()
@@ -196,7 +196,7 @@ class GroovyToKotlin {
     }
 
     void translateAnno(AnnotationNode anno) {
-        if (Utils.isEnabled(anno)) {
+        if (GtkUtils.isEnabled(anno)) {
             out.newLineCrlf("@${anno.classNode.name}")
         } else {
             out.newLineCrlf("// TODO groovy2kotlin: @${anno.classNode.name}")
@@ -246,15 +246,15 @@ class GroovyToKotlin {
         }
         if (field.initialValueExpression == null) {
             if (optional) {
-                def initialValue = Utils.makeDefaultInitialValue(kotlinType)
+                def initialValue = GtkUtils.makeDefaultInitialValue(kotlinType)
                 if (initialValue) {
                     out.append(" = ${initialValue}")
                 }
             }
         } else {
             out.append(" = ")
-            if (Utils.isArray(fieldType)) {
-                field.initialValueExpression.putNodeMetaData(G2KConsts.AST_NODE_META_PRODUCE_ARRAY, true)
+            if (GtkUtils.isArray(fieldType)) {
+                field.initialValueExpression.putNodeMetaData(AST_NODE_META_PRODUCE_ARRAY, true)
             }
             translateExpr(field.initialValueExpression)
         }
@@ -300,7 +300,7 @@ class GroovyToKotlin {
         }
 
         def rt2 = typeToKotlinString(method.returnType)
-        def rt3 = Utils.isVoidMethod(method) ? '' : ": ${rt2}"
+        def rt3 = GtkUtils.isVoidMethod(method) ? '' : ": ${rt2}"
         out.indent()
         def mods = getMethodModifierString(method)
         if (mods) {
@@ -317,7 +317,7 @@ class GroovyToKotlin {
         //out.append(getParametersText(method.parameters))
         out.append(")")
         out.append(rt3)
-        def code = Utils.tryReduceUselessBlockNesting(method.code)
+        def code = GtkUtils.tryReduceUselessBlockNesting(method.code)
         if (code == null) {
             out.lineBreak()
         } else if (code instanceof BlockStatement) {
@@ -357,7 +357,7 @@ class GroovyToKotlin {
     }
 
     private void translateMethodParam(Parameter node) {
-        def predefinedKotlinType = node.getNodeMetaData(G2KConsts.AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
+        def predefinedKotlinType = node.getNodeMetaData(GtkConsts.AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
         String name = node.getName() == null ? "<unknown>" : node.getName()
         String type = predefinedKotlinType ?: typeToKotlinString(node.getType())
         if (node.getInitialExpression() == null) {
@@ -374,8 +374,8 @@ class GroovyToKotlin {
 
     @DynamicDispatch
     void translateExpr(MethodCallExpression expr) {
-        def singleClosureArg = Utils.tryFindSingleClosureArgument(expr)
-        def numParams = Utils.getNumberOfActualParams(expr)
+        def singleClosureArg = GtkUtils.tryFindSingleClosureArgument(expr)
+        def numParams = GtkUtils.getNumberOfActualParams(expr)
 
         if (!expr.implicitThis) {
             String spread = expr.spreadSafe ? "*" : ""; // todo support it
@@ -391,7 +391,7 @@ class GroovyToKotlin {
                 name = 'replace' // Kotlin has no replaceAll(), but replace() looks the same
             }
             if (singleClosureArg) {
-                name = Utils.tryRewriteMethodNameWithSingleClosureArg(name)
+                name = GtkUtils.tryRewriteMethodNameWithSingleClosureArg(name)
             }
             out.append(name)
         } else {
@@ -452,7 +452,7 @@ class GroovyToKotlin {
     @DynamicDispatch
     void translateExpr(DeclarationExpression expr) {
         def rightExpr = expr.rightExpression
-        def assignedByNull = Utils.isNullConstant(rightExpr)
+        def assignedByNull = GtkUtils.isNullConstant(rightExpr)
         def hasInitializer = rightExpr != null && !(rightExpr instanceof EmptyExpression)
         String varOrVal
         boolean optional
@@ -473,8 +473,8 @@ class GroovyToKotlin {
         }
         if (hasInitializer) {
             out.append(" = ")
-            if (Utils.isArray(leftType)) {
-                rightExpr.putNodeMetaData(G2KConsts.AST_NODE_META_PRODUCE_ARRAY, true)
+            if (GtkUtils.isArray(leftType)) {
+                rightExpr.putNodeMetaData(AST_NODE_META_PRODUCE_ARRAY, true)
             }
             translateExpr(rightExpr)
         }
@@ -493,7 +493,7 @@ class GroovyToKotlin {
 
     private void translateRegularBinaryExpr(BinaryExpression expr) {
         translateExpr(expr.leftExpression)
-        def ktOp = Utils.translateOperator(expr.operation.text)
+        def ktOp = GtkUtils.translateOperator(expr.operation.text)
         out.append(" ${ktOp} ")
         translateExpr(expr.rightExpression)
     }
@@ -532,9 +532,9 @@ class GroovyToKotlin {
     @DynamicDispatch
     void translateExpr(ConstantExpression expr) {
         // todo use expr.constantName probably
-        if (Utils.isString(expr.type)) {
+        if (GtkUtils.isString(expr.type)) {
             if (expr.value != null) {
-                out.append("\"${Utils.escapeAsJavaStringContent((String)expr.value)}\"")
+                out.append("\"${GeneralUtils.escapeAsJavaStringContent((String)expr.value)}\"")
             } else {
                 // XXX not sure what is the case here
                 out.append("\"${expr.value}\"")
@@ -594,7 +594,7 @@ class GroovyToKotlin {
 
     @DynamicDispatch
     void translateExpr(ListExpression expr) {
-        def forceArray = expr.getNodeMetaData(G2KConsts.AST_NODE_META_PRODUCE_ARRAY) == true
+        def forceArray = expr.getNodeMetaData(AST_NODE_META_PRODUCE_ARRAY) == true
         def function = forceArray ? 'arrayOf' : 'listOf'
         out.append("${function}(")
         expr.expressions.eachWithIndex { anExpr, int i ->

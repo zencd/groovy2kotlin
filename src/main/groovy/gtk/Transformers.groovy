@@ -12,7 +12,7 @@ import java.util.logging.Logger
 /**
  * AST transformations
  */
-class Transformers {
+class Transformers implements GtkConsts {
     private static final Logger log = Logger.getLogger(this.name)
 
     /**
@@ -21,7 +21,7 @@ class Transformers {
      * so let's add a `return` at the end of such methods at least (a simple solution).
      */
     static List<Statement> tryAddExplicitReturnToMethodBody(MethodNode method, BlockStatement code) {
-        def isVoid = Utils.isVoidMethod(method)
+        def isVoid = GtkUtils.isVoidMethod(method)
         //def code = method.code
         //if (code instanceof BlockStatement) {
             List<Statement> stmts = []
@@ -44,20 +44,20 @@ class Transformers {
     }
 
     static void tryModifySignature(MethodNode method) {
-        def typeStr = Utils.typeToKotlinString(method.returnType)
-        int numParams = Utils.getNumberOfFormalParams(method)
+        def typeStr = GtkUtils.typeToKotlinString(method.returnType)
+        int numParams = GtkUtils.getNumberOfFormalParams(method)
         if (method.name == 'toString' && typeStr == 'String' && numParams == 0) {
-            method.putNodeMetaData(G2KConsts.AST_NODE_META_OVERRIDING_METHOD, true)
+            method.putNodeMetaData(AST_NODE_META_OVERRIDING_METHOD, true)
         }
         else if (method.name == 'hashCode' && typeStr == 'Int' && numParams == 0) {
-            method.putNodeMetaData(G2KConsts.AST_NODE_META_OVERRIDING_METHOD, true)
+            method.putNodeMetaData(AST_NODE_META_OVERRIDING_METHOD, true)
         }
         else if (method.name == 'equals' && typeStr == 'Boolean' && numParams == 1) {
             def param0 = method.parameters[0]
-            String paramType = Utils.typeToKotlinString(param0.type)
+            String paramType = GtkUtils.typeToKotlinString(param0.type)
             if (paramType == 'Object') {
-                method.putNodeMetaData(G2KConsts.AST_NODE_META_OVERRIDING_METHOD, true)
-                param0.putNodeMetaData(G2KConsts.AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING, 'Any?')
+                method.putNodeMetaData(AST_NODE_META_OVERRIDING_METHOD, true)
+                param0.putNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING, 'Any?')
             }
         }
     }

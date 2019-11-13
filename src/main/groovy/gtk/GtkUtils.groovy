@@ -24,7 +24,7 @@ import java.util.logging.Logger
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class Utils {
+class GtkUtils {
     private static final Logger log = Logger.getLogger(this.name)
 
     private static final Pattern PREV_JAVADOC_COMMENT_PATTERN = Pattern.compile("(?s)/\\*\\*(.*?)\\*/");
@@ -117,7 +117,7 @@ class Utils {
     static String getMethodModifierString(MethodNode method) {
         boolean allowAbstract = !method.declaringClass.interface
         String javaMods = getModifierString(method.modifiers, false, false, true, allowAbstract)
-        String override = method.getNodeMetaData(G2KConsts.AST_NODE_META_OVERRIDING_METHOD) == true ? G2KConsts.KOTLIN_OVERRIDE_KEYWORD : ''
+        String override = method.getNodeMetaData(GtkConsts.AST_NODE_META_OVERRIDING_METHOD) == true ? GtkConsts.KOTLIN_OVERRIDE_KEYWORD : ''
         return [override, javaMods].findAll { it }.join(' ')
     }
 
@@ -170,15 +170,6 @@ class Utils {
 
     static boolean isStatic(int mods) {
         return (mods & Opcodes.ACC_STATIC) != 0
-    }
-
-    public static final String UTF8_BOM = "\uFEFF";
-
-    static String cutBom(String s) {
-        if (s != null && s.startsWith(UTF8_BOM)) {
-            s = s.substring(1);
-        }
-        return s;
     }
 
     static boolean isString(ClassNode type) {
@@ -296,17 +287,9 @@ class Utils {
         }
     }
 
-    static String tryCutFromEnd(String s, String pattern) {
-        if (s && pattern && s.endsWith(pattern)) {
-            return s.substring(0, s.length() - pattern.length());
-        } else {
-            return s
-        }
-    }
-
     static String makeDefaultInitialValue(String kotlinType) {
         // todo string comparison is lame
-        kotlinType = tryCutFromEnd(kotlinType, '?')
+        kotlinType = GeneralUtils.tryCutFromEnd(kotlinType, '?')
         String defValForObjects = "null"
         def KT_TYPE_TO_INITIAL_VALUE = [
                 "String": defValForObjects,
@@ -327,13 +310,6 @@ class Utils {
         } else {
             defValForObjects
         }
-    }
-
-    private static final Pattern SINGLE_BACKSLASH = Pattern.compile('\\\\')
-    private static final String TWO_BACKSLASHES = '\\\\\\\\'
-
-    static String escapeAsJavaStringContent(String s) {
-        return s.replaceAll(SINGLE_BACKSLASH, TWO_BACKSLASHES)
     }
 
     static {

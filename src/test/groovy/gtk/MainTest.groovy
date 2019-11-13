@@ -1,8 +1,6 @@
 package gtk
 
 import groovyjarjarasm.asm.Opcodes
-import gtk.DevMain
-import gtk.Utils
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -261,18 +259,18 @@ private val x = "hello"
 
     @Test
     void getModifierString() {
-        assertEquals("", Utils.getModifierString(0))
-        assertEquals("abstract", Utils.getModifierString(Opcodes.ACC_ABSTRACT))
-        assertEquals("", Utils.getModifierString(Opcodes.ACC_PUBLIC))
-        assertEquals("private", Utils.getModifierString(Opcodes.ACC_PRIVATE))
-        assertEquals("protected", Utils.getModifierString(Opcodes.ACC_PROTECTED))
-        assertEquals("static", Utils.getModifierString(Opcodes.ACC_STATIC))
-        assertEquals("final", Utils.getModifierString(Opcodes.ACC_FINAL))
-        assertEquals("static final", Utils.getModifierString(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC|Opcodes.ACC_FINAL))
+        assertEquals("", GtkUtils.getModifierString(0))
+        assertEquals("abstract", GtkUtils.getModifierString(Opcodes.ACC_ABSTRACT))
+        assertEquals("", GtkUtils.getModifierString(Opcodes.ACC_PUBLIC))
+        assertEquals("private", GtkUtils.getModifierString(Opcodes.ACC_PRIVATE))
+        assertEquals("protected", GtkUtils.getModifierString(Opcodes.ACC_PROTECTED))
+        assertEquals("static", GtkUtils.getModifierString(Opcodes.ACC_STATIC))
+        assertEquals("final", GtkUtils.getModifierString(Opcodes.ACC_FINAL))
+        assertEquals("static final", GtkUtils.getModifierString(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC|Opcodes.ACC_FINAL))
     }
 
     static def splitGroovyAndKotlin(String s) {
-        s = Utils.cutBom(s)  // with BOM groovy parser goes crazy: it thinks there is no class in file
+        s = GeneralUtils.cutBom(s)  // with BOM groovy parser goes crazy: it thinks there is no class in file
         def split = s.split('-{5,}')
         return [split[0], split[1]]
     }
