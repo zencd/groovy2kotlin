@@ -49,7 +49,7 @@ Others may be supported but was not tested.
 
 - `@Overrdie` looks redundant in the emitted code
 - Groovy scripts (statements outside any classes)
-- Instance/class initializers (partially supported now)
+- Allow annotations for everything
 - Do import static things like this: `import pack.Classe.Companion.staticMethod`
 - Preserve javadoc (there is a way)
 - Replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
@@ -87,6 +87,7 @@ Others may be supported but was not tested.
 ✔ Anonymous classes 
 ✔ Inner classes ✔ Nested classes
 ✔ Inheritance
+✔ Annotations
 ✔ Range expression
 ✔ In-string expressions
 ✔ Operator `in`
@@ -99,6 +100,7 @@ Others may be supported but was not tested.
 ✔ `while`
 ✔ `for(;;)`
 ✔ `break` ✔ `continue`
+✔ loop labels
 ✔ `throws`
 ✔ `String.replaceAll()`
 ✔ `equals()`
