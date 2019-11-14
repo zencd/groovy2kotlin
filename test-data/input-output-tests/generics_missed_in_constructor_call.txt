@@ -1,10 +1,10 @@
 class ClassName {
-public static final def ERRORS = new ArrayList<ErrorInfo>()
+public static final def ERRORS = new ArrayList<String>()
 }
 ---------------
 $DEFAULT_IMPORTS
 open class ClassName {
     companion object {
-        val ERRORS = ArrayList<ErrorInfo>()
+        val ERRORS = ArrayList<String>()
     }
 }

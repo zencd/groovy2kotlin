@@ -2,6 +2,7 @@ package gtk
 
 import groovyjarjarasm.asm.Opcodes
 import gtk.inf.Inferer
+import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.builder.AstBuilder
 import org.codehaus.groovy.ast.expr.VariableExpression
@@ -37,14 +38,18 @@ class DevTest {
     @Test
     void invest2() {
         String source = """
-def x = 1 * 2
+class Main {
+    void method(float f, int i, def aDef, Object obj, noType) {
+        aDef + i
+    }
+}
 """
         def nodes = new AstBuilder().buildFromString(source)
-        assert nodes.size() == 1
-        def root = nodes[0]
         def inferer = new Inferer()
         inferer.init()
-        inferer.inferModule(root as BlockStatement)
+        for (ASTNode aNode  : nodes) {
+            inferer.inferencePass(aNode)
+        }
         def stop = 0
     }
 

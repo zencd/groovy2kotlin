@@ -8,17 +8,22 @@ import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
+import org.codehaus.groovy.ast.ConstructorNode
 import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
+import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.Statement
+import org.codehaus.groovy.classgen.BytecodeExpression
+import org.codehaus.groovy.syntax.Token
 
 import java.util.logging.Logger
 import java.util.regex.Matcher
@@ -122,6 +127,25 @@ class GtkUtils {
         String javaMods = getModifierString(method.modifiers, false, false, true, allowAbstract)
         String override = method.getNodeMetaData(GtkConsts.AST_NODE_META_OVERRIDING_METHOD) == true ? GtkConsts.KOTLIN_OVERRIDE_KEYWORD : ''
         return [override, javaMods].findAll { it }.join(' ')
+    }
+
+    static boolean hasSyntheticModifier(int mods) {
+        (mods & Opcodes.ACC_SYNTHETIC) != 0
+    }
+
+    static boolean isGroovyImplicitConstructorStatement(Statement stmt) {
+        // in the beginning of constructor Groovy compiler adds like:
+        // org.codehaus.groovy.ast.expr.BinaryExpression@d9f41[field(groovy.lang.MetaClass metaClass)("=":  "=" )org.codehaus.groovy.classgen.Verifier$1@d9f41]
+        // we don't want such ones
+        if (stmt instanceof ExpressionStatement) {
+            def expr = stmt.expression
+            if (expr instanceof BinaryExpression) {
+                if (expr.rightExpression instanceof BytecodeExpression) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     static String getModifierString(int mods, boolean allowFinal = true, boolean allowStatic = true, boolean allowPrivate = true, boolean allowAbstract = true) {
@@ -330,18 +354,16 @@ class GtkUtils {
         return !(anno.classNode.name in ALL_DISABLED_ANNO_CLASSES)
     }
 
-    /**
-     * By some reason groovy parser can produce a tree like this: `{{...}}`.
-     * Noticed for <init> and <clinit>.
-     * This method tries to reduce such nesting.
-     */
-    static Statement tryReduceUselessBlockNesting(Statement stmt) {
-        if (stmt instanceof BlockStatement) {
-            if (stmt.statements.size() == 1 && stmt.statements[0] instanceof BlockStatement) {
-                return stmt.statements[0] as BlockStatement
-            }
-        }
-        return stmt
+    static boolean isConstructor(MethodNode method) {
+        method instanceof ConstructorNode
     }
 
+    /**
+     * Detect if a method is auto-generated, having the @groovy.transform.Generated anno.
+     */
+    static boolean hasGroovyGeneratedAnnotation(MethodNode method) {
+        return method.annotations.any {
+            it.classNode.name == 'groovy.transform.Generated'
+        }
+    }
 }

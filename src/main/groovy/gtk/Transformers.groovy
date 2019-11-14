@@ -16,31 +16,50 @@ class Transformers implements GtkConsts {
     private static final Logger log = Logger.getLogger(this.name)
 
     /**
+     * By some reason groovy parser can produce a tree like this: `{{...}}`.
+     * Noticed for <init> and <clinit>.
+     * This method tries to reduce such nesting.
+     */
+    static List<Statement> tryReduceUselessBlockNesting(List<Statement> stmts) {
+        def onePass = { List<Statement> stmts2 ->
+            List<Statement> res = []
+            stmts2.forEach {
+                if (it instanceof BlockStatement) {
+                    it.statements.each {
+                        res.add(it)
+                    }
+                } else {
+                    res.add(it)
+                }
+            }
+            return res
+        }
+        def res = onePass(stmts)
+        return onePass(res)
+    }
+
+    /**
      * Groovy allows implicit returns and they are widely used.
      * Kotlin does not allow it (in regular methods)
      * so let's add a `return` at the end of such methods at least (a simple solution).
      */
-    static List<Statement> tryAddExplicitReturnToMethodBody(MethodNode method, BlockStatement code) {
-        def isVoid = GtkUtils.isVoidMethod(method)
-        //def code = method.code
-        //if (code instanceof BlockStatement) {
-            List<Statement> stmts = []
-            def originalStatements = code.statements
-            originalStatements.eachWithIndex { Statement aStmt, int i ->
-                def isLastStmt = i == originalStatements.size() - 1
-                if (!isVoid && isLastStmt && aStmt instanceof ExpressionStatement) {
-                    def expr = aStmt.expression
-                    if (!(expr instanceof DeclarationExpression)) {
-                        aStmt = new ReturnStatement(aStmt)
-                    }
-                }
-                stmts.add(aStmt)
-            }
+    static List<Statement> tryAddExplicitReturnToMethodBody(MethodNode method, List<Statement> stmts) {
+        if (GtkUtils.isVoidMethod(method)) {
             return stmts
-        //} else {
-        //    log.warning("unreachable code reached: method.code expected to be a BlockStatement")
-        //    return []
-        //}
+        }
+
+        List<Statement> newStmts = []
+        stmts.eachWithIndex { Statement aStmt, int i ->
+            def isLastStmt = i == stmts.size() - 1
+            if (isLastStmt && aStmt instanceof ExpressionStatement) {
+                def expr = aStmt.expression
+                if (!(expr instanceof DeclarationExpression)) {
+                    aStmt = new ReturnStatement(aStmt)
+                }
+            }
+            newStmts.add(aStmt)
+        }
+        return newStmts
     }
 
     static void tryModifySignature(MethodNode method) {

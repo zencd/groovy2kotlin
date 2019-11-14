@@ -14,13 +14,16 @@ import org.codehaus.groovy.antlr.treewalker.SourceCodeTraversal
 import org.codehaus.groovy.antlr.treewalker.SourcePrinter
 import org.codehaus.groovy.antlr.treewalker.Visitor
 import org.codehaus.groovy.antlr.treewalker.VisitorAdapter
+import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ModuleNode
+import org.codehaus.groovy.ast.builder.AstBuilder
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.runtime.ResourceGroovyMethods
 import org.codehaus.groovy.syntax.Reduction
 
 import java.nio.charset.StandardCharsets
+import java.util.logging.Logger
 
 /**
  * A little developer's helper.
@@ -66,6 +69,12 @@ import java.nio.charset.StandardCharsets
  * {@link org.codehaus.groovy.transform.stc.StaticTypesMarker#INFERRED_TYPE}
  */
 class DevMain {
+
+    private static final Logger log = Logger.getLogger(this.name)
+
+    //public static final boolean NEW_PARSING = true
+    public static final boolean NEW_PARSING = false
+
     static void main(String[] args) {
         //main1()
         //main2()
@@ -83,8 +92,14 @@ class DevMain {
         //File srcFile = new File("groovy-samples/StringGetBytes.groovy")
         File srcFile = new File("groovy-samples/Temp.groovy")
         //File srcFile = new File("C:\\projects\\sitewatch\\src\\main\\groovy\\watch\\db-example.groovy")
-        ModuleNode module = parseFile(srcFile)
         String groovyText = srcFile.getText(StandardCharsets.UTF_8.name())
+
+        ModuleNode module
+        if (NEW_PARSING) {
+            module = parseFileNew(srcFile)
+        } else {
+            module = parseText(groovyText)
+        }
         def cbuf = new CodeBuffer()
         def g2k = new GroovyToKotlin(module, cbuf, groovyText)
         g2k.translateModule()
@@ -93,23 +108,57 @@ class DevMain {
     }
 
     static String toKotlin(String groovyText) {
-        ModuleNode module = parseFile(groovyText)
+        ModuleNode module = parseText(groovyText)
         def cbuf = new CodeBuffer()
         def g2k = new GroovyToKotlin(module, cbuf, groovyText)
         g2k.translateModule()
         return cbuf.composeFinalText()
     }
 
-    static ModuleNode parseFile(String groovyText) {
+    static ModuleNode parseText(String groovyText) {
+        return parseText1(groovyText)
+        //return parseText2(groovyText)
+    }
+
+    static ModuleNode parseText2(String groovyText) {
+        GroovyClassLoader gcl = new GroovyClassLoader(this.getClassLoader())
+        def srcFile = new File('fake-file.groovy')
+        SourceUnit sourceUnit = new SourceUnit(srcFile, CompilerConfiguration.DEFAULT, gcl, null)
+        return parseTextNew(groovyText, sourceUnit)
+    }
+
+    static ModuleNode parseText1(String groovyText) {
         def reader = new StringReader(groovyText)
         SourceUnit sourceUnit = new SourceUnit("some-source-name", null, CompilerConfiguration.DEFAULT, null, null)
         try {
-            return parseFile(sourceUnit, reader)
+            return parseFileOld(sourceUnit, reader)
         } finally {
             reader.close()
         }
     }
 
+    static ModuleNode parseFileNew(File srcFile) {
+        GroovyClassLoader gcl = new GroovyClassLoader(this.getClassLoader())
+        SourceUnit sourceUnit = new SourceUnit(srcFile, CompilerConfiguration.DEFAULT, gcl, null)
+        def source = srcFile.getText('utf-8')
+        return parseTextNew(source, sourceUnit)
+    }
+
+    static ModuleNode parseTextNew(String source, SourceUnit sourceUnit) {
+        def nodes = new AstBuilder().buildFromString(source)
+        ModuleNode moduleNode = new ModuleNode(sourceUnit)
+        nodes.each {
+            // todo it would be much better to add them all at once
+            if (it instanceof ClassNode) {
+                moduleNode.addClass(it)
+            } else {
+                log.warning("not added to the module: ${it.class.name}")
+            }
+        }
+        return moduleNode
+    }
+
+    /*
     static ModuleNode parseFile(File srcFile) {
         GroovyClassLoader gcl = new GroovyClassLoader(this.getClassLoader())
         SourceUnit sourceUnit = new SourceUnit(srcFile, CompilerConfiguration.DEFAULT, gcl, null)
@@ -122,15 +171,12 @@ class DevMain {
             reader?.close()
         }
     }
+    */
 
-    static ModuleNode parseFile(SourceUnit sourceUnit, Reader reader) {
+    static ModuleNode parseFileOld(SourceUnit sourceUnit, Reader reader) {
         AntlrParserPlugin plugin = (AntlrParserPlugin) new AntlrParserPluginFactory().createParserPlugin()
         Reduction cst = plugin.parseCST(sourceUnit, reader)
-        def moduleNode = plugin.buildAST(sourceUnit, null, cst)
-
-        //ResolveVisitor visitor = new ResolveVisitor()
-
-        return moduleNode;
+        return plugin.buildAST(sourceUnit, null, cst)
     }
 
     static void main1() {

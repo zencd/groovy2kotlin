@@ -1,6 +1,17 @@
+/*
 class Temp {
-    void main() {
-        def (a, b) = [1, 2]
-        def (String c, int d) = [1, 2]
+    String field
+    void main(def x, int i) {
+        x + i
+    }
+}
+*/
+
+class ClassName {
+    //void call() {
+    //    funk(1)
+    //}
+    void funk(int normalParam, String defaultParam = "x") {
+        println(defaultParam)
     }
 }

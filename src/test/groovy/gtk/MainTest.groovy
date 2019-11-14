@@ -131,9 +131,10 @@ class MainTest {
     void testFromFile(String path) {
         File file = new File("test-data/input-output-tests", path)
         def text = file.getText('utf-8')
-        def (String groovy, String kotlin) = splitGroovyAndKotlin(text)
-        kotlin = kotlin.replace('$DEFAULT_IMPORTS', DEFAULT_IMPORTS)
-        assertGeneratedKotlin(kotlin, DevMain.toKotlin(groovy))
+        def (String groovy, String kotlinExpected) = splitGroovyAndKotlin(text)
+        kotlinExpected = kotlinExpected.replace('$DEFAULT_IMPORTS', DEFAULT_IMPORTS)
+        def kotlinActual = DevMain.toKotlin(groovy)
+        assertGeneratedKotlin(kotlinExpected, kotlinActual)
     }
 
     @Test
@@ -178,8 +179,8 @@ class MainTest {
     }
 
     @Test
-    void "regular_field"() {
-        testFromFile("regular_field.txt")
+    void "fields_regular"() {
+        testFromFile("fields_regular.txt")
     }
 
     @Test
@@ -259,7 +260,7 @@ private val x = "hello"
 
     @Test
     void "inner_class"() {
-        testFromFile("inner_class.txt")
+        testFromFile("class_inner.txt")
     }
 
     @Test

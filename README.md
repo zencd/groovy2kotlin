@@ -9,10 +9,9 @@ Started Nov 2019 by [zencd](https://github.com/zencd) in order to convert a proj
 because I've not found any existing tools (and it's easy to write one by myself).
 The current implementation is simple: it uses Groovy's internal
 libs to parse source text into a well designed AST, then the tree is traversed and
-translated to Kotlin. It's planned to add type inference to AST to allow more
-sophisticated transformations.
+translated to Kotlin. Type inference is WIP to allow more sophisticated translation.
 
-Feel free to submit a bug, ticket, etc.
+Feel free to submit a bug, ticket and do all the github things.
 
 | Covered  | Covered
 |----------|------------- 
@@ -48,6 +47,7 @@ Others may be supported but was not tested.
 
 ## Todo 1
 
+- `@Overrdie` looks redundant in the emitted code
 - Groovy scripts (statements outside any classes)
 - Instance/class initializers (partially supported now)
 - Do import static things like this: `import pack.Classe.Companion.staticMethod`

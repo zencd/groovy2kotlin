@@ -1,9 +1,11 @@
 package gtk
 
+import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.antlr.SourceBuffer
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
+import org.codehaus.groovy.ast.ConstructorNode
 import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
@@ -140,7 +142,9 @@ class GroovyToKotlin implements GtkConsts {
             extendList.add("${classNode.superClass.name}()")
         }
         for (ClassNode iface : classNode.interfaces) {
-            extendList.add(iface.name)
+            if (iface.name != 'groovy.lang.GroovyObject') {
+                extendList.add(iface.name)
+            }
         }
         def extendPadded = extendList ? " : ${extendList.join(', ')}" : ""
 
@@ -171,10 +175,18 @@ class GroovyToKotlin implements GtkConsts {
         }
 
         for (field in classNode.fields) {
-            translateField(field)
+            // XXX (field.synthetic == true) even for explicit fields
+            // but looking at the modifiers we can distinct implicit ones and omit them
+            def synth = GtkUtils.hasSyntheticModifier(field.modifiers)
+            if (synth) {
+                // groovy-specific methods added implicitly, we don't want them
+                // Examples: `$staticClassInfo`, `__$stMC`, `metaClass`
+            } else {
+                translateField(field)
+            }
         }
-        for (def objInit  : classNode.objectInitializerStatements) {
-            objInit = GtkUtils.tryReduceUselessBlockNesting(objInit)
+        for (def objInit : classNode.objectInitializerStatements) {
+            //objInit = GtkUtils.tryReduceUselessBlockNesting(objInit)
             out.newLineCrlf("/*")
             out.newLineCrlf("TODO groovy2kotlin: instance initializer not translated")
             out.indent()
@@ -183,10 +195,33 @@ class GroovyToKotlin implements GtkConsts {
             out.newLineCrlf("*/")
         }
         for (method in classNode.declaredConstructors) {
-            translateMethod(method)
+            def synth1 = method.synthetic
+            def synth2 = GtkUtils.hasSyntheticModifier(method.modifiers)
+            if (GtkUtils.hasGroovyGeneratedAnnotation(method)) {
+                // don't want auto-generated empty constructors
+            } else {
+                translateMethod(method)
+            }
         }
         for (method in classNode.methods) {
-            translateMethod(method)
+            def synth1 = method.synthetic
+            def synth2 = GtkUtils.hasSyntheticModifier(method.modifiers)
+            if (synth2) {
+                // groovy-specific methods added implicitly, we don't want them
+                // Examples: `getProperty`, `invokeMethod`, `setMetaClass`, `$getStaticMetaClass`
+                int stop = 0
+            } else if (synth1) {
+                // known cases:
+                // 1) static initializer
+                // 2) getters/setters auto-generated for fields
+                if (method.name == '<clinit>') {
+                    translateMethod(method)
+                }
+            } else if (GtkUtils.hasGroovyGeneratedAnnotation(method)) {
+                // don't want auto-gen methods
+            } else {
+                translateMethod(method)
+            }
         }
         out.pop()
         out.newLineCrlf("}")
@@ -265,10 +300,6 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     void translateMethod(MethodNode method) {
-        if (method.synthetic) {
-            // <clinit> methods are synthetic at least
-        }
-
         Transformers.tryModifySignature(method)
 
         def piece = null
@@ -288,14 +319,25 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     private void translateMethodImpl(MethodNode method) {
+        def synth1 = GtkUtils.hasSyntheticModifier(method.modifiers)
+        def synth2 = method.synthetic
+        if (method.synthetic) {
+            // <clinit> methods are synthetic at least
+        }
+
+        def params = method.parameters
         out.newLineCrlf('') // empty line btw methods
         translateAnnos(method.annotations)
         for (ClassNode aThrows : method.exceptions) {
             out.newLineCrlf("@Throws(${aThrows.name}::class)")
         }
-        def isConstructor = '<init>' == method.name
+        def isConstructor = GtkUtils.isConstructor(method)
         def isStaticBlock = '<clinit>' == method.name
         def name = method.name
+
+        if (isConstructor) {
+            int stop = 0
+        }
 
         if (isStaticBlock) {
             out.newLineCrlf("/*")
@@ -320,14 +362,22 @@ class GroovyToKotlin implements GtkConsts {
         //out.append(getParametersText(method.parameters))
         out.append(")")
         out.append(rt3)
-        def code = GtkUtils.tryReduceUselessBlockNesting(method.code)
+        def code = method.code
         if (code == null) {
             out.lineBreak()
         } else if (code instanceof BlockStatement) {
+            def stmts = code.statements
+
+            stmts = stmts.findAll { !GtkUtils.isGroovyImplicitConstructorStatement(it) }
+
+            // todo probably do not make this transformation because nesting maybe useful to avoid name clash
+            // but fix formatting then
+            stmts = Transformers.tryReduceUselessBlockNesting(stmts)
+            stmts = Transformers.tryAddExplicitReturnToMethodBody(method, stmts)
+
             out.append(" {")
             out.lineBreak()
             out.push()
-            def stmts = Transformers.tryAddExplicitReturnToMethodBody(method, code)
             for (stmt in stmts) {
                 translateStatement(stmt)
             }
@@ -460,7 +510,7 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     /**
-     * Local var declaration
+     * Declaration of 1+ local vars.
      */
     @DynamicDispatch
     void translateExpr(DeclarationExpression expr) {
@@ -518,6 +568,16 @@ class GroovyToKotlin implements GtkConsts {
         translateExpr(expr.leftExpression)
         def ktOp = GtkUtils.translateOperator(expr.operation.text)
         out.append(" ${ktOp} ")
+
+        if (ktOp == '+') {
+            def x1 = expr.leftExpression.originType as ClassNode
+            def x1p = ClassHelper.isPrimitiveType(x1)
+
+            def x2 = expr.rightExpression.originType as ClassNode
+            def x2p = ClassHelper.isPrimitiveType(x2)
+            int stop = 0
+        }
+
         translateExpr(expr.rightExpression)
     }
 
@@ -560,7 +620,7 @@ class GroovyToKotlin implements GtkConsts {
         // todo use expr.constantName probably
         if (GtkUtils.isString(expr.type)) {
             if (expr.value != null) {
-                out.append("\"${GeneralUtils.escapeAsJavaStringContent((String)expr.value)}\"")
+                out.append("\"${GeneralUtils.escapeAsJavaStringContent((String) expr.value)}\"")
             } else {
                 // XXX not sure what is the case here
                 out.append("\"${expr.value}\"")
@@ -981,10 +1041,8 @@ class GroovyToKotlin implements GtkConsts {
 
     /**
      * Translate:
-     *     label: while (false) {continue label}
-     * into:
-     *     label@ while (false) {continue@label}
-     */
+     *     label: while (false) {continue label}* into:
+     *     label@ while (false) {continue@label}*/
     @DynamicDispatch
     void translateStatement(ContinueStatement stmt) {
         def labelPadded = stmt.label ? "@$stmt.label" : ""
@@ -993,10 +1051,8 @@ class GroovyToKotlin implements GtkConsts {
 
     /**
      * Translate:
-     *     label: while (false) {break label}
-     * into:
-     *     label@ while (false) {break@label}
-     */
+     *     label: while (false) {break label}* into:
+     *     label@ while (false) {break@label}*/
     @DynamicDispatch
     void translateStatement(BreakStatement stmt) {
         def labelPadded = stmt.label ? "@$stmt.label" : ""
