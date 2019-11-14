@@ -98,13 +98,7 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     void translateModule() {
-        if (module.hasPackage()) {
-            def pak = module.package.name
-            // cutting the trailing dot; todo need a better solution
-            pak = pak.endsWith('.') ? pak.substring(0, pak.length() - 1) : pak
-            //out.appendLn("package ${pak}")
-            out.newLineCrlf("package ${pak}")
-        }
+        translatePackage()
         translateImports(module)
         out.newLineCrlf("")
         for (cls in module.classes) {
@@ -112,6 +106,24 @@ class GroovyToKotlin implements GtkConsts {
                 // anonymous classes gonna be emitted on demand
                 // inner/nested classes gonna be emitted inside the outer class
                 translateClass(cls)
+            }
+        }
+    }
+
+    private void translatePackage() {
+        if (module.hasPackage()) {
+            def pak = module.package.name
+            // cutting the trailing dot; todo need a better solution
+            pak = pak.endsWith('.') ? pak.substring(0, pak.length() - 1) : pak
+            //out.appendLn("package ${pak}")
+            out.newLineCrlf("package ${pak}")
+        } else {
+            // after I turned on type resolution, info about module's package get lost, so trying to restore it
+            if (module.classes.size() > 0) {
+                def aClass = module.classes[0]
+                if (aClass.packageName) {
+                    out.newLineCrlf("package ${aClass.packageName}")
+                }
             }
         }
     }

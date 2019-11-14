@@ -50,6 +50,7 @@ class Test {
     @Test
     void translate_string() {
         String source = """
+package p.pp.ppp
 class ClassName {
     Map makeMap() {
         return [:]

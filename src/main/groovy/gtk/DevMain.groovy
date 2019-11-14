@@ -17,6 +17,7 @@ import org.codehaus.groovy.antlr.treewalker.VisitorAdapter
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.builder.AstBuilder
+import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.SourceUnit
@@ -156,7 +157,11 @@ class DevMain {
             if (it instanceof ClassNode) {
                 moduleNode.addClass(it)
             } else {
-                log.warning("not added to the module: ${it.class.name}")
+                if (it instanceof BlockStatement && it.statements.size() == 0) {
+                    // empty block statements occurs, not wanted
+                } else {
+                    log.warning("not added to the module: ${it.class.name}")
+                }
             }
         }
         return moduleNode

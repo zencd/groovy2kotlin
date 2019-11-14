@@ -1,8 +1,8 @@
-﻿package xxx
+﻿package aa.bb
 class ClassName {
 }
 ---------------
-package xxx
+package aa.bb
 $DEFAULT_IMPORTS
 open class ClassName {
     companion object {
