@@ -50,10 +50,11 @@ class Test {
     @Test
     void translate_string() {
         String source = """
-package p.pp.ppp
-class ClassName {
-    Map makeMap() {
-        return [:]
+class Temp {
+    static def obj = new ArrayList<String>() {
+        String toString() {
+            return "xxx"
+        }
     }
 }
 """

@@ -209,8 +209,11 @@ class GroovyToKotlin implements GtkConsts {
         for (method in classNode.declaredConstructors) {
             def synth1 = method.synthetic
             def synth2 = GtkUtils.hasSyntheticModifier(method.modifiers)
+            def isConstructor = GtkUtils.isConstructor(method)
             if (GtkUtils.hasGroovyGeneratedAnnotation(method)) {
                 // don't want auto-generated empty constructors
+            } else if (isConstructor && GtkUtils.isAnonymous(classNode)) {
+                // don't want constructors for anonymous classes
             } else {
                 translateMethod(method)
             }
