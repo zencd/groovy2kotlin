@@ -83,25 +83,24 @@ Others may be supported but was not tested.
 
 ## Some history
 
-- ✔ `String.replaceAll` → `"aaa".replace("a", "x")`
-- ✔ Local vars without an initializer
-- ✔ `equals` → `override fun equals(other: Any?): Boolean`
-- ✔ `hashCode` → `override fun hashCode(): Int`
-- ✔ `toString` → `override fun toString(): String`
-- ✔ `String[] res = [...]` → `res = arrayOf(...)`
-- ✔ Range expression
-- ✔ Extend/implement
-- ✔ Generated fields `var url: String` must be initialized
-- ✔ Distinct classes and interfaces
-- ✔ Kotlin disallows use of `Map`/`List` without generics specified explicitly
-- ✔ Groovy operator `in`
-- ✔ Anonymous classes 
-- ✔ Inner classes: static and non-static
-- ✔ `String[]` → `Array<String>`
-- ✔ Groovy regex operator `==~`
-- ✔ Groovy regexps without quotes: `/.+/`
-- ✔ while loop
-- ✔ The `for(;;)` loop
-- ✔ `throws`
-- ✔ Bug: the `{}` braces lost: `${call()}"` → `"$call"`
-- ✔ Assignment to tuple: `def (x, y) = [1, 2]`
+✔ Classes ✔ Interfaces
+✔ Anonymous classes 
+✔ Inner classes ✔ Nested classes
+✔ Inheritance
+✔ Range expression
+✔ In-string expressions
+✔ Operator `in`
+✔ Operator `==~`
+✔ Arrays
+✔ Local vars
+✔ Multiple value assignment
+✔ `/.+/` regexps
+✔ `if`
+✔ `while`
+✔ `for(;;)`
+✔ `break` ✔ `continue`
+✔ `throws`
+✔ `String.replaceAll()`
+✔ `equals()`
+✔ `hashCode()`
+✔ `toString()`
