@@ -1,5 +1,5 @@
 class Strings {
-    static void main() {
+    static void main(a, b, c, text) {
         def jStringEscape = '\\d\\d'
         def gStringEscape = "\\d\\d"
         def regex = /[-]?\d\d+/
@@ -10,7 +10,7 @@ class Strings {
 $DEFAULT_IMPORTS
 open class Strings {
     companion object {
-        fun main() {
+        fun main(a: java.lang.Object, b: java.lang.Object, c: java.lang.Object, text: java.lang.Object) {
             val jStringEscape = "\\d\\d"
             val gStringEscape = "\\d\\d"
             val regex = "[-]?\\d\\d+"

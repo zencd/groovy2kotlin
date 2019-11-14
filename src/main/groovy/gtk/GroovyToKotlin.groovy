@@ -1,11 +1,10 @@
 package gtk
 
-import groovyjarjarasm.asm.Opcodes
+
 import org.codehaus.groovy.antlr.SourceBuffer
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
-import org.codehaus.groovy.ast.ConstructorNode
 import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
@@ -36,6 +35,7 @@ import org.codehaus.groovy.ast.expr.NotExpression
 import org.codehaus.groovy.ast.expr.PostfixExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.RangeExpression
+import org.codehaus.groovy.ast.expr.StaticMethodCallExpression
 import org.codehaus.groovy.ast.expr.TernaryExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
@@ -427,12 +427,31 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(MethodCallExpression expr) {
+        String name = expr.method.text
+        def numParams = GtkUtils.getNumberOfActualParams(expr)
+        if (name == 'is' && numParams == 1) {
+            translateOperatorIs(expr)
+        } else {
+            translateRegularMethodCall(expr)
+        }
+    }
+
+    void translateOperatorIs(MethodCallExpression expr) {
+        // todo you'd better replace suitable method-call subtreess with a custom ones, then procreating if/elses
+        translateExpr(expr.objectExpression)
+        out.append(' === ')
+        def args = expr.arguments as ArgumentListExpression
+        translateExpr(args[0])
+    }
+
+    void translateRegularMethodCall(MethodCallExpression expr) {
         def singleClosureArg = GtkUtils.tryFindSingleClosureArgument(expr)
         def numParams = GtkUtils.getNumberOfActualParams(expr)
 
         if (!expr.implicitThis) {
             String spread = expr.spreadSafe ? "*" : ""; // todo support it
             String dereference = expr.safe ? "?" : "";
+            expr.objectExpression.putNodeMetaData(AST_NODE_META_DONT_ADD_JAVA_CLASS, true)
             translateExpr(expr.objectExpression)
             out.append(spread)
             out.append(dereference)
@@ -441,6 +460,7 @@ class GroovyToKotlin implements GtkConsts {
         if (expr.method instanceof ConstantExpression) {
             String name = expr.method.text
             if (name == 'replaceAll' && numParams == 2) {
+                // todo move to Transformers, generalize tree transformations
                 name = 'replace' // Kotlin has no replaceAll(), but replace() looks the same
             }
             if (singleClosureArg) {
@@ -459,6 +479,11 @@ class GroovyToKotlin implements GtkConsts {
         } else {
             translateExpr(expr.arguments)
         }
+    }
+
+    @DynamicDispatch
+    void translateExpr(StaticMethodCallExpression expr) {
+        out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
     }
 
     @DynamicDispatch
@@ -565,20 +590,17 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     private void translateRegularBinaryExpr(BinaryExpression expr) {
-        translateExpr(expr.leftExpression)
+        def left = expr.leftExpression
+        def right = expr.rightExpression
+
         def ktOp = GtkUtils.translateOperator(expr.operation.text)
-        out.append(" ${ktOp} ")
-
-        if (ktOp == '+') {
-            def x1 = expr.leftExpression.originType as ClassNode
-            def x1p = ClassHelper.isPrimitiveType(x1)
-
-            def x2 = expr.rightExpression.originType as ClassNode
-            def x2p = ClassHelper.isPrimitiveType(x2)
-            int stop = 0
+        if (expr.operation.text == 'instanceof') {
+            right.putNodeMetaData(AST_NODE_META_DONT_ADD_JAVA_CLASS, true)
         }
 
-        translateExpr(expr.rightExpression)
+        translateExpr(left)
+        out.append(" ${ktOp} ")
+        translateExpr(right)
     }
 
     /**
@@ -607,12 +629,15 @@ class GroovyToKotlin implements GtkConsts {
         out.append("]")
     }
 
+    /**
+     * Use of a local variable.
+     */
     @DynamicDispatch
     void translateExpr(VariableExpression expr) {
         out.append(expr.name)
-        if (!expr.dynamicTyped) {
-            out.append(": ${typeToKotlinString(expr.type)}")
-        }
+        //if (!expr.dynamicTyped) {
+        //    out.append(": ${typeToKotlinString(expr.type)}")
+        //}
     }
 
     @DynamicDispatch
@@ -829,8 +854,12 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(ClassExpression expr) {
+        def dajc = expr.getNodeMetaData(AST_NODE_META_DONT_ADD_JAVA_CLASS)
         String typeStr = typeToKotlinString(expr.type)
         out.append(typeStr)
+        if (!dajc) {
+            out.append("::class.java")
+        }
     }
 
     /**

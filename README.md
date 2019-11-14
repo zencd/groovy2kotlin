@@ -72,7 +72,6 @@ Others may be supported but was not tested.
 - Other mappings:
     - `Some.class` → `Some::class.java`
     - `~16` → `16.inv()`
-    - `a.is(b)` → `a === b`
 
 ## Todo 2
 
@@ -92,6 +91,7 @@ Others may be supported but was not tested.
 ✔ In-string expressions
 ✔ Operator `in`
 ✔ Operator `==~`
+✔ Operator `is`
 ✔ Arrays
 ✔ Local vars
 ✔ Multiple value assignment

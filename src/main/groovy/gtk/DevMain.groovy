@@ -17,6 +17,7 @@ import org.codehaus.groovy.antlr.treewalker.VisitorAdapter
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.builder.AstBuilder
+import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.runtime.ResourceGroovyMethods
@@ -72,8 +73,8 @@ class DevMain {
 
     private static final Logger log = Logger.getLogger(this.name)
 
-    //public static final boolean NEW_PARSING = true
-    public static final boolean NEW_PARSING = false
+    public static final boolean NEW_PARSING = true
+    //public static final boolean NEW_PARSING = false
 
     static void main(String[] args) {
         //main1()
@@ -116,8 +117,11 @@ class DevMain {
     }
 
     static ModuleNode parseText(String groovyText) {
-        return parseText1(groovyText)
-        //return parseText2(groovyText)
+        if (NEW_PARSING) {
+            return parseText2(groovyText)
+        } else {
+            return parseText1(groovyText)
+        }
     }
 
     static ModuleNode parseText2(String groovyText) {
@@ -145,7 +149,7 @@ class DevMain {
     }
 
     static ModuleNode parseTextNew(String source, SourceUnit sourceUnit) {
-        def nodes = new AstBuilder().buildFromString(source)
+        def nodes = new AstBuilder().buildFromString(CompilePhase.CANONICALIZATION, false, source)
         ModuleNode moduleNode = new ModuleNode(sourceUnit)
         nodes.each {
             // todo it would be much better to add them all at once

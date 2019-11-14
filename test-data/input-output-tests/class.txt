@@ -14,7 +14,7 @@ open class Simplest {
     fun main() {
     }
 }
-open class Temp : ArrayList(), Serializable, Closeable {
+open class Temp : java.util.ArrayList(), java.io.Serializable, java.io.Closeable {
     companion object {
     }
     fun main() {

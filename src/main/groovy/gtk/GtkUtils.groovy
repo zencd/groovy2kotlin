@@ -9,9 +9,11 @@ import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ConstructorNode
+import org.codehaus.groovy.ast.GenericsType
 import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
+import org.codehaus.groovy.ast.decompiled.DecompiledClassNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
@@ -112,8 +114,42 @@ class GtkUtils {
             return kotlinType + optionalStr
         }
 
-        def s = classNode.toString() + optionalStr
-        return s.replace(' <', '<') // todo lame solution
+        // field @name hold class name as it was used in the original source code
+        // toString(false) or getName() returns fully qualified name
+        def s
+        if (classNode.usingGenerics) {
+            s = toString(classNode)
+        } else {
+            s = classNode.@name + optionalStr
+        }
+        return s
+    }
+
+    private static String toString(ClassNode classNode) {
+        boolean showRedirect = false
+
+        if (classNode instanceof DecompiledClassNode) {
+            return classNode.toString(showRedirect)
+        }
+
+        if (classNode.isArray()) {
+            return classNode.componentType.toString(showRedirect)+"[]";
+        }
+        StringBuilder ret = new StringBuilder(classNode.@name);
+        if (classNode.placeholder) ret = new StringBuilder(classNode.getUnresolvedName());
+        if (!classNode.placeholder && classNode.genericsTypes != null) {
+            ret.append("<");
+            for (int i = 0; i < classNode.genericsTypes.length; i++) {
+                if (i != 0) ret.append(", ");
+                GenericsType genericsType = classNode.genericsTypes[i];
+                ret.append(classNode.genericTypeAsString(genericsType));
+            }
+            ret.append(">");
+        }
+        if (classNode.redirect != null && showRedirect) {
+            ret.append(" -> ").append(classNode.redirect().toString());
+        }
+        return ret.toString();
     }
 
     static String getClassModifierString(ClassNode classNode) {

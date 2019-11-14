@@ -4,6 +4,7 @@ class Temp {
         str instanceof String
         1 in [1,2]
         'xxx111' ==~ '.*xxx.*'
+        1.is(2)
     }
 }
 ------------
@@ -16,5 +17,6 @@ open class Temp {
         str is String
         1 in listOf(1, 2)
         ".*xxx.*".toRegex().matches("xxx111")
+        1 === 2
     }
 }
