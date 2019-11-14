@@ -11,6 +11,6 @@ open class Temp {
     }
     fun main() {
         val (a, b) = listOf(1, 2)
-        val (c: String, d: Integer) = listOf(1, 2)
+        val (c, d) = listOf(1, 2)
     }
 }

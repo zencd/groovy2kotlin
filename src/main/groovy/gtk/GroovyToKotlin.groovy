@@ -483,7 +483,12 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(StaticMethodCallExpression expr) {
-        out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
+        out.append(typeToKotlinString(expr.ownerType))
+        out.append(".")
+        out.append(expr.method)
+        translateExpr(expr.arguments)
+
+        //out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
     }
 
     @DynamicDispatch

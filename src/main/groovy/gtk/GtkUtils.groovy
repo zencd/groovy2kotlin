@@ -105,8 +105,8 @@ class GtkUtils {
             // Kotlin prohibits non-generics List and Map
             // so rewriting them to List<Any> and Map<Any,Any>
             kotlinType = [
-                    'List': 'List<Any>',
-                    'Map': 'Map<Any, Any>',
+                    'java.util.List': 'List<Any>',
+                    'java.util.Map': 'Map<Any, Any>',
             ].get(classNode.name)
         }
 

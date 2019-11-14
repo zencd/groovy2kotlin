@@ -1,17 +1,7 @@
-/*
-class Temp {
-    String field
-    void main(def x, int i) {
-        x + i
-    }
-}
-*/
-
+import java.util.*
+import java.util.List
+import static java.util.Collections.*
+import static java.util.Collections.emptyList
 class ClassName {
-    //void call() {
-    //    funk(1)
-    //}
-    void funk(int normalParam, String defaultParam = "x") {
-        println(defaultParam)
-    }
+    def xxx = emptyList()
 }

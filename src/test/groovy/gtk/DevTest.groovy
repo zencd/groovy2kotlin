@@ -50,12 +50,9 @@ class Test {
     @Test
     void translate_string() {
         String source = """
-class Temp {
-    static funk() {}
-    void main() {
-        Temp.funk()
-        Temp.class
-        Temp.class.name
+class ClassName {
+    Map makeMap() {
+        return [:]
     }
 }
 """

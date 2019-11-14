@@ -3,7 +3,7 @@ class ClassName {
 }
 -------------------
 $DEFAULT_IMPORTS
-@@java.lang.Deprecated
+@java.lang.Deprecated
 open class ClassName {
     companion object {
     }
