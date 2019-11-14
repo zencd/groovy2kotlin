@@ -33,7 +33,7 @@ Others may be supported but was not tested.
     git clone "https://github.com/zencd/groovy2kotlin"
     cd groovy2kotlin
     gradlew test jar
-    groovy -cp build/libs/groovy2kotlin-0.0.1.jar -e="gtk.BulkProcessor.process('/groovy-project', '/output')"
+    groovy -cp build/libs/groovy2kotlin-0.0.1.jar:custom-dependency.jar -e="gtk.BulkProcessor.process('/groovy-project', '/output')"
 
 ## Structure
 
