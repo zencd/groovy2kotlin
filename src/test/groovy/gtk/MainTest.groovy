@@ -158,8 +158,8 @@ class MainTest {
     }
 
     @Test
-    void call_static() {
-        testFromFile("call_static.txt")
+    void static_members() {
+        testFromFile("static_members.txt")
     }
 
     @Test

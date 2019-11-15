@@ -804,6 +804,7 @@ class GroovyToKotlin implements GtkConsts {
     @DynamicDispatch
     void translateExpr(PropertyExpression expr) {
         def prop = expr.property
+        expr.objectExpression.putNodeMetaData(AST_NODE_META_DONT_ADD_JAVA_CLASS, true)
         translateExpr(expr.objectExpression)
         out.append('.')
         if (prop instanceof ConstantExpression) {

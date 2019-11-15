@@ -78,14 +78,11 @@ class Temp {
     @Test
     void trans_single_string() {
         String source1 = """
-package xxx
-import static java.util.Collections.emptyList
-import static Slave.slave
-class Slave {
-    static void slave() {}
-}
 class Temp {
-    def main(List javaThing, Temp kotlinThing) {}
+    static int ONE
+    int main() {
+        return Temp.ONE
+    }
 }
 """
         //println(DevMain.toKotlin(source))

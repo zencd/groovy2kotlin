@@ -1,17 +1,27 @@
 class ClassName {
+    static int FLAG = 1
     void main() {
         parse()
     }
     private static int parse() {
         return 123
     }
+    static void useFlag() {
+        println(FLAG)
+        println(ClassName.FLAG)
+    }
 }
 ---------------
 $DEFAULT_IMPORTS
 open class ClassName {
     companion object {
+        var FLAG: Int? = 1
         private fun parse(): Int {
             return 123
+        }
+        fun useFlag() {
+            println(FLAG)
+            println(ClassName.FLAG)
         }
     }
     fun main() {
