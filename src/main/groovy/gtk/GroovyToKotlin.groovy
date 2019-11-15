@@ -5,6 +5,7 @@ import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
+import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
@@ -147,12 +148,20 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     void translateImports(ModuleNode module) {
-        def allImports = module.starImports + module.imports + module.staticStarImports.values() + module.staticImports.values()
+        def allImports = module.starImports + module.imports + module.staticStarImports.values()
         for (imp in allImports) {
             def line = makeImportText(imp)
             def isGroovyPackage = line.startsWith('import groovy.')
             if (!isGroovyPackage) {
                 out.newLineCrlf(line)
+            }
+        }
+        module.staticImports.each { String s, ImportNode anImport ->
+            def kotlinClass = (anImport.type?.module != null) || (anImport.type?.redirect()?.module != null)
+            if (kotlinClass) {
+                out.newLineCrlf("import ${anImport.type.name}.Companion.${anImport.fieldName}")
+            } else {
+                out.newLineCrlf("import ${anImport.type.name}.${anImport.fieldName}")
             }
         }
         for (def imp : DEFAULT_IMPORTS) {
@@ -361,7 +370,6 @@ class GroovyToKotlin implements GtkConsts {
             // <clinit> methods are synthetic at least
         }
 
-        def params = method.parameters
         out.newLineCrlf('') // empty line btw methods
         translateAnnos(method.annotations)
         for (ClassNode aThrows : method.exceptions) {

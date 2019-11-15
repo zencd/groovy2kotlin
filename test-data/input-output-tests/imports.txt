@@ -2,6 +2,10 @@
 import java.util.List
 import static java.util.Collections.*
 import static java.util.Collections.emptyList
+import static Slave.slave
+class Slave {
+    static void slave() {}
+}
 class ClassName {
     def xxx = emptyList()
 }
@@ -10,7 +14,14 @@ import java.util.*
 import java.util.List
 import java.util.Collections.*
 import java.util.Collections.emptyList
+import Slave.Companion.slave
 $DEFAULT_IMPORTS
+open class Slave {
+    companion object {
+        fun slave() {
+        }
+    }
+}
 open class ClassName {
     companion object {
     }
