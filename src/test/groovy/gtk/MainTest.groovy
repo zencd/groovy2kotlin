@@ -133,7 +133,7 @@ class MainTest {
         def text = file.getText('utf-8')
         def (String groovy, String kotlinExpected) = splitGroovyAndKotlin(text)
         kotlinExpected = kotlinExpected.replace('$DEFAULT_IMPORTS', DEFAULT_IMPORTS)
-        def kotlinActual = DevMain.toKotlin(groovy)
+        def kotlinActual = Gtk.toKotlinAsSingleString(groovy)
         assertGeneratedKotlin(kotlinExpected, kotlinActual)
     }
 
@@ -298,6 +298,8 @@ private val x = "hello"
             it.trim()
         }.findAll {
             !it.isEmpty()
+        }.findAll {
+            !it.startsWith('//')
         }
         return list.join('\n').trim()
     }

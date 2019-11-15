@@ -17,6 +17,7 @@ class Annos {
     void throwsSome() throws RuntimeException {}
 }
 --------------
+import java.lang.annotation.Documented
 $DEFAULT_IMPORTS
 // TODO groovy2kotlin: @groovy.transform.CompileStatic
 @java.lang.Deprecated

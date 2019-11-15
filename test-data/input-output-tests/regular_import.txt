@@ -6,6 +6,10 @@ class ClassName {
     def xxx = emptyList()
 }
 ---------------
+import java.util.*
+import java.util.List
+import java.util.Collections.*
+import java.util.Collections.emptyList
 $DEFAULT_IMPORTS
 open class ClassName {
     companion object {

@@ -13,6 +13,28 @@ import org.junit.jupiter.api.Test
 class DevTest {
 
     @Test
+    void load_jar_at_runtime_2() {
+        def cl = GtkUtils.makeMyClassLoader(DevTest.class.classLoader)
+        Class classToLoad = Class.forName("org.apache.commons.lang.ArrayUtils", true, cl)
+        println("loaded: $classToLoad")
+        //Method method = classToLoad.getDeclaredMethod("myMethod");
+        //Object instance = classToLoad.newInstance();
+        //Object result = method.invoke(instance);
+    }
+
+
+    @Test
+    void load_jar_at_runtime() {
+        def jar = 'C:/Users/pasza/.m2/repository/commons-lang/commons-lang/2.6/commons-lang-2.6.jar'
+        def f = new File(jar)
+        def url = f.toURL()
+        println(url)
+        def cl = this.class.classLoader//.rootLoader
+        cl.addURL(url);
+        Class.forName('org.apache.commons.lang.ArrayUtils')
+    }
+
+    @Test
     void newParsing() {
         def srcFile = new File('fake-file.groovy')
         GroovyClassLoader gcl = new GroovyClassLoader(this.class.getClassLoader())
@@ -39,13 +61,15 @@ class Test {
     }
 
     @Test
-    void translate_multiple_strings() {
+    void trans_multiple_strings() {
         String source1 = """
 package aa.bb
+import java.lang.reflect.Method
 class Utils {}
 """
         String source2 = """
 package aa.bb
+import java.lang.reflect.Method
 class Temp {
     def utils = new Utils()
 }
@@ -55,14 +79,28 @@ class Temp {
         String kotlinText = Gtk.toKotlinAsSingleString(nodes)
         println("--- Kotlin ---")
         println(kotlinText)
-        def stop = 0
     }
 
     @Test
-    void translate_file() {
+    void trans_single_string() {
+        String source1 = """
+package aa.bb
+import org.cyberneko.html.parsers.SAXParser
+class Temp {
+    void main() {}
+}
+"""
+        //println(DevMain.toKotlin(source))
+        //def nodes = Gtk.parseTexts([source1])
+        String kotlinText = Gtk.toKotlinAsSingleString(source1)
+        println(kotlinText)
+    }
+
+    @Test
+    void trans_test_file() {
         def source = new File("test-data/input-output-tests/regular_import.txt").text
         source = MainTest.splitGroovyAndKotlin(source)[0]
-        println(DevMain.toKotlin(source))
+        println(Gtk.toKotlinAsSingleString(source))
     }
 
     //@Test

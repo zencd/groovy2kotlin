@@ -1,7 +1,5 @@
 package gtk
 
-
-import org.codehaus.groovy.antlr.SourceBuffer
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
@@ -56,9 +54,8 @@ import org.codehaus.groovy.control.SourceUnit
 
 import java.util.logging.Logger
 
-import static GtkUtils.getJavaDocCommentsBeforeNode
-import static GtkUtils.getModifierString
 import static GtkUtils.getMethodModifierString
+import static GtkUtils.getModifierString
 import static GtkUtils.isFinal
 import static GtkUtils.isStatic
 import static GtkUtils.makeImportText
@@ -71,16 +68,13 @@ class GroovyToKotlin implements GtkConsts {
 
     private static final Logger log = Logger.getLogger(this.name)
 
-    final ModuleNode module
-    final List<ASTNode> astNodes
+    final List<ModuleNode> modules
 
-    //PrintStream out
-    int indent = 0
     CodeBuffer _out
-    CodeBuffer singleOut = null
     Map<String, CodeBuffer> outBuffers = [:]
 
-    // todo use node's meta map
+    Closure getBufName
+
     def classCompanions = new HashMap<ClassNode, CodeBuffer.CodePiece>()
 
     static DEFAULT_IMPORTS = [
@@ -92,57 +86,37 @@ class GroovyToKotlin implements GtkConsts {
             'import java.math.BigDecimal',
     ]
 
-    //SourceBuffer sbuf
-
-    GroovyToKotlin(ModuleNode module, CodeBuffer out, String groovyText = null) {
-        this.module = module
-        this.astNodes = null
-        this._out = out
-        //this.sbuf = new SourceBuffer()
-        //for (int i = 0; i < groovyText.length(); i++) {
-        //    sbuf.write((int) groovyText.charAt(i))
-        //}
-    }
-
-    GroovyToKotlin(List<ASTNode> astNodes, CodeBuffer singleOut) {
-        this.module = new ModuleNode(null as SourceUnit)
-        this.astNodes = astNodes
+    GroovyToKotlin(List<ModuleNode> modules, Closure getBufName = null) {
+        this.modules = modules
         this._out = null
-        this.singleOut = singleOut
+        this.getBufName = getBufName
     }
 
     private CodeBuffer getOut() {
-        //return this.@singleOut ?: this.@_out
         return this.@_out
     }
 
     void translateAll() {
-        //assert astNodes && !module
         int cnt = 0
-        astNodes.each {
-            if (it instanceof ClassNode) {
-                def cbuf = new CodeBuffer()
-                this._out = cbuf
-                this.classCompanions = new HashMap<ClassNode, CodeBuffer.CodePiece>()
-                def bufName = getKotlinFilePath(it)
-                outBuffers[bufName] = cbuf
-                translateClass(it)
-                //module.addClass(it)
-            } else {
-                log.warning("node not recognized: ${it}")
+        modules.each {
+            String groovyFileNameAbs = it.description
+            def cbuf = new CodeBuffer()
+            this._out = cbuf
+            this.classCompanions = new HashMap<ClassNode, CodeBuffer.CodePiece>()
+            def bufName = "File${cnt++}.kt".toString() // todo
+            if (getBufName && groovyFileNameAbs) {
+                def bufName2 = getBufName(groovyFileNameAbs)
+                if (bufName2) {
+                    bufName = bufName2
+                }
             }
+            outBuffers[bufName] = cbuf
+            translateModule(it)
         }
-
-        //translateModule()
     }
 
-    static String getKotlinFilePath(ClassNode classNode) {
-        return classNode.name.replaceAll('\\.', '/') + '.kt'
-    }
-
-    @Deprecated
-    void translateModule() {
-        translatePackage()
+    void translateModule(ModuleNode module) {
+        translatePackageFromModule(module)
         translateImports(module)
         out.newLineCrlf("")
         for (cls in module.classes) {
@@ -154,7 +128,7 @@ class GroovyToKotlin implements GtkConsts {
         }
     }
 
-    private void translatePackage() {
+    private void translatePackageFromModule(ModuleNode module) {
         if (module.hasPackage()) {
             def pak = module.package.name
             // cutting the trailing dot; todo need a better solution
@@ -187,6 +161,7 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     void translateClass(ClassNode classNode) {
+        //translatePackageFromClass(classNode)
         //def classComments = getJavaDocCommentsBeforeNode(sbuf, classNode)
         translateAnnos(classNode.annotations)
 
@@ -471,7 +446,7 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     private void translateMethodParam(Parameter node) {
-        def predefinedKotlinType = node.getNodeMetaData(GtkConsts.AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
+        def predefinedKotlinType = node.getNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
         String name = node.getName() == null ? "<unknown>" : node.getName()
         String type = predefinedKotlinType ?: typeToKotlinString(node.getType())
         if (node.getInitialExpression() == null) {
