@@ -184,8 +184,8 @@ class MainTest {
     }
 
     @Test
-    void "list_expr"() {
-        testFromFile("list_expr.txt")
+    void "list"() {
+        testFromFile("list.txt")
     }
 
     @Test

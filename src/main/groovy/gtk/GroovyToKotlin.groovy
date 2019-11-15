@@ -499,6 +499,9 @@ class GroovyToKotlin implements GtkConsts {
                 // todo move to Transformers, generalize tree transformations
                 name = 'replace' // Kotlin has no replaceAll(), but replace() looks the same
             }
+            if (expr.objectExpression.type == ClassHelper.LIST_TYPE && name == 'join' && numParams == 1) {
+                name = 'joinToString'
+            }
             if (singleClosureArg) {
                 name = GtkUtils.tryRewriteMethodNameWithSingleClosureArg(name)
             }

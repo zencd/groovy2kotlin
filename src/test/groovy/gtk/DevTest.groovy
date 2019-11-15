@@ -87,7 +87,11 @@ class Temp {
 package aa.bb
 import org.cyberneko.html.parsers.SAXParser
 class Temp {
-    void main() {}
+    void main(def x) {
+        [1,2,3].join(',')
+        [1,2,3].join()
+        x.join(',')
+    }
 }
 """
         //println(DevMain.toKotlin(source))

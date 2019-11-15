@@ -1,0 +1,24 @@
+﻿class ClassName {
+    void makeListExpr() {
+        def x = [1, 2, 3]
+    }
+    void join(def unknown) {
+        [1,2,3].join(',')
+        [1,2,3].join()
+        unknown.join(',')
+    }
+}
+-------------------
+$DEFAULT_IMPORTS
+open class ClassName {
+    companion object {
+    }
+    fun makeListExpr() {
+        val x = listOf(1, 2, 3)
+    }
+    fun join(unknown: java.lang.Object) {
+        listOf(1, 2, 3).joinToString(",")
+        listOf(1, 2, 3).join()
+        unknown.join(",")
+    }
+}
