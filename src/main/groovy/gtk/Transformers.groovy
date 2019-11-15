@@ -1,5 +1,7 @@
 package gtk
 
+import org.codehaus.groovy.ast.ClassHelper
+import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
@@ -8,6 +10,8 @@ import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
 
 import java.util.logging.Logger
+
+import static gtk.GtkUtils.isBoolean
 
 /**
  * AST transformations
@@ -63,20 +67,19 @@ class Transformers implements GtkConsts {
     }
 
     static void tryModifySignature(MethodNode method) {
-        def typeStr = GtkUtils.typeToKotlinString(method.returnType)
+        def rt = method.returnType
         int numParams = GtkUtils.getNumberOfFormalParams(method)
-        if (method.name == 'toString' && typeStr == 'String' && numParams == 0) {
+        if (method.name == 'toString' && rt == ClassHelper.STRING_TYPE && numParams == 0) {
             method.putNodeMetaData(AST_NODE_META_OVERRIDING_METHOD, true)
         }
-        else if (method.name == 'hashCode' && typeStr == 'Int' && numParams == 0) {
+        else if (method.name == 'hashCode' && rt == ClassHelper.int_TYPE && numParams == 0) {
             method.putNodeMetaData(AST_NODE_META_OVERRIDING_METHOD, true)
         }
-        else if (method.name == 'equals' && typeStr == 'Boolean' && numParams == 1) {
+        else if (method.name == 'equals' && isBoolean(rt) && numParams == 1) {
             def param0 = method.parameters[0]
-            String paramType = GtkUtils.typeToKotlinString(param0.type)
-            if (paramType == 'Object') {
+            if (param0.type == ClassHelper.OBJECT_TYPE) {
                 method.putNodeMetaData(AST_NODE_META_OVERRIDING_METHOD, true)
-                param0.putNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING, 'Any?')
+                param0.putNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING, ANY_OPTIONAL)
             }
         }
     }

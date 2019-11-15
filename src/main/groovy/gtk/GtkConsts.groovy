@@ -16,4 +16,7 @@ interface GtkConsts {
     static final String AST_NODE_META_DONT_ADD_JAVA_CLASS = "${AST_NODE_META_PREFIX}.DONT_ADD_JAVA_CLASS"
 
     static final String KOTLIN_OVERRIDE_KEYWORD = "override"
+
+    public static final String ANY_OPTIONAL = 'Any?'
+    public static final String ANY = 'Any'
 }

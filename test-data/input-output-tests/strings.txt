@@ -10,7 +10,7 @@ class Strings {
 $DEFAULT_IMPORTS
 open class Strings {
     companion object {
-        fun main(a: java.lang.Object, b: java.lang.Object, c: java.lang.Object, text: java.lang.Object) {
+        fun main(a: Any, b: Any, c: Any, text: Any) {
             val jStringEscape = "\\d\\d"
             val gStringEscape = "\\d\\d"
             val regex = "[-]?\\d\\d+"

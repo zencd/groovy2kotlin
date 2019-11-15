@@ -68,6 +68,10 @@ class GtkUtils {
     static String typeToKotlinString(ClassNode classNode, boolean optional = false) {
         String optionalStr = optional ? '?' : ''
 
+        if (classNode == ClassHelper.OBJECT_TYPE) {
+            return "${GtkConsts.ANY}${optionalStr}"
+        }
+
         if (classNode.componentType != null) {
             return "Array<${typeToKotlinString(classNode.componentType)}>${optionalStr}"
         }
@@ -403,5 +407,9 @@ class GtkUtils {
         return method.annotations.any {
             it.classNode.name == 'groovy.transform.Generated'
         }
+    }
+
+    static boolean isBoolean(ClassNode classNode) {
+        classNode == ClassHelper.Boolean_TYPE || classNode == ClassHelper.boolean_TYPE
     }
 }

@@ -8,7 +8,7 @@ $DEFAULT_IMPORTS
 open class ClassName {
     companion object {
     }
-    fun main(x: java.lang.Object) {
+    fun main(x: Any) {
         x.prop
     }
 }

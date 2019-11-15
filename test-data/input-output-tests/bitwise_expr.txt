@@ -13,7 +13,7 @@ $DEFAULT_IMPORTS
 open class Bitwise {
     companion object {
     }
-    fun bitwise(x: java.lang.Object) {
+    fun bitwise(x: Any) {
         x = 16 or 32
         x = 16 and 32
         x = 16 shl 32

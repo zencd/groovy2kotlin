@@ -16,7 +16,7 @@ open class ClassName {
     fun makeListExpr() {
         val x = listOf(1, 2, 3)
     }
-    fun join(unknown: java.lang.Object) {
+    fun join(unknown: Any) {
         listOf(1, 2, 3).joinToString(",")
         listOf(1, 2, 3).join()
         unknown.join(",")
