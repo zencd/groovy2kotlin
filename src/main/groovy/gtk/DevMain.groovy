@@ -14,10 +14,13 @@ import org.codehaus.groovy.antlr.treewalker.SourceCodeTraversal
 import org.codehaus.groovy.antlr.treewalker.SourcePrinter
 import org.codehaus.groovy.antlr.treewalker.Visitor
 import org.codehaus.groovy.antlr.treewalker.VisitorAdapter
+import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.builder.AstBuilder
+import org.codehaus.groovy.ast.builder.AstStringCompiler
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.control.CompilationUnit
 import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.SourceUnit
@@ -25,6 +28,8 @@ import org.codehaus.groovy.runtime.ResourceGroovyMethods
 import org.codehaus.groovy.syntax.Reduction
 
 import java.nio.charset.StandardCharsets
+import java.security.AccessController
+import java.security.PrivilegedAction
 import java.util.logging.Logger
 
 /**
@@ -70,6 +75,7 @@ import java.util.logging.Logger
  * {@link org.codehaus.groovy.transform.StaticTypesTransformation} forced by TypeChecked
  * {@link org.codehaus.groovy.transform.stc.StaticTypesMarker#INFERRED_TYPE}
  */
+@Deprecated // use Gtk
 class DevMain {
 
     private static final Logger log = Logger.getLogger(this.name)
@@ -149,8 +155,17 @@ class DevMain {
         return parseTextNew(source, sourceUnit)
     }
 
+    private static String makeScriptClassName() {
+        "Script${System.nanoTime()}"
+    }
+
     static ModuleNode parseTextNew(String source, SourceUnit sourceUnit) {
-        def nodes = new AstBuilder().buildFromString(CompilePhase.CANONICALIZATION, false, source)
+        //def nodes = new AstStringCompiler().compile(source, CompilePhase.CANONICALIZATION, false)
+        //def nodes = new AstBuilder().buildFromString(CompilePhase.CANONICALIZATION, false, source)
+        def sources = [
+                new GroovyCodeSource(source, "${makeScriptClassName()}.groovy", '/groovy/script')
+        ]
+        def nodes = compile(sources, CompilePhase.CANONICALIZATION, false)
         ModuleNode moduleNode = new ModuleNode(sourceUnit)
         nodes.each {
             // todo it would be much better to add them all at once
@@ -165,6 +180,48 @@ class DevMain {
             }
         }
         return moduleNode
+    }
+
+    static List<ASTNode> translateTexts(List<String> sources) {
+        def sources2 = sources.collect {
+            new GroovyCodeSource(it, "${makeScriptClassName()}.groovy", '/groovy/script')
+        }
+        return translateCodeSources(sources2)
+    }
+
+    static List<ASTNode> translateCodeSources(List<GroovyCodeSource> sources) {
+        return compile(sources, CompilePhase.CANONICALIZATION, false)
+    }
+
+    private static List<ASTNode> compile(List<GroovyCodeSource> sources, CompilePhase compilePhase, boolean statementsOnly) {
+        final scriptClassName = "Script${System.nanoTime()}"
+        CompilationUnit cu = new CompilationUnit(CompilerConfiguration.DEFAULT, /*codeSource.codeSource*/ null, AccessController.doPrivileged({
+            new GroovyClassLoader()
+        } as PrivilegedAction<GroovyClassLoader>))
+        for (def codeSource : sources) {
+            //GroovyCodeSource codeSource = new GroovyCodeSource(script, "${scriptClassName}.groovy", '/groovy/script')
+            cu.addSource(codeSource.name, codeSource.scriptText)
+        }
+        cu.compile(compilePhase.phaseNumber)
+        // collect all the ASTNodes into the result, possibly ignoring the script body if desired
+        def nodes = (List<ASTNode>) cu.AST.modules.inject([]) { List acc, ModuleNode node ->
+            if (node.statementBlock) acc.add(node.statementBlock)
+            node.classes?.each {
+                if (!(statementsOnly && it.name == scriptClassName)) {
+                    acc << it
+                }
+            }
+            acc
+        }
+        nodes = nodes.findAll {
+            // dropping empty BlockStatement (happening by some reason)
+            if (it instanceof BlockStatement) {
+                it.statements.size() > 0
+            } else {
+                true
+            }
+        }
+        return nodes
     }
 
     /*

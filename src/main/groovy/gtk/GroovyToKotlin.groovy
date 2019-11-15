@@ -2,6 +2,7 @@ package gtk
 
 
 import org.codehaus.groovy.antlr.SourceBuffer
+import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
@@ -51,6 +52,7 @@ import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 import org.codehaus.groovy.ast.stmt.WhileStatement
+import org.codehaus.groovy.control.SourceUnit
 
 import java.util.logging.Logger
 
@@ -69,10 +71,14 @@ class GroovyToKotlin implements GtkConsts {
 
     private static final Logger log = Logger.getLogger(this.name)
 
-    ModuleNode module
+    final ModuleNode module
+    final List<ASTNode> astNodes
+
     //PrintStream out
     int indent = 0
-    CodeBuffer out
+    CodeBuffer _out
+    CodeBuffer singleOut = null
+    Map<String, CodeBuffer> outBuffers = [:]
 
     // todo use node's meta map
     def classCompanions = new HashMap<ClassNode, CodeBuffer.CodePiece>()
@@ -86,17 +92,55 @@ class GroovyToKotlin implements GtkConsts {
             'import java.math.BigDecimal',
     ]
 
-    SourceBuffer sbuf
+    //SourceBuffer sbuf
 
-    GroovyToKotlin(ModuleNode module, CodeBuffer out, String groovyText) {
+    GroovyToKotlin(ModuleNode module, CodeBuffer out, String groovyText = null) {
         this.module = module
-        this.out = out
-        this.sbuf = new SourceBuffer()
-        for (int i = 0; i < groovyText.length(); i++) {
-            sbuf.write((int) groovyText.charAt(i))
-        }
+        this.astNodes = null
+        this._out = out
+        //this.sbuf = new SourceBuffer()
+        //for (int i = 0; i < groovyText.length(); i++) {
+        //    sbuf.write((int) groovyText.charAt(i))
+        //}
     }
 
+    GroovyToKotlin(List<ASTNode> astNodes, CodeBuffer singleOut) {
+        this.module = new ModuleNode(null as SourceUnit)
+        this.astNodes = astNodes
+        this._out = null
+        this.singleOut = singleOut
+    }
+
+    private CodeBuffer getOut() {
+        //return this.@singleOut ?: this.@_out
+        return this.@_out
+    }
+
+    void translateAll() {
+        //assert astNodes && !module
+        int cnt = 0
+        astNodes.each {
+            if (it instanceof ClassNode) {
+                def cbuf = new CodeBuffer()
+                this._out = cbuf
+                this.classCompanions = new HashMap<ClassNode, CodeBuffer.CodePiece>()
+                def bufName = getKotlinFilePath(it)
+                outBuffers[bufName] = cbuf
+                translateClass(it)
+                //module.addClass(it)
+            } else {
+                log.warning("node not recognized: ${it}")
+            }
+        }
+
+        //translateModule()
+    }
+
+    static String getKotlinFilePath(ClassNode classNode) {
+        return classNode.name.replaceAll('\\.', '/') + '.kt'
+    }
+
+    @Deprecated
     void translateModule() {
         translatePackage()
         translateImports(module)
@@ -143,7 +187,7 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     void translateClass(ClassNode classNode) {
-        def classComments = getJavaDocCommentsBeforeNode(sbuf, classNode)
+        //def classComments = getJavaDocCommentsBeforeNode(sbuf, classNode)
         translateAnnos(classNode.annotations)
 
         def modStr = GtkUtils.getClassModifierString(classNode)
@@ -173,7 +217,9 @@ class GroovyToKotlin implements GtkConsts {
         if (!classNode.interface && !GtkUtils.isAnonymous(classNode)) {
             out.newLineCrlf("companion object {")
             def classCompanionPiece = out.addPiece('companion-piece')
-            assert !classCompanions.containsKey(classNode)
+            def sz = classCompanions.size()
+            def contains = classCompanions.containsKey(classNode)
+            assert !contains
             classCompanions[classNode] = classCompanionPiece
             out.addPiece()
             out.newLineCrlf("}")

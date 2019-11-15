@@ -1,22 +1,13 @@
 package gtk
 
-import groovyjarjarasm.asm.Opcodes
-import gtk.inf.Inferer
-import org.codehaus.groovy.ast.ASTNode
-import org.codehaus.groovy.ast.ClassNode
+
 import org.codehaus.groovy.ast.builder.AstBuilder
 import org.codehaus.groovy.ast.expr.VariableExpression
-import org.codehaus.groovy.ast.stmt.BlockStatement
-import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.SourceUnit
-import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer
-import org.codehaus.groovy.transform.sc.StaticCompileTransformation
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-
-import static org.junit.Assert.assertEquals
 
 @Disabled("not a test actually but added for purposes of development")
 class DevTest {
@@ -48,17 +39,23 @@ class Test {
     }
 
     @Test
-    void translate_string() {
-        String source = """
+    void translate_multiple_strings() {
+        String source1 = """
+package aa.bb
+class Utils {}
+"""
+        String source2 = """
+package aa.bb
 class Temp {
-    static def obj = new ArrayList<String>() {
-        String toString() {
-            return "xxx"
-        }
-    }
+    def utils = new Utils()
 }
 """
-        println(DevMain.toKotlin(source))
+        //println(DevMain.toKotlin(source))
+        def nodes = Gtk.parseTexts([source1, source2])
+        String kotlinText = Gtk.toKotlinAsSingleString(nodes)
+        println("--- Kotlin ---")
+        println(kotlinText)
+        def stop = 0
     }
 
     @Test
