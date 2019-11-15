@@ -168,8 +168,8 @@ class MainTest {
     }
 
     @Test
-    void "regular_import"() {
-        testFromFile("regular_import.txt")
+    void "imports"() {
+        testFromFile("imports.txt")
     }
 
     @Test
@@ -224,8 +224,8 @@ private val x = "hello"
     }
 
     @Test
-    void "make_map"() {
-        testFromFile("make_map.txt")
+    void "map_maker"() {
+        testFromFile("map_maker.txt")
     }
 
     @Test

@@ -88,9 +88,8 @@ package aa.bb
 import org.cyberneko.html.parsers.SAXParser
 class Temp {
     void main(def x) {
+        def list = [1,2,3]
         [1,2,3].join(',')
-        [1,2,3].join()
-        x.join(',')
     }
 }
 """

@@ -9,7 +9,7 @@ Started Nov 2019 by [zencd](https://github.com/zencd) in order to convert a proj
 because I've not found any existing tools (and it's easy to write one by myself).
 The current implementation is simple: it uses Groovy's internal
 libs to parse source text into a well designed AST, then the tree is traversed and
-translated to Kotlin. Type inference is WIP to allow more sophisticated translation.
+translated to Kotlin. Type inference .
 
 Feel free to submit a bug, ticket and do all the github things.
 
@@ -103,3 +103,4 @@ Others may be supported but was not tested.
 ✔ `equals()`
 ✔ `hashCode()`
 ✔ `toString()`
+✔ `String.join` → `joinToString` 
