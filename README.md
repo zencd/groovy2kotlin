@@ -30,7 +30,7 @@ Others may be supported but was not tested.
 
 ## Usage
 
-[See here](usage.md)
+[See here](USAGE.md)
 
 ## Structure
 
