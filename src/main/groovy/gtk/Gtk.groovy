@@ -12,34 +12,36 @@ class Gtk {
 
     private static final Logger log = Logger.getLogger(this.name)
 
-    static List<ModuleNode> parseFiles(List<File> groovyFiles) {
+    /**
+     * Stopping at CANONICALIZATION because the further phases will modify AST too much
+     * for example an argument's default value gonna be removed.
+     */
+    private static final CompilePhase UP_TO_PHASE = CompilePhase.CANONICALIZATION
+
+    static List<ModuleNode> parseFiles(List<File> groovyFiles, ClassLoader classLoader = null) {
         def sources = groovyFiles.collect {
             //new GroovyCodeSource(it.getText('utf-8'), it.name, it.parentFile.name)
             new GroovyCodeSource(it)
         }
-        return translateCodeSources(sources)
+        return translateCodeSources(sources, classLoader)
     }
 
-    static List<ModuleNode> parseTexts(List<String> sources) {
+    static List<ModuleNode> parseTexts(List<String> sources, ClassLoader classLoader = null) {
         def sources2 = sources.collect {
             new GroovyCodeSource(it, "${makeScriptClassName()}.groovy", '/groovy/script')
         }
-        return translateCodeSources(sources2)
+        return translateCodeSources(sources2, classLoader)
     }
 
-    private static List<ModuleNode> translateCodeSources(List<GroovyCodeSource> sources) {
-        return compile(sources, CompilePhase.CANONICALIZATION, false)
+    private static List<ModuleNode> translateCodeSources(List<GroovyCodeSource> sources, ClassLoader classLoader = null) {
+        return compile(sources, UP_TO_PHASE, classLoader)
     }
 
-    private static List<ModuleNode> compile(List<GroovyCodeSource> sources, CompilePhase compilePhase, boolean statementsOnly) {
-        final scriptClassName = "Script${System.nanoTime()}"
-
-        def jcl = GtkUtils.makeMyClassLoader(Gtk.classLoader)
-        GroovyClassLoader classLoader = new GroovyClassLoader(jcl)
-
+    private static List<ModuleNode> compile(List<GroovyCodeSource> sources, CompilePhase compilePhase, ClassLoader projectClassLoader = null) {
+        def gcl = new GroovyClassLoader(projectClassLoader ?: Gtk.classLoader)
         def cc = CompilerConfiguration.DEFAULT
 
-        CompilationUnit cu = new CompilationUnit(cc, /*codeSource.codeSource*/ null, classLoader)
+        CompilationUnit cu = new CompilationUnit(cc, /*codeSource.codeSource*/ null, gcl)
         for (def codeSource : sources) {
             if (codeSource.file) {
                 cu.addSource(codeSource.file)

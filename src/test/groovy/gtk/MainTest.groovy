@@ -175,7 +175,8 @@ class MainTest {
     @Test
     @Disabled
     void empty_module() {
-        assertGeneratedKotlin('', DevMain.toKotlin(''))
+        // todo fix it
+        //assertGeneratedKotlin('', DevMain.toKotlin(''))
     }
 
     @Test
@@ -191,6 +192,7 @@ class MainTest {
     @Test
     @Disabled
     void final_field_without_type() {
+        // todo fix it
         def (String groovy, String kotlin) = splitGroovyAndKotlin("""
 class ClassName {
 final x = 'hello'
@@ -200,7 +202,7 @@ class ClassName {
 private val x = "hello"
 }
 """)
-        assertGeneratedKotlin(kotlin, DevMain.toKotlin(groovy))
+        //assertGeneratedKotlin(kotlin, DevMain.toKotlin(groovy))
     }
 
     @Test

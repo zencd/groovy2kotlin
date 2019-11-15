@@ -34,4 +34,9 @@ class GeneralUtils {
     static String relatively(File base, File path) {
         return base.toURI().relativize(path.toURI()).getPath()
     }
+
+    static ClassLoader makeUrlClassLoader(ClassLoader parent, List<String> jarPaths) {
+        def urls = jarPaths.collect { new File(it).toURI().toURL() } as URL[]
+        return new URLClassLoader(urls, parent)
+    }
 }
