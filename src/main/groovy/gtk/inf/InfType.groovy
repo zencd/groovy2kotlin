@@ -32,6 +32,11 @@ class InfType {
                 classNode: null)
     }
 
+    static InfType from(Class javaClass) {
+        // todo add generics info
+        return from(ClassHelper.make(javaClass))
+    }
+
     static InfType from(ClassNode classNode, boolean dynamicTyped = false) {
         return new InfType(
                 typeName: null,

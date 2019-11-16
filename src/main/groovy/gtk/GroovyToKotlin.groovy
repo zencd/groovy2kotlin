@@ -1,6 +1,6 @@
 package gtk
 
-
+import gtk.inf.Inferer
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
@@ -69,6 +69,7 @@ class GroovyToKotlin implements GtkConsts {
     private static final Logger log = Logger.getLogger(this.name)
 
     final List<ModuleNode> modules
+    final Inferer inferer = new Inferer()
 
     CodeBuffer _out
     Map<String, CodeBuffer> outBuffers = [:]
@@ -97,6 +98,11 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     void translateAll() {
+        inferer.doInference(modules)
+        translateAllToKotlin()
+    }
+
+    private void translateAllToKotlin() {
         int cnt = 0
         modules.each {
             String groovyFileNameAbs = it.description

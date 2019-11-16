@@ -80,7 +80,7 @@ class Temp {
         String source1 = """
 class Temp {
     void main() {
-        Arrays.asList(1,2,3).join(',')
+        'xxx'.getClass().toString()
     }
 }
 """
