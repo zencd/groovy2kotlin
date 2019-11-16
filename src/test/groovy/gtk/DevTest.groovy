@@ -1,6 +1,6 @@
 package gtk
 
-
+import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.builder.AstBuilder
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.control.CompilePhase
@@ -80,7 +80,8 @@ class Temp {
         String source1 = """
 class Temp {
     void main() {
-        'xxx'.getClass().toString()
+        //'xxx'.getClass().toString()
+        Arrays.asList(words).join(',')
     }
 }
 """
@@ -88,6 +89,14 @@ class Temp {
         //def nodes = Gtk.parseTexts([source1])
         String kotlinText = Gtk.toKotlinAsSingleString(source1)
         println(kotlinText)
+    }
+
+    @Test
+    void tmp() {
+        def arrays = new ClassNode(Arrays.class)
+        def methodName = 'asList'
+        def method = arrays.getMethods(methodName)
+        int stop = 0
     }
 
     @Test

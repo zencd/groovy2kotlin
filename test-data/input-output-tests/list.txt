@@ -3,6 +3,7 @@
         def x = [1, 2, 3]
     }
     void join(def unknown) {
+        Arrays.asList(1,2,3).join(',')
         [1,2,3].join(',')
         [1,2,3].join()
         unknown.join(',')
@@ -17,6 +18,7 @@ open class ClassName {
         val x = listOf(1, 2, 3)
     }
     fun join(unknown: Any) {
+        Arrays.asList(1, 2, 3).joinToString(",")
         listOf(1, 2, 3).joinToString(",")
         listOf(1, 2, 3).join()
         unknown.join(",")

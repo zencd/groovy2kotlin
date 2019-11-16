@@ -3,6 +3,7 @@ package gtk.inf
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 
+@Deprecated // use ClassNode
 class InfType {
     // unresolved yet
     static InfType UNRESOLVED = special("<special:UNRESOLVED>")

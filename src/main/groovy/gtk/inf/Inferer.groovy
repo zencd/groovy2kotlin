@@ -6,29 +6,34 @@ import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
-import org.codehaus.groovy.ast.Variable
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.ClassExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
+import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
-import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.classgen.BytecodeSequence
 
 import java.util.logging.Logger
-
 
 class Inferer {
 
     private static final Logger log = Logger.getLogger(this.name)
 
     public static final String INFERRED_TYPE = 'G2K.INFERRED_TYPE'
+    
+    static class SpecialClass {}
+
+    @Deprecated
+    public static final ClassNode TMP = ClassHelper.int_TYPE
+
+    public static final ClassNode RESOLVED_UNKNOWN = new ClassNode(SpecialClass.class)
 
     static {
         initMetaClasses()
@@ -39,30 +44,41 @@ class Inferer {
             def node = delegate as ASTNode
             return inferType(node)
         }
-        //ASTNode.metaClass.setType = { InfType type ->
+        //ASTNode.metaClass.setType = { ClassNode type ->
         //    def node = delegate as ASTNode
         //    node.putNodeMetaData(INFERRED_TYPE, type)
         //}
-        //ASTNode.metaClass.setType = { InfType type ->
+        //ASTNode.metaClass.setType = { ClassNode type ->
         //    def node = delegate as ASTNode
         //    node.putNodeMetaData(INFERRED_TYPE, type)
         //}
-        //ASTNode.metaClass.getType = { InfType type ->
+        //ASTNode.metaClass.getType = { ClassNode type ->
         //    def node = delegate as ASTNode
         //    node.putNodeMetaData(INFERRED_TYPE, type)
         //}
     }
 
-    private InfType inferType(ASTNode node) {
-        def type = getType(node)
+    @DynamicDispatch
+    private ClassNode inferType(ASTNode node) {
+        return infer(node)
+    }
 
-        if (type != null && type.resolved) {
+    @DynamicDispatch
+    private ClassNode inferType(Expression node) {
+        def type = node.type
+
+        if (type != ClassHelper.OBJECT_TYPE) {
             return type
         }
 
+        //if (type != null) {
+        //    return type
+        //}
+
         type = infer(node)
         assert type != null
-        setType(node, type)
+        node.setType(type)
+        //setType(node, type)
         return type
     }
 
@@ -70,16 +86,16 @@ class Inferer {
         modules.each { infer(it) }
     }
 
-    static void setType(ASTNode node, InfType type) {
+    static void setType(ASTNode node, ClassNode type) {
         node.putNodeMetaData(INFERRED_TYPE, type)
     }
 
-    static InfType getType(ASTNode node) {
+    static ClassNode getType(ASTNode node) {
         if (node != null) {
-            return node.getNodeMetaData(INFERRED_TYPE) as InfType
+            return node.getNodeMetaData(INFERRED_TYPE) as ClassNode
         } else {
             log.warning("null ASTNode passed to getType()")
-            return InfType.TMP
+            return RESOLVED_UNKNOWN
         }
     }
 
@@ -90,22 +106,22 @@ class Inferer {
     }
 
     @DynamicDispatch
-    InfType infer(ModuleNode module) {
+    ClassNode infer(ModuleNode module) {
         inferList(module.classes)
         // todo process other things too
-        return InfType.RESOLVED_UNKNOWN
+        return RESOLVED_UNKNOWN
     }
 
     @DynamicDispatch
-    InfType infer(ClassNode classNode) {
+    ClassNode infer(ClassNode classNode) {
         for (MethodNode method : classNode.methods) {
             inferType(method)
         }
-        return InfType.RESOLVED_UNKNOWN
+        return RESOLVED_UNKNOWN
     }
 
     @DynamicDispatch
-    InfType infer(MethodNode method) {
+    ClassNode infer(MethodNode method) {
         // todo infer params? probably not needed already
         def code = method.code
         def type = inferType(code)
@@ -113,84 +129,91 @@ class Inferer {
     }
 
     @DynamicDispatch
-    InfType infer(BytecodeSequence stmt) {
+    ClassNode infer(BytecodeSequence stmt) {
         // not sure what to do here, now ignoring
-        return InfType.RESOLVED_UNKNOWN
+        return RESOLVED_UNKNOWN
     }
 
     @DynamicDispatch
-    InfType infer(ReturnStatement stmt) {
+    ClassNode infer(ReturnStatement stmt) {
         return inferType(stmt.expression)
     }
 
     @DynamicDispatch
-    InfType infer(ClassExpression expr) {
-        return InfType.from(Class.class)
+    ClassNode infer(ClassExpression expr) {
+        return new ClassNode(Class.class)
     }
 
     @DynamicDispatch
-    InfType infer(MethodCallExpression expr) {
-        def objTypeWas = expr.objectExpression.type
-        def objType = inferType(expr.objectExpression)
+    ClassNode infer(MethodCallExpression expr) {
+        final originalType = expr.type
+        final objTypeWas = expr.objectExpression.type
+        final objType = inferType(expr.objectExpression)
         // todo find method from expr.methodAsString
         if (expr.method instanceof ConstantExpression) {
-            def name = expr.method.value
+            String methodName = expr.method.value
             inferType(expr.arguments)
-            InfType res
-            if (name == 'getClass') {
-                res = InfType.from(Class.class)
-            } else if (name == 'toString') {
-                res = InfType.from(ClassHelper.STRING_TYPE)
-            } else {
-                res = InfType.TMP
-            }
-            return res
+            def args = expr.arguments
+            ClassNode resType = tryResolveMethodReturnType(objType, methodName) ?: originalType
+            return resType
         } else {
             log.warning("yet unsupported expr.method as ${expr.method.class.name}")
-            return InfType.TMP
+            return originalType
         }
     }
 
+    private static ClassNode tryResolveMethodReturnType(ClassNode objectType, String methodName) {
+        // todo consider actual args
+        def methods = objectType.getMethods(methodName)
+        return methods.size() == 1 ? methods[0].returnType : null
+    }
+
+    //private static ClassNode tryResolveMethodReturnType2(ClassNode objectType, String methodName) {
+    //    //def methods = objectType.getMethods(methodName)
+    //    objectType.getMethod()
+    //    //return methods.size() == 1 ? methods[0].returnType : null
+    //}
+
     @DynamicDispatch
-    InfType infer(TupleExpression expr) {
+    ClassNode infer(TupleExpression expr) {
         inferList(expr.expressions)
-        return InfType.RESOLVED_UNKNOWN
+        return expr.getType()
     }
 
     @DynamicDispatch
-    InfType infer(ConstantExpression expr) {
-        return InfType.TMP
+    ClassNode infer(ConstantExpression expr) {
+        return expr.getType()
     }
 
     @DynamicDispatch
-    InfType infer(VariableExpression expr) {
+    ClassNode infer(VariableExpression expr) {
         if (expr.accessedVariable) {
             def av = expr.accessedVariable
             def ty = av.originType
             def prim = ClassHelper.isPrimitiveType(ty)
-            return InfType.from(av.originType, av.dynamicTyped)
+            return av.originType
         } else {
             // todo
             log.warning("VariableExpression.accessedVariable is null X_x")
-            return InfType.TMP
+            return expr.getType()
         }
     }
 
     @DynamicDispatch
-    InfType infer(ASTNode node) {
+    ClassNode infer(ASTNode node) {
         //throw new Exception("${getClass().simpleName}.infer() not defined for ${node.class.name}")
-        log.warning("${getClass().simpleName}.infer() not defined for ${node.class.name}")
-        return InfType.TMP
+        log.warning("${getClass().simpleName}::infer() not defined for ${node?.class?.name}")
+        return RESOLVED_UNKNOWN
     }
 
     @DynamicDispatch
-    InfType infer(ExpressionStatement stmt) {
+    ClassNode infer(ExpressionStatement stmt) {
         inferType(stmt.expression)
-        return InfType.RESOLVED_UNKNOWN
+        return RESOLVED_UNKNOWN
     }
 
     @DynamicDispatch
-    InfType infer(DeclarationExpression expr) {
+    ClassNode infer(DeclarationExpression expr) {
         def type = inferType(expr.rightExpression)
         if (expr.leftExpression instanceof VariableExpression) {
             setType(expr, type)
@@ -203,7 +226,7 @@ class Inferer {
     }
 
     @DynamicDispatch
-    InfType infer(BinaryExpression expr) {
+    ClassNode infer(BinaryExpression expr) {
         def type1 = inferType(expr.leftExpression)
         def type2 = inferType(expr.rightExpression)
 
@@ -213,12 +236,12 @@ class Inferer {
         //def x2 = expr.rightExpression.originType as ClassNode
         //def x2p = ClassHelper.isPrimitiveType(x2)
 
-        return type1
+        return expr.getType()
     }
 
     @DynamicDispatch
-    InfType infer(BlockStatement stmt) {
+    ClassNode infer(BlockStatement stmt) {
         inferList(stmt.statements)
-        return InfType.RESOLVED_UNKNOWN
+        return RESOLVED_UNKNOWN
     }
 }
