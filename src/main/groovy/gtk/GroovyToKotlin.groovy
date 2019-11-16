@@ -729,7 +729,19 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(BooleanExpression expr) {
-        translateExpr(expr.expression)
+        def type = expr.expression.type
+        if (type == ClassHelper.STRING_TYPE || type == ClassHelper.GSTRING_TYPE) {
+            translateExpr(Transformers.makeGroovyTruthSubTreeForString(expr))
+        } else if (ClassHelper.isPrimitiveType(type)) {
+            translateExpr(expr.expression)
+        } else {
+            def notNull = new BinaryExpression(
+                    expr.expression,
+                    GtkUtils.makeToken("!="),
+                    ConstantExpression.NULL
+            )
+            translateExpr(notNull)
+        }
     }
 
     @DynamicDispatch

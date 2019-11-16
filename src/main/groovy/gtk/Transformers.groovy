@@ -2,7 +2,12 @@ package gtk
 
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.MethodNode
+import org.codehaus.groovy.ast.expr.AttributeExpression
+import org.codehaus.groovy.ast.expr.BinaryExpression
+import org.codehaus.groovy.ast.expr.BooleanExpression
+import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
+import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
@@ -81,5 +86,28 @@ class Transformers implements GtkConsts {
                 param0.putNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING, KT_ANY_OPT)
             }
         }
+    }
+
+    static Expression makeGroovyTruthSubTreeForString(BooleanExpression expr) {
+        def notNull = new BinaryExpression(
+                expr.expression,
+                GtkUtils.makeToken("!="),
+                ConstantExpression.NULL
+        )
+        def getLength = new AttributeExpression(
+                expr.expression, new ConstantExpression('length')
+        )
+        // todo kotlin prefers `.isNotEmpty`
+        def lengthNotZero = new BinaryExpression(
+                getLength,
+                GtkUtils.makeToken(">"),
+                new ConstantExpression(0)
+        )
+        def andExpr = new BinaryExpression(
+                notNull,
+                GtkUtils.makeToken("&&"),
+                lengthNotZero
+        )
+        return andExpr
     }
 }

@@ -113,7 +113,7 @@ Others may be supported but was not tested.
 
 ## Progress on a project
 
-    2019-11-16 - 640 Kotlin errors
+    2019-11-16 - 619 Kotlin errors
     2019-11-15 - 714
 	2019-11-13 - 691
 	2019-11-12 - 848

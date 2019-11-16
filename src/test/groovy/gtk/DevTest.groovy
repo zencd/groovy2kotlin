@@ -79,8 +79,10 @@ class Temp {
     void trans_single_string() {
         String source1 = """
 class Test {
-    void main(String s) {
-        if (s) { println(1) }
+    String makeString() { "xxx" }
+    void main(String s, File f) {
+        //if (s) { println(1) }
+        if (makeString()) { println(2) }
     }
 }
 """

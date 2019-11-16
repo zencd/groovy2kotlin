@@ -25,6 +25,7 @@ import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.classgen.BytecodeExpression
+import org.codehaus.groovy.syntax.Token
 
 import java.util.logging.Logger
 import java.util.regex.Matcher
@@ -416,5 +417,9 @@ class GtkUtils {
 
     static boolean isBoolean(ClassNode classNode) {
         classNode == ClassHelper.Boolean_TYPE || classNode == ClassHelper.boolean_TYPE
+    }
+
+    static Token makeToken(String s) {
+        new Token(0, s, 0,0)
     }
 }

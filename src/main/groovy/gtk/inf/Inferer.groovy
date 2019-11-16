@@ -17,6 +17,7 @@ import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
+import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.classgen.BytecodeSequence
 
@@ -78,7 +79,7 @@ class Inferer {
         type = infer(node)
         assert type != null
         node.setType(type)
-        //setType(node, type)
+        setTypeToMeta(node, type)
         return type
     }
 
@@ -86,7 +87,7 @@ class Inferer {
         modules.each { infer(it) }
     }
 
-    static void setType(ASTNode node, ClassNode type) {
+    static void setTypeToMeta(ASTNode node, ClassNode type) {
         node.putNodeMetaData(INFERRED_TYPE, type)
     }
 
@@ -216,7 +217,7 @@ class Inferer {
     ClassNode infer(DeclarationExpression expr) {
         def type = inferType(expr.rightExpression)
         if (expr.leftExpression instanceof VariableExpression) {
-            setType(expr, type)
+            //setType(expr, type)
         } else if (expr.leftExpression instanceof ArgumentListExpression) {
             log.warning("infer() not impl for ${expr.leftExpression.class.name}") // todo
         } else {
@@ -237,6 +238,16 @@ class Inferer {
         //def x2p = ClassHelper.isPrimitiveType(x2)
 
         return expr.getType()
+    }
+
+    @DynamicDispatch
+    ClassNode infer(IfStatement stmt) {
+        inferType(stmt.booleanExpression)
+        inferType(stmt.ifBlock)
+        if (stmt.elseBlock) {
+            inferType(stmt.elseBlock)
+        }
+        return RESOLVED_UNKNOWN
     }
 
     @DynamicDispatch
