@@ -1,7 +1,6 @@
 package gtk
 
 import org.codehaus.groovy.ast.ClassHelper
-import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
@@ -79,7 +78,7 @@ class Transformers implements GtkConsts {
             def param0 = method.parameters[0]
             if (param0.type == ClassHelper.OBJECT_TYPE) {
                 method.putNodeMetaData(AST_NODE_META_OVERRIDING_METHOD, true)
-                param0.putNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING, ANY_OPTIONAL)
+                param0.putNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING, KT_ANY_OPT)
             }
         }
     }

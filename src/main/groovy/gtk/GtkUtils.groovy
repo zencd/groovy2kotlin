@@ -69,7 +69,7 @@ class GtkUtils {
         String optionalStr = optional ? '?' : ''
 
         if (classNode == ClassHelper.OBJECT_TYPE) {
-            return "${GtkConsts.ANY}${optionalStr}"
+            return "${GtkConsts.KT_ANY}${optionalStr}"
         }
 
         if (classNode.componentType != null) {
@@ -167,7 +167,7 @@ class GtkUtils {
     static String getMethodModifierString(MethodNode method) {
         boolean allowAbstract = !method.declaringClass.interface
         String javaMods = getModifierString(method.modifiers, false, false, true, allowAbstract)
-        String override = method.getNodeMetaData(GtkConsts.AST_NODE_META_OVERRIDING_METHOD) == true ? GtkConsts.KOTLIN_OVERRIDE_KEYWORD : ''
+        String override = method.getNodeMetaData(GtkConsts.AST_NODE_META_OVERRIDING_METHOD) == true ? GtkConsts.KT_OVERRIDE : ''
         return [override, javaMods].findAll { it }.join(' ')
     }
 

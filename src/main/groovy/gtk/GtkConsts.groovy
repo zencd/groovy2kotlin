@@ -15,8 +15,13 @@ interface GtkConsts {
      */
     static final String AST_NODE_META_DONT_ADD_JAVA_CLASS = "${AST_NODE_META_PREFIX}.DONT_ADD_JAVA_CLASS"
 
-    static final String KOTLIN_OVERRIDE_KEYWORD = "override"
+    static final String KT_OVERRIDE = "override"
+    static final String KT_ANY_OPT = 'Any?'
+    static final String KT_ANY = 'Any'
+    static final String KT_REF_EQ = '==='
 
-    public static final String ANY_OPTIONAL = 'Any?'
-    public static final String ANY = 'Any'
+    static final String GR_REGEX_TEST = '==~'
+    static final String GR_INDEX_OP = '['
+    static final String GR_IS_OP = 'is'
+    static final String GR_INSTANCEOF = 'instanceof'
 }

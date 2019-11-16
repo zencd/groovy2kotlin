@@ -1,6 +1,6 @@
 package gtk
 
-import org.codehaus.groovy.ast.ASTNode
+
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
@@ -51,7 +51,6 @@ import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 import org.codehaus.groovy.ast.stmt.WhileStatement
-import org.codehaus.groovy.control.SourceUnit
 
 import java.util.logging.Logger
 
@@ -473,7 +472,7 @@ class GroovyToKotlin implements GtkConsts {
     void translateExpr(MethodCallExpression expr) {
         String name = expr.method.text
         def numParams = GtkUtils.getNumberOfActualParams(expr)
-        if (name == 'is' && numParams == 1) {
+        if (name == GR_IS_OP && numParams == 1) {
             translateOperatorIs(expr)
         } else {
             translateRegularMethodCall(expr)
@@ -483,7 +482,7 @@ class GroovyToKotlin implements GtkConsts {
     void translateOperatorIs(MethodCallExpression expr) {
         // todo you'd better replace suitable method-call subtreess with a custom ones, then procreating if/elses
         translateExpr(expr.objectExpression)
-        out.append(' === ')
+        out.append(" ${KT_REF_EQ} ")
         def args = expr.arguments as ArgumentListExpression
         translateExpr(args[0])
     }
@@ -506,6 +505,9 @@ class GroovyToKotlin implements GtkConsts {
             if (name == 'replaceAll' && numParams == 2) {
                 // todo move to Transformers, generalize tree transformations
                 name = 'replace' // Kotlin has no replaceAll(), but replace() looks the same
+            }
+            if (name == 'join') {
+                int stop = 0
             }
             if (expr.objectExpression.type == ClassHelper.LIST_TYPE && name == 'join' && numParams == 1) {
                 name = 'joinToString'
@@ -632,9 +634,9 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(BinaryExpression expr) {
-        if (expr.operation.text == '[') {
+        if (expr.operation.text == GR_INDEX_OP) {
             translateIndexingExpr(expr)
-        } else if (expr.operation.text == '==~') {
+        } else if (expr.operation.text == GR_REGEX_TEST) {
             translateMatchOperator(expr)
         } else {
             translateRegularBinaryExpr(expr)
@@ -646,7 +648,7 @@ class GroovyToKotlin implements GtkConsts {
         def right = expr.rightExpression
 
         def ktOp = GtkUtils.translateOperator(expr.operation.text)
-        if (expr.operation.text == 'instanceof') {
+        if (expr.operation.text == GR_INSTANCEOF) {
             right.putNodeMetaData(AST_NODE_META_DONT_ADD_JAVA_CLASS, true)
         }
 
@@ -925,7 +927,7 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     /**
-     * Not sure if "..<" is ok in Kotlin but we'd better produce incorrect code than correct but wrong.
+     * XXX Not sure if "..<" is ok in Kotlin but we'd better produce incorrect code than correct but wrong.
      */
     @DynamicDispatch
     void translateExpr(RangeExpression expr) {

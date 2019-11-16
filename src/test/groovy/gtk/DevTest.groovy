@@ -79,9 +79,8 @@ class Temp {
     void trans_single_string() {
         String source1 = """
 class Temp {
-    static int ONE
-    int main() {
-        return Temp.ONE
+    void main() {
+        Arrays.asList(1,2,3).join(',')
     }
 }
 """
