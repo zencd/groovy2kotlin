@@ -28,7 +28,9 @@ class BulkProcessor {
         gtk.outBuffers.each { String filePath, CodeBuffer buf ->
             def text = buf.composeFinalText()
             log.info("writing ${text.size()} chars to ${filePath}")
-            new File(filePath).text = text
+            def f = new File(filePath)
+            GeneralUtils.makeDirsForRegularFile(f)
+            f.text = text
         }
         log.info("successfully finished processing ${gtk.outBuffers.size()} files")
     }
