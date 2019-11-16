@@ -9,6 +9,7 @@ import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.ConstructorNode
+import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.GenericsType
 import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.InnerClassNode
@@ -239,6 +240,10 @@ class GtkUtils {
 
     static boolean isStatic(int mods) {
         return (mods & Opcodes.ACC_STATIC) != 0
+    }
+
+    static boolean isStatic(FieldNode field) {
+        return isStatic(field.modifiers) || field.declaringClass.interface
     }
 
     static boolean isString(ClassNode type) {

@@ -78,12 +78,8 @@ class Temp {
     @Test
     void trans_single_string() {
         String source1 = """
-class Temp {
-    void main() {
-        //'xxx'.getClass().toString()
-        //Arrays.asList(words).join(',')
-        println(~16)
-    }
+public interface Config {
+    public static final String CURRENCY_RUB = 'RUB'
 }
 """
         //println(DevMain.toKotlin(source))

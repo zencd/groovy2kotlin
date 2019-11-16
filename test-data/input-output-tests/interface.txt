@@ -4,5 +4,7 @@ interface Interface {
 ------------
 $DEFAULT_IMPORTS
 interface Interface {
+    companion object {
+    }
     fun nop()
 }

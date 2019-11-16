@@ -204,7 +204,8 @@ class GroovyToKotlin implements GtkConsts {
     private void translateClassBody(ClassNode classNode) {
         out.appendLn("{")
         out.push()
-        if (!classNode.interface && !GtkUtils.isAnonymous(classNode)) {
+        if (!GtkUtils.isAnonymous(classNode)) {
+            // companion object is possible for classes and interfaces; unwanted for anonymous classes
             out.newLineCrlf("companion object {")
             def classCompanionPiece = out.addPiece('companion-piece')
             def sz = classCompanions.size()
@@ -294,7 +295,7 @@ class GroovyToKotlin implements GtkConsts {
 
     void translateField(FieldNode field) {
         def piece = null
-        if (isStatic(field.modifiers)) {
+        if (isStatic(field)) {
             piece = classCompanions[field.declaringClass]
         }
 
