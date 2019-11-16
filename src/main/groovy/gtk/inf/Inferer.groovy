@@ -16,6 +16,7 @@ import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.EmptyStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
@@ -201,13 +202,6 @@ class Inferer {
     }
 
     @DynamicDispatch
-    ClassNode infer(ASTNode node) {
-        //throw new Exception("${getClass().simpleName}.infer() not defined for ${node.class.name}")
-        log.warning("${getClass().simpleName}::infer() not defined for ${node?.class?.name}")
-        return RESOLVED_UNKNOWN
-    }
-
-    @DynamicDispatch
     ClassNode infer(ExpressionStatement stmt) {
         inferType(stmt.expression)
         return RESOLVED_UNKNOWN
@@ -253,6 +247,22 @@ class Inferer {
     @DynamicDispatch
     ClassNode infer(BlockStatement stmt) {
         inferList(stmt.statements)
+        return RESOLVED_UNKNOWN
+    }
+
+    ClassNode infer(EmptyStatement stmt) {
+        return RESOLVED_UNKNOWN
+    }
+
+    @DynamicDispatch
+    ClassNode infer(Expression expr) {
+        return expr.getType()
+    }
+
+    @DynamicDispatch
+    ClassNode infer(ASTNode node) {
+        //throw new Exception("${getClass().simpleName}.infer() not defined for ${node.class.name}")
+        log.warning("${getClass().simpleName}::infer() not defined for ${node?.class?.name}")
         return RESOLVED_UNKNOWN
     }
 }
