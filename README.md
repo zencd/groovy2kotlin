@@ -68,7 +68,7 @@ Others may be supported but was not tested.
 - `Number` mapping:
     - `intValue()` → `.toInt()` etc
 - Other mappings:
-    - `~16` → `16.inv()`
+    - ...
 
 ## Todo 2
 
@@ -86,6 +86,7 @@ Others may be supported but was not tested.
 ✔ Annotations
 ✔ Range expression
 ✔ In-string expressions
+✔ Bitwise expressions
 ✔ Operator `in`
 ✔ Operator `==~`
 ✔ Operator `is`

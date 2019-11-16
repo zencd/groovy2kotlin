@@ -14,6 +14,7 @@ import org.codehaus.groovy.ast.VariableScope
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.AttributeExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
+import org.codehaus.groovy.ast.expr.BitwiseNegationExpression
 import org.codehaus.groovy.ast.expr.BooleanExpression
 import org.codehaus.groovy.ast.expr.CastExpression
 import org.codehaus.groovy.ast.expr.ClassExpression
@@ -942,6 +943,16 @@ class GroovyToKotlin implements GtkConsts {
         append(!expr.isInclusive() ? "..<" : "..")
         translateExpr(expr.to)
         append(")")
+    }
+
+    /**
+     * `~16` → `16.inv()`
+     */
+    @DynamicDispatch
+    void translateExpr(BitwiseNegationExpression expr) {
+        // todo check for expr type
+        translateExpr(expr.expression)
+        append(".inv()")
     }
 
     @DynamicDispatch
