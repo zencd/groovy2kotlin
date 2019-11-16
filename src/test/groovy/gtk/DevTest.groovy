@@ -78,8 +78,10 @@ class Temp {
     @Test
     void trans_single_string() {
         String source1 = """
-public interface Config {
-    public static final String CURRENCY_RUB = 'RUB'
+class Test {
+    void main(String s) {
+        if (s) { println(1) }
+    }
 }
 """
         //println(DevMain.toKotlin(source))

@@ -10,7 +10,7 @@
 
 The tool performs type checking so you are required to supply:
 
-- Your Groovy project's valid source files
+- Your Groovy project's *valid* source files
 - The `groovy2kotlin.jar` or corresponding classes
 - All dependencies of your Groovy project
 

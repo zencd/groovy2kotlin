@@ -39,4 +39,8 @@ class GeneralUtils {
         def urls = jarPaths.collect { new File(it).toURI().toURL() } as URL[]
         return new URLClassLoader(urls, parent)
     }
+
+    static void makeDirsForRegularFile(File file) {
+        file.parentFile.mkdir()
+    }
 }

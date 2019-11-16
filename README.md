@@ -72,9 +72,13 @@ Others may be supported but was not tested.
 
 ## Todo 2
 
+- Check a field is never rewritten thru code, and mark it as `val` then
 - Groovy's special use of bitwise operators on lists, streams, etc
 - Translate Groovy's implicit `return` (solved for certain cases)
-- "Groovy truth" can't be translated straight
+- Implement "Groovy truth" behaviour for:
+    - String, GString
+    - List and Map ancestors
+    - Object
 - Kotlin's `open` and `override` (a common, type-aware algorithm)
 
 ## Some history
@@ -106,3 +110,11 @@ Others may be supported but was not tested.
 ✔ `toString()`
 ✔ `String.join` → `joinToString` 
 ✔ `Some.class`
+
+## Progress on a project
+
+    2019-11-16 - 640 Kotlin errors
+    2019-11-15 - 714
+	2019-11-13 - 691
+	2019-11-12 - 848
+	2019-11-10 - 798
