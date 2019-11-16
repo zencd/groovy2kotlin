@@ -81,7 +81,8 @@ class Temp {
 class Temp {
     void main() {
         //'xxx'.getClass().toString()
-        Arrays.asList(words).join(',')
+        //Arrays.asList(words).join(',')
+        println(String.class)
     }
 }
 """

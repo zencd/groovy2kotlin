@@ -10,6 +10,9 @@ class ClassName {
         println(FLAG)
         println(ClassName.FLAG)
     }
+    void classUse() {
+        println(String.class)
+    }
 }
 ---------------
 $DEFAULT_IMPORTS
@@ -26,5 +29,8 @@ open class ClassName {
     }
     fun main() {
         ClassName.parse()
+    }
+    fun classUse() {
+        println(String::class.java)
     }
 }

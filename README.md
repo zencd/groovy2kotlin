@@ -68,7 +68,6 @@ Others may be supported but was not tested.
 - `Number` mapping:
     - `intValue()` → `.toInt()` etc
 - Other mappings:
-    - `Some.class` → `Some::class.java`
     - `~16` → `16.inv()`
 
 ## Todo 2
@@ -105,3 +104,4 @@ Others may be supported but was not tested.
 ✔ `hashCode()`
 ✔ `toString()`
 ✔ `String.join` → `joinToString` 
+✔ `Some.class`
