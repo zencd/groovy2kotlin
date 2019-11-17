@@ -52,21 +52,10 @@ class Temp {
     void trans_single_string() {
         String groovyText = """
 class Main {
-    Main instance1
-    Main instance2
-    int type
-    void main(Main o) {
-        o.instance1.@type
-        o.instance1.type
-        o.getType()
-        
-        o.instance1.@type = 1
-        o.instance1.type = 2
-        o.setType(3)
+    void main() {
+        def x = 1
+        x = 2
     }
-    int getType() { 0 }
-    void setType(int i) {}
-    Main pass() { return this }
 }
 """
         //println(DevMain.toKotlin(source))

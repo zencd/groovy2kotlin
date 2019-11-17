@@ -12,6 +12,8 @@ interface GtkConsts {
     static final String AST_NODE_META__GETTER = "${AST_NODE_META_PREFIX}.GETTER"
     static final String AST_NODE_META__SETTER = "${AST_NODE_META_PREFIX}.SETTER"
 
+    static final String AST_NODE_META__WRITABLE = "${AST_NODE_META_PREFIX}.WRITABLE"
+
     /**
      * Force generate `ClassName` instead of `ClassName::class.java`.
      */

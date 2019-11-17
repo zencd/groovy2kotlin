@@ -657,7 +657,8 @@ class GroovyToKotlin implements GtkConsts {
         def hasInitializer = rightExpr != null && !(rightExpr instanceof EmptyExpression)
         String varOrVal
         boolean optional
-        if (!hasInitializer || assignedByNull) {
+        def writable = Inferer.getMeta(expr.leftExpression, AST_NODE_META__WRITABLE) == true
+        if (!hasInitializer || assignedByNull || writable) {
             varOrVal = 'var'
             optional = true
         } else {

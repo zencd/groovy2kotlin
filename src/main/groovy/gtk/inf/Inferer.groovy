@@ -50,6 +50,8 @@ class Inferer implements GtkConsts {
 
     private final Stack<ClassNode> enclosingClasses = new Stack<ClassNode>()
 
+    private final Scopes scopes = new Scopes()
+
     static {
         initMetaClasses()
     }
@@ -146,9 +148,11 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(MethodNode method) {
+        scopes.pushScope()
         if (method.code != null) {
             inferType(method.code)
         }
+        scopes.popScope()
         return RESOLVED_UNKNOWN
     }
 
@@ -259,13 +263,16 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(DeclarationExpression expr) {
+        def left = expr.leftExpression
+
         def type = inferType(expr.rightExpression)
-        if (expr.leftExpression instanceof VariableExpression) {
+        if (left instanceof VariableExpression) {
+            scopes.addLocal(left)
             //setType(expr, type)
-        } else if (expr.leftExpression instanceof ArgumentListExpression) {
-            log.warning("infer() not impl for ${expr.leftExpression.class.name}") // todo
+        } else if (left instanceof ArgumentListExpression) {
+            log.warning("infer() not impl for ${left.class.name}") // todo
         } else {
-            throw new Exception("not impl for ${expr.leftExpression.class.name}")
+            throw new Exception("not impl for ${left.class.name}")
         }
         return type
     }
@@ -276,6 +283,11 @@ class Inferer implements GtkConsts {
             // XXX note the different order for assignment
             def rt = inferType(expr.rightExpression)
             def lt = inferAssignment(expr.leftExpression, expr.rightExpression)
+            def s = scopes.scope
+            def left = expr.leftExpression
+            if (left instanceof VariableExpression) {
+                scopes.scope.markVarAsWritable(left.name)
+            }
             return rt
         } else {
             def type1 = inferType(expr.leftExpression)
