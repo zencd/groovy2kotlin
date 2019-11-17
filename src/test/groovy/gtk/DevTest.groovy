@@ -52,8 +52,8 @@ class Temp {
     void trans_single_string() {
         String groovyText = """
 class Main {
-    void funk() {
-        [1,2,3].findAll { it }
+    void funk(List<File> list) {
+        list*.path = ""
     }
 }
 """
@@ -68,16 +68,6 @@ class Main {
 
     @Test
     void tmp() {
-        assertEquals(
-                STRING_TYPE,
-                tryResolveMethodReturnType(OBJECT_TYPE, "toString", ArgumentListExpression.EMPTY_ARGUMENTS)
-        )
-        assertEquals(
-                boolean_TYPE,
-                tryResolveMethodReturnType(OBJECT_TYPE, "equals", new ArgumentListExpression(
-                        new ConstantExpression("xxx")
-                ))
-        )
     }
 
     @Test

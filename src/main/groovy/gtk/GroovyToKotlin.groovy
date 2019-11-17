@@ -61,7 +61,9 @@ import static GtkUtils.isFinal
 import static GtkUtils.isStatic
 import static GtkUtils.makeImportText
 import static GtkUtils.typeToKotlinString
+import static gtk.GtkUtils.isFile
 import static gtk.GtkUtils.isList
+import static gtk.GtkUtils.isString
 
 /**
  * The core code of the translator.
@@ -501,8 +503,8 @@ class GroovyToKotlin implements GtkConsts {
         def numParams = GtkUtils.getNumberOfActualParams(expr)
 
         if (!expr.implicitThis) {
-            String spread = expr.spreadSafe ? "*" : ""; // todo support it
-            String dereference = expr.safe ? "?" : "";
+            String spread = expr.spreadSafe ? "*" : "" // todo support it
+            String dereference = expr.safe ? "?" : ""
             expr.objectExpression.putNodeMetaData(AST_NODE_META_DONT_ADD_JAVA_CLASS, true)
             translateExpr(expr.objectExpression)
             out.append(spread)
@@ -527,6 +529,12 @@ class GroovyToKotlin implements GtkConsts {
             }
             else if (isList(objType) && name == 'join' && numParams == 1) {
                 name = 'joinToString'
+            }
+            else if (isString(objType) && name == 'getBytes' && numParams == 1) {
+                name = 'toByteArray'
+            }
+            else if (isFile(objType) && name == 'size' && numParams == 0) {
+                name = 'length'
             }
             else if (singleClosureArg) {
                 name = GtkUtils.tryRewriteMethodNameWithSingleClosureArg(name)
@@ -650,13 +658,26 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(BinaryExpression expr) {
-        if (expr.operation.text == GR_INDEX_OP) {
+        if (tryTranslateSpecialLeftShift(expr)) {
+            // performed already
+        } else if (expr.operation.text == GR_INDEX_OP) {
             translateIndexingExpr(expr)
         } else if (expr.operation.text == GR_REGEX_TEST) {
             translateMatchOperator(expr)
         } else {
             translateRegularBinaryExpr(expr)
         }
+    }
+
+    private boolean tryTranslateSpecialLeftShift(BinaryExpression expr) {
+        if (isList(expr.leftExpression.type) && expr.operation.text == GR_SHIFT_LEFT) {
+            translateExpr(expr.leftExpression)
+            out.append(".add(")
+            translateExpr(expr.rightExpression)
+            out.append(")")
+            return true
+        }
+        return false
     }
 
     private void translateRegularBinaryExpr(BinaryExpression expr) {
@@ -834,8 +855,10 @@ class GroovyToKotlin implements GtkConsts {
     @DynamicDispatch
     void translateExpr(PropertyExpression expr) {
         def prop = expr.property
+        String spread = expr.spreadSafe ? "*" : ""
         expr.objectExpression.putNodeMetaData(AST_NODE_META_DONT_ADD_JAVA_CLASS, true)
         translateExpr(expr.objectExpression)
+        out.append(spread)
         out.append('.')
         if (prop instanceof ConstantExpression) {
             // todo duplicated snippet

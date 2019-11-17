@@ -39,6 +39,8 @@ class GtkUtils {
 
     private static final Pattern PREV_JAVADOC_COMMENT_PATTERN = Pattern.compile("(?s)/\\*\\*(.*?)\\*/");
 
+    public static final ClassNode FILE_TYPE = ClassHelper.makeCached(File.class)
+
     // todo make it non static
     static lastLineCol = new LineColumn(1, 1)
 
@@ -127,7 +129,10 @@ class GtkUtils {
             try {
                 s = classNode.@name + optionalStr
             } catch (MissingFieldException e) {
-                s = '<groovy2kotlin: FAILED PROCESSING A TYPE>' // todo
+                // todo get rid of the try catch
+                // a known case: org.codehaus.groovy.control.ResolveVisitor.ConstructedNestedClass
+                // for example when accessing `javax.mail.internet.MimeMessage.RecipientType.TO`
+                s = classNode.name.replaceAll('\\$', '.')
             }
         }
         return s
@@ -462,6 +467,10 @@ class GtkUtils {
 
     static boolean isMap(ClassNode type) {
         type.isDerivedFrom(ClassHelper.MAP_TYPE)
+    }
+
+    static boolean isFile(ClassNode type) {
+        type.isDerivedFrom(FILE_TYPE)
     }
 
 }

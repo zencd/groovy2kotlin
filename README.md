@@ -45,6 +45,9 @@ Others may be supported but was not tested.
 
 ## Todo 1
 
+- Wildcard expressions: `list*.prop = 123`
+- If there are both field `some` and `getSome()`, the method should be preferred (like Groovy does)
+- Operator `input =~ regex`
 - `@Overrdie` looks redundant in the emitted code
 - Groovy scripts (statements outside any classes)
 - Allow annotations for everything
@@ -58,19 +61,21 @@ Others may be supported but was not tested.
 - Optional: Add `const` to `val FLAGS: Int = 11`
 - `List` mapping:
     - `eachWithIndex` → `forEachIndexed` (params swapped!)
-    - `collect` → `map`
     - `grep` → `?`
 - `File` mapping:
     - `size()` → `length()`
     - `File.text`
 - `String` mapping:
-    - `getBytes()` → `toByteArray()`
     - `length()` → `length` attr
     - `String.execute()`
 - `Number` mapping:
     - `intValue()` → `.toInt()` etc
 - Other mappings:
     - ...
+- Add tests:
+    - `list << item`
+    - `String.toByteArray`
+    - `File.size()`
 
 ## Todo 2
 

@@ -21,6 +21,7 @@ interface GtkConsts {
     static final String KT_REF_EQ = '==='
 
     static final String GR_REGEX_TEST = '==~'
+    static final String GR_SHIFT_LEFT = '<<'
     static final String GR_INDEX_OP = '['
     static final String GR_IS_OP = 'is'
     static final String GR_INSTANCEOF = 'instanceof'
