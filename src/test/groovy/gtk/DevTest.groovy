@@ -53,8 +53,7 @@ class Temp {
         String groovyText = """
 class Main {
     void main() {
-        def x = 1
-        x = 2
+        def m = summary =~ /.+/
     }
 }
 """

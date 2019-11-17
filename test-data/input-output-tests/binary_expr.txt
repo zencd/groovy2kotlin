@@ -5,6 +5,7 @@ class Temp {
         1 in [1,2]
         'xxx111' ==~ '.*xxx.*'
         1.is(2)
+        def m = summary =~ /.+/
     }
 }
 ------------
@@ -18,5 +19,6 @@ open class Temp {
         1 in listOf(1, 2)
         ".*xxx.*".toRegex().matches("xxx111")
         1 === 2
+        val m = ".+".toRegex().matchEntire(summary)
     }
 }

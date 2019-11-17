@@ -3,13 +3,20 @@ package gtk.inf
 import gtk.GtkConsts
 import org.codehaus.groovy.ast.expr.VariableExpression
 
+import java.util.logging.Logger
+
 class Scopes implements GtkConsts {
+
+    private static final Logger log = Logger.getLogger(this.name)
 
     static class Scope {
         private final Map<String, VariableExpression> vars = new HashMap<>()
         void addLocal(VariableExpression expr) {
-            //assert !(expr.name in vars)
-            vars[expr.name] = expr
+            if (expr.name in vars) {
+                // nop
+            } else {
+                vars[expr.name] = expr
+            }
         }
     }
 
@@ -45,6 +52,7 @@ class Scopes implements GtkConsts {
                 return ve
             }
         }
+        log.warning("no var found in scopes by name ${varName}")
         return null
     }
 
