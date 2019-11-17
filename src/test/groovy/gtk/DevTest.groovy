@@ -52,8 +52,8 @@ class Temp {
     void trans_single_string() {
         String groovyText = """
 class Main {
-    @Override
-    String toString() { "" }
+    static Object makeLogger(Class clazz) {}
+    private static final Object log = makeLogger(this)
 }
 """
         //println(DevMain.toKotlin(source))

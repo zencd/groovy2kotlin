@@ -171,8 +171,13 @@ class MainTest {
     }
 
     @Test
-    void static_members() {
+    void "static_members"() {
         testFromFile("static_members.txt")
+    }
+
+    @Test
+    void "static_this.txt"() {
+        testFromFile("static_this.txt")
     }
 
     @Test

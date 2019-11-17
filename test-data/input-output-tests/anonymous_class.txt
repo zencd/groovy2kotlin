@@ -9,7 +9,7 @@ class Temp {
 $DEFAULT_IMPORTS
 open class Temp {
     companion object {
-        var obj = object : java.util.ArrayList <E extends java.lang.Object>(this) {
+        var obj = object : java.util.ArrayList <E extends java.lang.Object>(Temp::class.java) {
             override fun toString(): String {
                 return "xxx"
             }

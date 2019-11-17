@@ -46,7 +46,8 @@ Others may be supported but was not tested.
 ## Todo 1
 
 - Wildcard expressions: `list*.prop = 123`
-- If there are both field `some` and `getSome()`, the method should be preferred (like Groovy does)
+- Presence of both field `some` and `getSome()` is not respected by Kotlin (but it's ok in Groovy)
+- If there are both field `some` and `getSome()` in Groovy code, the method should be preferred (like Groovy does)
 - Operator `input =~ regex`
 - Groovy scripts (statements outside any classes)
 - Allow annotations for everything

@@ -91,6 +91,13 @@ class GroovyToKotlin implements GtkConsts {
             'import java.math.BigDecimal',
     ]
 
+    private final Stack<ClassNode> staticContext = new Stack<ClassNode>()
+
+    private ClassNode getCurrentStaticContext() {
+        def stack = staticContext
+        return stack.isEmpty() ? null : stack.peek()
+    }
+
     GroovyToKotlin(List<ModuleNode> modules, Closure getBufName = null) {
         this.modules = modules
         this._out = null
@@ -345,11 +352,22 @@ class GroovyToKotlin implements GtkConsts {
                 }
             }
         } else {
+            def staticContextPushed = false
+            if (isStatic(field)) {
+                staticContext.push(field.declaringClass)
+                staticContextPushed = true
+            }
+
             out.append(" = ")
             if (GtkUtils.isArray(fieldType)) {
                 field.initialValueExpression.putNodeMetaData(AST_NODE_META_PRODUCE_ARRAY, true)
             }
+
             translateExpr(field.initialValueExpression)
+
+            if (staticContextPushed) {
+                staticContext.pop()
+            }
         }
         out.lineBreak()
     }
@@ -725,7 +743,15 @@ class GroovyToKotlin implements GtkConsts {
      */
     @DynamicDispatch
     void translateExpr(VariableExpression expr) {
-        out.append(expr.name)
+        def csc = getCurrentStaticContext()
+        if (expr.getText() == 'this' && csc) {
+            // in static context `this` means the enclosing class in Groovy
+            // so translate it respectively
+            out.append(csc.nameWithoutPackage)
+            out.append('::class.java')
+        } else {
+            out.append(expr.name)
+        }
         //if (!expr.dynamicTyped) {
         //    out.append(": ${typeToKotlinString(expr.type)}")
         //}

@@ -41,7 +41,7 @@ class Inferer {
 
     public static final ClassNode RESOLVED_UNKNOWN = new ClassNode(ResolvedUnknownMarker.class)
 
-    private Stack<ClassNode> enclosingClasses = new Stack<ClassNode>()
+    private final Stack<ClassNode> enclosingClasses = new Stack<ClassNode>()
 
     static {
         initMetaClasses()
