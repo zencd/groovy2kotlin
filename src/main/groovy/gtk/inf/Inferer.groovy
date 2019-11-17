@@ -19,17 +19,22 @@ import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.ConstructorCallExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
+import org.codehaus.groovy.ast.expr.EmptyExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
+import org.codehaus.groovy.ast.expr.TernaryExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.CatchStatement
 import org.codehaus.groovy.ast.stmt.EmptyStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ForStatement
 import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
+import org.codehaus.groovy.ast.stmt.TryCatchStatement
+import org.codehaus.groovy.ast.stmt.WhileStatement
 import org.codehaus.groovy.classgen.BytecodeSequence
 
 import java.util.logging.Logger
@@ -248,6 +253,14 @@ class Inferer implements GtkConsts {
     }
 
     @DynamicDispatch
+    ClassNode infer(TernaryExpression expr) {
+        inferType(expr.booleanExpression)
+        def t1 = inferType(expr.trueExpression)
+        def t2 = inferType(expr.falseExpression)
+        return t1 // todo combine t1 and t2 somehow, don't pick randomly
+    }
+
+    @DynamicDispatch
     ClassNode infer(BooleanExpression expr) {
         inferType(expr.expression) // do not save the result here
         def type = expr.getType()
@@ -280,6 +293,34 @@ class Inferer implements GtkConsts {
     @DynamicDispatch
     ClassNode infer(ExpressionStatement stmt) {
         inferType(stmt.expression)
+        return RESOLVED_UNKNOWN
+    }
+
+    @DynamicDispatch
+    ClassNode infer(EmptyExpression stmt) {
+        return RESOLVED_UNKNOWN
+    }
+
+    @DynamicDispatch
+    ClassNode infer(WhileStatement stmt) {
+        inferType(stmt.booleanExpression)
+        inferType(stmt.loopBlock)
+        return RESOLVED_UNKNOWN
+    }
+
+    @DynamicDispatch
+    ClassNode infer(TryCatchStatement stmt) {
+        inferType(stmt.tryStatement)
+        for (CatchStatement aCatch : stmt.catchStatements) {
+            inferType(aCatch)
+        }
+        inferTypeOptional(stmt.finallyStatement)
+        return RESOLVED_UNKNOWN
+    }
+
+    @DynamicDispatch
+    ClassNode infer(CatchStatement stmt) {
+        inferType(stmt.code)
         return RESOLVED_UNKNOWN
     }
 
