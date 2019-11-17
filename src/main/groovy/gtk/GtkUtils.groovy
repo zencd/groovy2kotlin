@@ -446,12 +446,14 @@ class GtkUtils {
         if (isStatic(method) || isPrivate(method.modifiers)) {
             return false
         }
-        def dc = method.declaringClass.superClass
-        def superMethod = dc.getMethod(method.name, method.parameters)
-        if (!superMethod) {
-            return false
+        def allAncestors = method.declaringClass.interfaces + method.declaringClass.superClass
+        for (ClassNode anInterface : allAncestors) {
+            def superMethod = anInterface.getMethod(method.name, method.parameters)
+            if (superMethod) {
+                return true
+            }
         }
-        return true
+        return false
     }
 
 }
