@@ -11,18 +11,11 @@ class Scopes implements GtkConsts {
             //assert !(expr.name in vars)
             vars[expr.name] = expr
         }
-
-        void markVarAsWritable(String varName) {
-            def expr = vars[varName]
-            if (expr) {
-                Inferer.setMeta(expr, AST_NODE_META__WRITABLE, true)
-            }
-        }
     }
 
     private final scopes = new Stack<Scope>()
 
-    Scope getScope() {
+    private Scope getScope() {
         return scopes.peek()
     }
 
@@ -43,10 +36,22 @@ class Scopes implements GtkConsts {
         scope.addLocal(expr)
     }
 
-    //void markVarAsWritable(String varName) {
-    //    def expr = vars[varName]
-    //    if (expr) {
-    //        Inferer.setMeta(expr, AST_NODE_META__WRITABLE, true)
-    //    }
-    //}
+    private VariableExpression findVar(String varName) {
+        ListIterator listIterator = scopes.listIterator(scopes.size());
+        while (listIterator.hasPrevious()) {
+            def aScope = listIterator.previous()
+            def ve = aScope.vars[varName]
+            if (ve) {
+                return ve
+            }
+        }
+        return null
+    }
+
+    void markVarAsWritable(String varName) {
+        def expr = findVar(varName)
+        if (expr) {
+            Inferer.setMeta(expr, AST_NODE_META__WRITABLE, true)
+        }
+    }
 }

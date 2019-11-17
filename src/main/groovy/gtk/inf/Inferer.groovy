@@ -283,10 +283,9 @@ class Inferer implements GtkConsts {
             // XXX note the different order for assignment
             def rt = inferType(expr.rightExpression)
             def lt = inferAssignment(expr.leftExpression, expr.rightExpression)
-            def s = scopes.scope
             def left = expr.leftExpression
             if (left instanceof VariableExpression) {
-                scopes.scope.markVarAsWritable(left.name)
+                scopes.markVarAsWritable(left.name)
             }
             return rt
         } else {
