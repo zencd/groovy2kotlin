@@ -1,9 +1,11 @@
 package gtk
 
 import groovyjarjarasm.asm.Opcodes
+import org.codehaus.groovy.ast.ClassHelper
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+import static gtk.GtkUtils.typeToKotlinString
 import static org.junit.Assert.assertEquals
 
 class MainTest {
@@ -16,6 +18,12 @@ class MainTest {
             'import java.math.BigInteger',
             'import java.math.BigDecimal',
     ].join('\n')
+
+    @Test
+    void typeToKotlinString_01() {
+        assertEquals("Boolean", typeToKotlinString(ClassHelper.boolean_TYPE)) // there is just one boolean in Kotlin - primitive
+        assertEquals("Boolean", typeToKotlinString(ClassHelper.Boolean_TYPE))
+    }
 
     @Test
     void "postfix_expr"() {

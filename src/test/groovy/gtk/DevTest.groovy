@@ -1,5 +1,6 @@
 package gtk
 
+import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.builder.AstBuilder
 import org.codehaus.groovy.ast.expr.VariableExpression
@@ -8,6 +9,8 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.SourceUnit
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+
+import static gtk.GtkUtils.typeToKotlinString
 
 @Disabled("not a test actually but added for purposes of development")
 class DevTest {
@@ -79,10 +82,14 @@ class Temp {
     void trans_single_string() {
         String source1 = """
 class Test {
-    String makeString() { "xxx" }
-    void main(String s, File f) {
-        //if (s) { println(1) }
-        if (makeString()) { println(2) }
+    //String makeString() { "xxx" }
+    //void main(String s, File f) {
+    //    //if (s) { println(1) }
+    //    //if (makeString()) { println(2) }
+    //}
+    boolean bool() { return false }
+    void main() {
+        if (this.bool()) { println(1) }
     }
 }
 """
@@ -94,9 +101,8 @@ class Test {
 
     @Test
     void tmp() {
-        def arrays = new ClassNode(Arrays.class)
-        def methodName = 'asList'
-        def method = arrays.getMethods(methodName)
+        def x1 = ClassHelper.isPrimitiveType(ClassHelper.boolean_TYPE)
+        def x2 = ClassHelper.isPrimitiveType(ClassHelper.Boolean_TYPE)
         int stop = 0
     }
 

@@ -256,6 +256,7 @@ class Inferer {
 
     @DynamicDispatch
     ClassNode infer(Expression expr) {
+        log.warning("${getClass().simpleName}::infer() not defined for ${expr?.class?.name}")
         return expr.getType()
     }
 
