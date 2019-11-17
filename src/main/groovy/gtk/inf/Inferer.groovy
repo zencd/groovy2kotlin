@@ -26,6 +26,8 @@ import org.codehaus.groovy.classgen.BytecodeSequence
 
 import java.util.logging.Logger
 
+import static gtk.GtkUtils.tryResolveMethodReturnType
+
 class Inferer {
 
     private static final Logger log = Logger.getLogger(this.name)
@@ -82,7 +84,7 @@ class Inferer {
         if (node instanceof Expression) {
             def prevType = node.getType()
             if (prevType != type) {
-                log.warning("rewriting node's type ${prevType} ==> ${type}")
+                log.info("rewriting node's type: ${prevType} ==> ${type}")
                 node.setType(type)
             }
         }
@@ -178,27 +180,14 @@ class Inferer {
         if (expr.method instanceof ConstantExpression) {
             String methodName = expr.method.value
             inferType(expr.arguments)
-            def args = expr.arguments
-            ClassNode resType = tryResolveMethodReturnType(objType, methodName) ?: originalType
-            return resType
+            def customResolved = tryResolveMethodReturnType(objType, methodName, expr.arguments)
+            ClassNode resultType = customResolved ?: originalType
+            return resultType
         } else {
             log.warning("yet unsupported expr.method as ${expr.method.class.name}")
             return originalType
         }
     }
-
-    private static ClassNode tryResolveMethodReturnType(ClassNode objectType, String methodName) {
-        // todo consider actual args
-        def methods = objectType.getMethods(methodName)
-        //objectType.getMethod()
-        return methods.size() == 1 ? methods[0].returnType : null
-    }
-
-    //private static ClassNode tryResolveMethodReturnType2(ClassNode objectType, String methodName) {
-    //    //def methods = objectType.getMethods(methodName)
-    //    objectType.getMethod()
-    //    //return methods.size() == 1 ? methods[0].returnType : null
-    //}
 
     @DynamicDispatch
     ClassNode infer(TupleExpression expr) {

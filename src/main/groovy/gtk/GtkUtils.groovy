@@ -428,4 +428,10 @@ class GtkUtils {
     static Token makeToken(String s) {
         new Token(0, s, 0,0)
     }
+
+    static ClassNode tryResolveMethodReturnType(ClassNode objectType, String methodName, Expression args) {
+        def m = objectType.tryFindPossibleMethod(methodName, args)
+        return m?.returnType
+    }
+
 }

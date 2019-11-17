@@ -1,19 +1,21 @@
 package gtk
 
 import org.codehaus.groovy.ast.ClassHelper
-import org.codehaus.groovy.ast.ClassNode
-import org.codehaus.groovy.ast.builder.AstBuilder
-import org.codehaus.groovy.ast.expr.VariableExpression
-import org.codehaus.groovy.control.CompilePhase
-import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.SourceUnit
+import org.codehaus.groovy.ast.expr.ArgumentListExpression
+import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-import static gtk.GtkUtils.typeToKotlinString
+import static gtk.GtkUtils.tryResolveMethodReturnType
+import static org.junit.jupiter.api.Assertions.assertEquals
 
 @Disabled("not a test actually but added for purposes of development")
 class DevTest {
+
+    static final OBJECT_TYPE = ClassHelper.OBJECT_TYPE
+    static final STRING_TYPE = ClassHelper.STRING_TYPE
+    static final GSTRING_TYPE = ClassHelper.GSTRING_TYPE
+    static final boolean_TYPE = ClassHelper.boolean_TYPE
 
     @Test
     void process_a_project() {
@@ -70,7 +72,9 @@ class Test {
         String groovyText = """
 class Test {
     void main(String s) {
-        if (s.startsWith('^')) {}
+        //Arrays.asList(1,2,3)
+        Arrays.asList(1,2,3).join(",")
+        //if (s.startsWith('^')) {}
     }
 }
 """
@@ -85,9 +89,16 @@ class Test {
 
     @Test
     void tmp() {
-        def x1 = ClassHelper.isPrimitiveType(ClassHelper.boolean_TYPE)
-        def x2 = ClassHelper.isPrimitiveType(ClassHelper.Boolean_TYPE)
-        int stop = 0
+        assertEquals(
+                STRING_TYPE,
+                tryResolveMethodReturnType(OBJECT_TYPE, "toString", ArgumentListExpression.EMPTY_ARGUMENTS)
+        )
+        assertEquals(
+                boolean_TYPE,
+                tryResolveMethodReturnType(OBJECT_TYPE, "equals", new ArgumentListExpression(
+                        new ConstantExpression("xxx")
+                ))
+        )
     }
 
     @Test
