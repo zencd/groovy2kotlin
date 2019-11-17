@@ -167,7 +167,7 @@ class GroovyToKotlin implements GtkConsts {
         def allImports = module.starImports + module.imports + module.staticStarImports.values()
         for (imp in allImports) {
             def line = makeImportText(imp)
-            def isGroovyPackage = line.startsWith('import groovy.')
+            def isGroovyPackage = line.startsWith('import groovy.') // todo do analyze class name instead of that string
             if (!isGroovyPackage) {
                 out.newLineCrlf(line)
             }
@@ -323,6 +323,11 @@ class GroovyToKotlin implements GtkConsts {
     private void translateFieldImpl(FieldNode field) {
         translateAnnos(field.annotations)
         out.indent()
+
+        def beConst = GtkUtils.shouldBeConst(field)
+        def constStr = beConst ? "const " : ""
+        out.append(constStr)
+
         // XXX we don't need private fields because a field is private in Groovy if no access modifier given
         def mods = getModifierString(field.modifiers, false, false, false)
         if (mods) {
@@ -553,6 +558,9 @@ class GroovyToKotlin implements GtkConsts {
             }
             else if (isFile(objType) && name == 'size' && numParams == 0) {
                 name = 'length'
+            }
+            else if (isFile(objType) && name == 'getText') {
+                name = 'readText'
             }
             else if (singleClosureArg) {
                 name = GtkUtils.tryRewriteMethodNameWithSingleClosureArg(name)

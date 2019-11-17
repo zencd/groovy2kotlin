@@ -474,4 +474,10 @@ class GtkUtils {
         type.isDerivedFrom(FILE_TYPE)
     }
 
+    static boolean shouldBeConst(FieldNode field) {
+        if (!isStatic(field)) return false
+        if (field.initialValueExpression == null) return false
+        if (!(field.initialValueExpression instanceof ConstantExpression)) return false
+        return true
+    }
 }

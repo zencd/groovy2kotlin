@@ -48,7 +48,7 @@ Others may be supported but was not tested.
 - Wildcard expressions: `list*.prop = 123`
 - Presence of both field `some` and `getSome()` is not respected by Kotlin (but it's ok in Groovy)
 - If there are both field `some` and `getSome()` in Groovy code, the method should be preferred (like Groovy does)
-- Operator `input =~ regex`
+- Operator `input =~ regex` -> `regex.toRegex().matchEntire(input)`
 - Groovy scripts (statements outside any classes)
 - Allow annotations for everything
 - Do import static things like this: `import pack.Classe.Companion.staticMethod`
@@ -58,7 +58,6 @@ Others may be supported but was not tested.
 - Groovy allows implicit conversions like `String s = 1L`
 - Groovy comparison operator `<=>`
 - static inner classes can't be translated with modifier `static`
-- Optional: Add `const` to `val FLAGS: Int = 11`
 - `List` mapping:
     - `eachWithIndex` → `forEachIndexed` (params swapped!)
     - `grep` → `?`
@@ -70,13 +69,16 @@ Others may be supported but was not tested.
     - `String.execute()`
 - `Number` mapping:
     - `intValue()` → `.toInt()` etc
-- Other mappings:
-    - ...
+- Optional:
+    - `Deprecated` -> `@kotlin.Deprecated(message)`
+    - Add `const` to `val FLAGS: Int = 11`
 - Add tests:
     - `list << item`
     - `String.toByteArray`
     - `File.size()`
     - `@Override` not translated
+    - `File.getText`
+    - `const val`
 
 ## Todo 2
 
@@ -126,4 +128,4 @@ Others may be supported but was not tested.
 	2019-11-13 - 691
     2019-11-15 - 714
     2019-11-16 - 619
-    2019-11-17 - 585
+    2019-11-17 - 526

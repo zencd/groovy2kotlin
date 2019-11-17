@@ -51,9 +51,11 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = """
+@Deprecated
 class Main {
-    static Object makeLogger(Class clazz) {}
-    private static final Object log = makeLogger(this)
+    static final int PORT = 25
+    void main() {
+    }
 }
 """
         //println(DevMain.toKotlin(source))
@@ -61,7 +63,7 @@ class Main {
         def nodes = Gtk.parseTexts([groovyText])
         def kotlinText = Gtk.toKotlinAsSingleString(nodes)
         println(kotlinText)
-        def node = nodes[0].classes[0].methods[0].code.statements
+        //def node = nodes[0].classes[0].methods[0].code.statements
         int stop = 0
     }
 
