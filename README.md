@@ -48,7 +48,6 @@ Others may be supported but was not tested.
 - Wildcard expressions: `list*.prop = 123`
 - If there are both field `some` and `getSome()`, the method should be preferred (like Groovy does)
 - Operator `input =~ regex`
-- `@Overrdie` looks redundant in the emitted code
 - Groovy scripts (statements outside any classes)
 - Allow annotations for everything
 - Do import static things like this: `import pack.Classe.Companion.staticMethod`
@@ -76,6 +75,7 @@ Others may be supported but was not tested.
     - `list << item`
     - `String.toByteArray`
     - `File.size()`
+    - `@Override` not translated
 
 ## Todo 2
 

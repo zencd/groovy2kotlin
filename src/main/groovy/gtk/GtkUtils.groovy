@@ -402,6 +402,7 @@ class GtkUtils {
 
     static {
         addDisabledAnno(CompileStatic.class)
+        addDisabledAnno(Override.class)
     }
 
     private static final Set<String> ALL_DISABLED_ANNO_CLASSES = []

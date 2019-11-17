@@ -52,9 +52,8 @@ class Temp {
     void trans_single_string() {
         String groovyText = """
 class Main {
-    void funk(List<File> list) {
-        list*.path = ""
-    }
+    @Override
+    String toString() { "" }
 }
 """
         //println(DevMain.toKotlin(source))

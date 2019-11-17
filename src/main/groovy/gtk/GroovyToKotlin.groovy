@@ -292,7 +292,7 @@ class GroovyToKotlin implements GtkConsts {
         if (GtkUtils.isEnabled(anno)) {
             out.newLineCrlf("@${anno.classNode.name}")
         } else {
-            out.newLineCrlf("// TODO groovy2kotlin: @${anno.classNode.name}")
+            out.newLineCrlf("// groovy2kotlin: omitted: @${anno.classNode.name}")
         }
     }
 
