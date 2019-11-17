@@ -700,13 +700,15 @@ class GroovyToKotlin implements GtkConsts {
             translateIndexingExpr(expr)
         } else if (expr.operation.text == GR_REGEX_TEST) {
             translateMatchOperator(expr)
-        //} else if (expr.operation.text == '=~') {
-        //    // input =~ regex
-        //    // regex.toRegex().matchEntire(input)
-        //    translateExpr(expr.rightExpression)
-        //    out.append(".toRegex().matchEntire(")
-        //    translateExpr(expr.leftExpression)
-        //    out.append(")")
+        } else if (expr.operation.text == '=~') {
+            // converts:
+            //   input =~ regex
+            // into:
+            //   regex.toRegex().matchEntire(input)
+            translateExpr(expr.rightExpression)
+            out.append(".toRegex().matchEntire(")
+            translateExpr(expr.leftExpression)
+            out.append(")")
         } else {
             translateRegularBinaryExpr(expr)
         }

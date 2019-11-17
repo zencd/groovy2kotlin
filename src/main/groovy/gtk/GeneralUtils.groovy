@@ -1,17 +1,14 @@
 package gtk
 
-import java.util.regex.Pattern
+import groovy.json.StringEscapeUtils
 
 /**
  * Common use utils.
  */
 class GeneralUtils {
 
-    private static final Pattern SINGLE_BACKSLASH = Pattern.compile('\\\\')
-    private static final String TWO_BACKSLASHES = '\\\\\\\\'
-
     static String escapeAsJavaStringContent(String s) {
-        return s.replaceAll(SINGLE_BACKSLASH, TWO_BACKSLASHES)
+        return StringEscapeUtils.escapeJava(s)
     }
 
     static String tryCutFromEnd(String s, String pattern) {

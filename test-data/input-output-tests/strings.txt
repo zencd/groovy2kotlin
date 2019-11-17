@@ -4,6 +4,7 @@ class Strings {
         def gStringEscape = "\\d\\d"
         def regex = /[-]?\d\d+/
         def gString = "$a$b${toString()}text$c\\d"
+        def crlf = '\r\n'
     }
 }
 -----------
@@ -15,6 +16,7 @@ open class Strings {
             val gStringEscape = "\\d\\d"
             val regex = "[-]?\\d\\d+"
             val gString = "${a}${b}${toString()}text${c}\\d"
+            val crlf = "\r\n"
         }
     }
 }
