@@ -53,8 +53,8 @@ class Temp {
         String groovyText = """
 @Deprecated
 class Main {
-    static final int PORT = 25
-    void main() {
+    void main(File f) {
+        if (f.size() == 0) {}
     }
 }
 """

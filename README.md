@@ -45,6 +45,7 @@ Others may be supported but was not tested.
 
 ## Todo 1
 
+- Kotlin prohibits implicit casts like `Int -> Long`
 - Wildcard expressions: `list*.prop = 123`
 - Presence of both field `some` and `getSome()` is not respected by Kotlin (but it's ok in Groovy)
 - If there are both field `some` and `getSome()` in Groovy code, the method should be preferred (like Groovy does)
@@ -79,6 +80,8 @@ Others may be supported but was not tested.
     - `@Override` not translated
     - `File.getText`
     - `const val`
+    - `List.size() -> size`
+    - `List.every() -> all`
 
 ## Todo 2
 

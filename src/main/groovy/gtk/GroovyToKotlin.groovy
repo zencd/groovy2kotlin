@@ -524,6 +524,7 @@ class GroovyToKotlin implements GtkConsts {
     void translateRegularMethodCall(MethodCallExpression expr) {
         def singleClosureArg = GtkUtils.tryFindSingleClosureArgument(expr)
         def numParams = GtkUtils.getNumberOfActualParams(expr)
+        def methodWasConvertedToAttribute = false
 
         if (!expr.implicitThis) {
             String spread = expr.spreadSafe ? "*" : "" // todo support it
@@ -550,6 +551,9 @@ class GroovyToKotlin implements GtkConsts {
             else if (isList(objType) && name == 'collect' && numParams == 1) {
                 name = 'map'
             }
+            else if (isList(objType) && name == 'every' && numParams == 1) {
+                name = 'all'
+            }
             else if (isList(objType) && name == 'join' && numParams == 1) {
                 name = 'joinToString'
             }
@@ -562,6 +566,9 @@ class GroovyToKotlin implements GtkConsts {
             else if (isFile(objType) && name == 'getText') {
                 name = 'readText'
             }
+            else if (isList(objType) && name == 'size' && numParams == 0) {
+                methodWasConvertedToAttribute = true
+            }
             else if (singleClosureArg) {
                 name = GtkUtils.tryRewriteMethodNameWithSingleClosureArg(name)
             }
@@ -571,12 +578,14 @@ class GroovyToKotlin implements GtkConsts {
             translateExpr(expr.method)
         }
 
-        if (singleClosureArg) {
-            // let's omit the `()`
-            out.append(' ')
-            translateExpr(singleClosureArg)
-        } else {
-            translateExpr(expr.arguments)
+        if (!methodWasConvertedToAttribute) {
+            if (singleClosureArg) {
+                // let's omit the `()`
+                out.append(' ')
+                translateExpr(singleClosureArg)
+            } else {
+                translateExpr(expr.arguments)
+            }
         }
     }
 
@@ -798,12 +807,13 @@ class GroovyToKotlin implements GtkConsts {
         } else if (ClassHelper.isPrimitiveType(type)) {
             translateExpr(expr.expression)
         } else {
-            def notNull = new BinaryExpression(
-                    expr.expression,
-                    GtkUtils.makeToken("!="),
-                    ConstantExpression.NULL
-            )
-            translateExpr(notNull)
+            //def notNull = new BinaryExpression(
+            //        expr.expression,
+            //        GtkUtils.makeToken("!="),
+            //        ConstantExpression.NULL
+            //)
+            //translateExpr(notNull)
+            translateExpr(expr.expression)
         }
     }
 
