@@ -419,6 +419,12 @@ class GtkUtils {
         classNode == ClassHelper.Boolean_TYPE || classNode == ClassHelper.boolean_TYPE
     }
 
+    private static final def BOOLEAN_OPS = ['==', '!=', '<', '>', '<=', '>=', '!', 'instanceof']
+
+    static boolean isBoolean(BinaryExpression expr) {
+        return (expr.operation.text in BOOLEAN_OPS)
+    }
+
     static Token makeToken(String s) {
         new Token(0, s, 0,0)
     }

@@ -30,6 +30,12 @@ class MainTest {
         testFromFile("postfix_expr.txt")
     }
 
+    @Disabled
+    @Test
+    void "regressions"() {
+        testFromFile("regressions.txt")
+    }
+
     @Test
     void "loops"() {
         testFromFile("loops.txt")

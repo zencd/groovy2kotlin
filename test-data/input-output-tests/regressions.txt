@@ -1,0 +1,15 @@
+class RegressionTests {
+    void method_with_multiple_signatures_not_found_by_inferer(String s) {
+        if (s.startsWith("xxx")) {}
+    }
+}
+---------
+$DEFAULT_IMPORTS
+open class RegressionTests {
+    companion object {
+    }
+    fun method_with_multiple_signatures_not_found_by_inferer(s: String) {
+        if (s.startsWith("xxx")) {
+        }
+    }
+}
