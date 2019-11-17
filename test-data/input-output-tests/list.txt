@@ -11,6 +11,9 @@
     void findAll() {
         [1,2].findAll {}
     }
+    void collect() {
+        [1,2].collect {}
+    }
 }
 -------------------
 $DEFAULT_IMPORTS
@@ -28,6 +31,10 @@ open class ClassName {
     }
     fun findAll() {
         listOf(1, 2).filter {
+        }
+    }
+    fun collect() {
+        listOf(1, 2).map {
         }
     }
 }

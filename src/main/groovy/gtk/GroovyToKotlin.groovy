@@ -522,6 +522,9 @@ class GroovyToKotlin implements GtkConsts {
             else if (objType.isArray() && name == 'findAll' && numParams == 1) {
                 name = 'filter'
             }
+            else if (isList(objType) && name == 'collect' && numParams == 1) {
+                name = 'map'
+            }
             else if (isList(objType) && name == 'join' && numParams == 1) {
                 name = 'joinToString'
             }
