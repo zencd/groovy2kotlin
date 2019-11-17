@@ -478,6 +478,7 @@ class GtkUtils {
         if (!isStatic(field)) return false
         if (field.initialValueExpression == null) return false
         if (!(field.initialValueExpression instanceof ConstantExpression)) return false
+        if (!isFinal(field.modifiers)) return false
         return true
     }
 }
