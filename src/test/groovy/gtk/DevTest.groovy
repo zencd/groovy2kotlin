@@ -52,8 +52,9 @@ class Temp {
     void trans_single_string() {
         String groovyText = """
 class Main {
+    def x = InetAddress.localHost
     void main() {
-        def m = "\n"
+        def z = InetAddress.localHost
     }
 }
 """

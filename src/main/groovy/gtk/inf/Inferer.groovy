@@ -6,6 +6,7 @@ import gtk.GtkUtils
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
+import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
@@ -79,6 +80,12 @@ class Inferer implements GtkConsts {
         }
     }
 
+    private void inferTypeOptional(ASTNode node) {
+        if (node != null) {
+            inferType(node)
+        }
+    }
+
     @DynamicDispatch
     private ClassNode inferType(ASTNode node) {
         assert node != null
@@ -142,7 +149,22 @@ class Inferer implements GtkConsts {
         for (MethodNode method : classNode.methods) {
             inferType(method)
         }
+        for (field in classNode.fields) {
+            inferType(field)
+        }
+        for (method in classNode.declaredConstructors) {
+            // todo
+        }
+        for (def objInit : classNode.objectInitializerStatements) {
+            // todo
+        }
         enclosingClasses.pop()
+        return RESOLVED_UNKNOWN
+    }
+
+    @DynamicDispatch
+    ClassNode infer(FieldNode field) {
+        inferTypeOptional(field.initialValueExpression)
         return RESOLVED_UNKNOWN
     }
 

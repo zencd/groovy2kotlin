@@ -3,6 +3,9 @@ class RegressionTests {
         if (s.startsWith("xxx")) {}
     }
 }
+class PropertyAccessInField {
+    def x = InetAddress.localHost
+}
 ---------
 $DEFAULT_IMPORTS
 open class RegressionTests {
@@ -12,4 +15,9 @@ open class RegressionTests {
         if (s.startsWith("xxx")) {
         }
     }
+}
+open class PropertyAccessInField {
+    companion object {
+    }
+    var x = InetAddress.getLocalHost()
 }
