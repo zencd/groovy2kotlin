@@ -456,4 +456,12 @@ class GtkUtils {
         return false
     }
 
+    static boolean isList(ClassNode type) {
+        type.isDerivedFrom(ClassHelper.LIST_TYPE)
+    }
+
+    static boolean isMap(ClassNode type) {
+        type.isDerivedFrom(ClassHelper.MAP_TYPE)
+    }
+
 }

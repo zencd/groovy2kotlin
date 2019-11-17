@@ -51,12 +51,10 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = """
-class Base {
-    void funk() {}
-}
-class Extended extends Base {
-    void funk() {}
-    String toString() { "xxx" }
+class Main {
+    void funk() {
+        [1,2,3].findAll { it }
+    }
 }
 """
         //println(DevMain.toKotlin(source))

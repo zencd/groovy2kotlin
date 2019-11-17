@@ -61,6 +61,7 @@ import static GtkUtils.isFinal
 import static GtkUtils.isStatic
 import static GtkUtils.makeImportText
 import static GtkUtils.typeToKotlinString
+import static gtk.GtkUtils.isList
 
 /**
  * The core code of the translator.
@@ -510,17 +511,21 @@ class GroovyToKotlin implements GtkConsts {
         }
         if (expr.method instanceof ConstantExpression) {
             String name = expr.method.text
+            final objType = expr.objectExpression.type
             if (name == 'replaceAll' && numParams == 2) {
                 // todo move to Transformers, generalize tree transformations
                 name = 'replace' // Kotlin has no replaceAll(), but replace() looks the same
             }
-            if (name == 'join') {
-                int stop = 0
+            else if (isList(objType) && name == 'findAll' && numParams == 1) {
+                name = 'filter'
             }
-            if (expr.objectExpression.type == ClassHelper.LIST_TYPE && name == 'join' && numParams == 1) {
+            else if (objType.isArray() && name == 'findAll' && numParams == 1) {
+                name = 'filter'
+            }
+            else if (isList(objType) && name == 'join' && numParams == 1) {
                 name = 'joinToString'
             }
-            if (singleClosureArg) {
+            else if (singleClosureArg) {
                 name = GtkUtils.tryRewriteMethodNameWithSingleClosureArg(name)
             }
             out.append(name)

@@ -2,6 +2,9 @@ class Temp {
     void main(String[] o) {
         String[][] arr = null
     }
+    void renamedMethods(String[] ss) {
+        ss.findAll {}
+    }
 }
 ------------
 $DEFAULT_IMPORTS
@@ -10,5 +13,9 @@ open class Temp {
     }
     fun main(o: Array<String>) {
         var arr: Array<Array<String>>? = null
+    }
+    fun renamedMethods(ss: Array<String>) {
+        ss.filter {
+        }
     }
 }

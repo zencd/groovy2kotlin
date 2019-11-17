@@ -55,9 +55,11 @@ Others may be supported but was not tested.
 - Groovy allows implicit conversions like `String s = 1L`
 - Groovy comparison operator `<=>`
 - static inner classes can't be translated with modifier `static`
+- Optional: Add `const` to `val FLAGS: Int = 11`
 - `List` mapping:
     - `eachWithIndex` → `forEachIndexed` (params swapped!)
     - `collect` → `map`
+    - `grep` → `?`
 - `File` mapping:
     - `size()` → `length()`
     - `File.text`
@@ -113,8 +115,9 @@ Others may be supported but was not tested.
 
 ## Progress on a project
 
-    2019-11-16 - 619 Kotlin errors
-    2019-11-15 - 714
-	2019-11-13 - 691
+	2019-11-10 - 4734 Kotlin errors
 	2019-11-12 - 848
-	2019-11-10 - 4734
+	2019-11-13 - 691
+    2019-11-15 - 714
+    2019-11-16 - 619
+    2019-11-17 - 585

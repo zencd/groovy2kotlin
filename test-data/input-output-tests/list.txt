@@ -8,6 +8,9 @@
         [1,2,3].join()
         unknown.join(',')
     }
+    void findAll() {
+        [1,2].findAll {}
+    }
 }
 -------------------
 $DEFAULT_IMPORTS
@@ -22,5 +25,9 @@ open class ClassName {
         listOf(1, 2, 3).joinToString(",")
         listOf(1, 2, 3).join()
         unknown.join(",")
+    }
+    fun findAll() {
+        listOf(1, 2).filter {
+        }
     }
 }
