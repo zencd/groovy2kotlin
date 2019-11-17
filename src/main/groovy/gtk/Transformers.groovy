@@ -73,16 +73,10 @@ class Transformers implements GtkConsts {
     static void tryModifySignature(MethodNode method) {
         def rt = method.returnType
         int numParams = GtkUtils.getNumberOfFormalParams(method)
-        if (method.name == 'toString' && rt == ClassHelper.STRING_TYPE && numParams == 0) {
-            method.putNodeMetaData(AST_NODE_META_OVERRIDING_METHOD, true)
-        }
-        else if (method.name == 'hashCode' && rt == ClassHelper.int_TYPE && numParams == 0) {
-            method.putNodeMetaData(AST_NODE_META_OVERRIDING_METHOD, true)
-        }
-        else if (method.name == 'equals' && isBoolean(rt) && numParams == 1) {
+        if (method.name == 'equals' && isBoolean(rt) && numParams == 1) {
+            // todo maybe do it in a general way
             def param0 = method.parameters[0]
             if (param0.type == ClassHelper.OBJECT_TYPE) {
-                method.putNodeMetaData(AST_NODE_META_OVERRIDING_METHOD, true)
                 param0.putNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING, KT_ANY_OPT)
             }
         }

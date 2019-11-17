@@ -1,11 +1,22 @@
-class ClassName {
+class Base {
+    void customMethod() {}
+}
+class Extended extends Base {
     String toString() { return "xxx" }
     int hashCode() { return 123 }
     boolean equals(Object o) { return false }
+    void customMethod() {}
+    void customMethod(String x) {}
 }
 ---------------
 $DEFAULT_IMPORTS
-open class ClassName {
+open class Base {
+    companion object {
+    }
+    fun customMethod() {
+    }
+}
+open class Extended : Base() {
     companion object {
     }
     override fun toString(): String {
@@ -16,5 +27,9 @@ open class ClassName {
     }
     override fun equals(o: Any?): Boolean {
         return false
+    }
+    override fun customMethod() {
+    }
+    fun customMethod(x: String) {
     }
 }

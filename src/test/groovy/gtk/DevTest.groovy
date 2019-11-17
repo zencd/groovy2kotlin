@@ -51,31 +51,12 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = """
-class Test {
-    boolean bool() { return false }
-    void main() {
-        if (this.bool()) { println(1) }
-    }
+class Base {
+    void funk() {}
 }
-"""
-        //println(DevMain.toKotlin(source))
-        //def nodes = Gtk.parseTexts([source1])
-        def nodes = Gtk.parseTexts([groovyText])
-        def kotlinText = Gtk.toKotlinAsSingleString(nodes)
-        println(kotlinText)
-        def node = nodes[0].classes[0].methods[1].code.statements[0]
-        int stop = 0
-    }
-
-    @Test
-    void trans_single_string_2() {
-        String groovyText = """
-class Test {
-    void main(String s) {
-        //Arrays.asList(1,2,3)
-        Arrays.asList(1,2,3).join(",")
-        //if (s.startsWith('^')) {}
-    }
+class Extended extends Base {
+    void funk() {}
+    String toString() { "xxx" }
 }
 """
         //println(DevMain.toKotlin(source))

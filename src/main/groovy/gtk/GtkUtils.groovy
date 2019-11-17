@@ -169,8 +169,8 @@ class GtkUtils {
     static String getMethodModifierString(MethodNode method) {
         boolean allowAbstract = !method.declaringClass.interface
         String javaMods = getModifierString(method.modifiers, false, false, true, allowAbstract)
-        String override = method.getNodeMetaData(GtkConsts.AST_NODE_META_OVERRIDING_METHOD) == true ? GtkConsts.KT_OVERRIDE : ''
-        return [override, javaMods].findAll { it }.join(' ')
+        String overrideStr = isOverridingMethod(method) ? GtkConsts.KT_OVERRIDE : ''
+        return [overrideStr, javaMods].findAll { it }.join(' ')
     }
 
     static boolean hasSyntheticModifier(int mods) {
@@ -243,8 +243,16 @@ class GtkUtils {
         return (mods & Opcodes.ACC_STATIC) != 0
     }
 
+    static boolean isPrivate(int mods) {
+        return (mods & Opcodes.ACC_PRIVATE) != 0
+    }
+
     static boolean isStatic(FieldNode field) {
         return isStatic(field.modifiers) || field.declaringClass.interface
+    }
+
+    static boolean isStatic(MethodNode method) {
+        return isStatic(method.modifiers)
     }
 
     static boolean isString(ClassNode type) {
@@ -432,6 +440,18 @@ class GtkUtils {
     static ClassNode tryResolveMethodReturnType(ClassNode objectType, String methodName, Expression args) {
         def m = objectType.tryFindPossibleMethod(methodName, args)
         return m?.returnType
+    }
+
+    static boolean isOverridingMethod(MethodNode method) {
+        if (isStatic(method) || isPrivate(method.modifiers)) {
+            return false
+        }
+        def dc = method.declaringClass.superClass
+        def superMethod = dc.getMethod(method.name, method.parameters)
+        if (!superMethod) {
+            return false
+        }
+        return true
     }
 
 }
