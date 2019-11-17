@@ -279,7 +279,7 @@ private val x = "hello"
     }
 
     @Test
-    void "inner_class"() {
+    void "class_inner"() {
         testFromFile("class_inner.txt")
     }
 

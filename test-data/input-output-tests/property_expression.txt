@@ -1,14 +1,46 @@
-﻿class ClassName {
-    void main(def x) {
-        x.prop
+﻿class Main {
+    Main instance1
+    Main instance2
+    int type
+    void main(Main o) {
+        o.instance1.@type
+        o.instance1.type
+        o.getType()
+
+        o.instance1.@type = 1
+        o.instance1.type = 2
+        o.setType(3)
     }
+    int getType() { 0 }
+    void setType(int i) {}
+    Main pass() { return this }
 }
 ---------------
 $DEFAULT_IMPORTS
-open class ClassName {
+open class Main {
     companion object {
     }
-    fun main(x: Any) {
-        x.prop
+    var instance1: Main? = null
+    var instance2: Main? = null
+    var type: Int? = 0
+
+    fun main(o: Main) {
+        o.instance1.type
+        o.instance1.getType()
+        o.getType()
+        o.instance1.type = 1
+        o.instance1.setType(2)
+        o.setType(3)
+    }
+
+    fun getType(): Int {
+        return 0
+    }
+
+    fun setType(i: Int) {
+    }
+
+    fun pass(): Main {
+        return this
     }
 }

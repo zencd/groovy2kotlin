@@ -25,6 +25,7 @@ import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.classgen.BytecodeExpression
+import org.codehaus.groovy.classgen.Verifier
 import org.codehaus.groovy.syntax.Token
 
 import java.util.logging.Logger
@@ -443,6 +444,21 @@ class GtkUtils {
         new Token(0, s, 0,0)
     }
 
+    static MethodNode findMethod(ClassNode objectType, String methodName, Expression args = ArgumentListExpression.EMPTY_ARGUMENTS) {
+        return objectType.tryFindPossibleMethod(methodName, args)
+    }
+
+    static MethodNode findGetter(ClassNode objectType, String propName) {
+        def methodName = getPropertyGetterName(propName)
+        return objectType.tryFindPossibleMethod(methodName, ArgumentListExpression.EMPTY_ARGUMENTS)
+    }
+
+    static MethodNode findSetter(ClassNode objectType, String propName, Expression rvalueExpr) {
+        def methodName = getPropertySetterName(propName)
+        def mm = objectType.getMethods(propName)
+        return objectType.tryFindPossibleMethod(methodName, new ArgumentListExpression(rvalueExpr))
+    }
+
     static ClassNode tryResolveMethodReturnType(ClassNode objectType, String methodName, Expression args) {
         def m = objectType.tryFindPossibleMethod(methodName, args)
         return m?.returnType
@@ -480,5 +496,15 @@ class GtkUtils {
         if (!(field.initialValueExpression instanceof ConstantExpression)) return false
         if (!isFinal(field.modifiers)) return false
         return true
+    }
+
+    static String getPropertyGetterName(String propName) {
+        // from org.codehaus.groovy.ast.tools.GeneralUtils.getGetterName()
+        return "get" + Verifier.capitalize(propName)
+    }
+
+    static String getPropertySetterName(String propName) {
+        // from org.codehaus.groovy.ast.tools.GeneralUtils.getGetterName()
+        return "set" + Verifier.capitalize(propName)
     }
 }

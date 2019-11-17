@@ -724,10 +724,40 @@ class GroovyToKotlin implements GtkConsts {
             right.putNodeMetaData(AST_NODE_META_DONT_ADD_JAVA_CLASS, true)
         }
 
-        translateExpr(left)
-        out.append(" ${ktOp} ")
-        translateExpr(right)
+        if (expr.operation.text == '=') {
+            translateAssignment(left, right)
+        } else {
+            translateExpr(left)
+            out.append(" ${ktOp} ")
+            translateExpr(right)
+        }
     }
+
+    /////////////////////////////////////
+    // translateAssignment
+    /////////////////////////////////////
+
+    @DynamicDispatch
+    private void translateAssignment(VariableExpression expr, Expression rvalue) {
+        translateExpr(expr)
+        out.append(" = ")
+        translateExpr(rvalue)
+
+    }
+
+    @DynamicDispatch
+    private void translateAssignment(Expression expr, Expression rvalue) {
+        throw new InternalError("#translateAssignment: not implemented for ${expr.class.name}")
+    }
+
+    @DynamicDispatch
+    private void translateAssignment(PropertyExpression left, Expression rvalue) {
+        translatePropertyExpressionImpl(left, rvalue)
+    }
+
+    /////////////////////////////////////
+    //
+    /////////////////////////////////////
 
     /**
      * Groovy's match operator `==~` (it returns a boolean).
@@ -870,6 +900,9 @@ class GroovyToKotlin implements GtkConsts {
         }
     }
 
+    /**
+     * Like `o.@attr`
+     */
     @DynamicDispatch
     void translateExpr(AttributeExpression expr) {
         translateExpr(expr.objectExpression)
@@ -896,17 +929,48 @@ class GroovyToKotlin implements GtkConsts {
         out.append(expr.operation.text)
     }
 
+    /**
+     * Like `o.property`
+     */
     @DynamicDispatch
     void translateExpr(PropertyExpression expr) {
+        translatePropertyExpressionImpl(expr)
+    }
+
+    private void translatePropertyExpressionImpl(PropertyExpression expr, Expression rvalue = null) {
         def prop = expr.property
         String spread = expr.spreadSafe ? "*" : ""
         expr.objectExpression.putNodeMetaData(AST_NODE_META_DONT_ADD_JAVA_CLASS, true)
         translateExpr(expr.objectExpression)
         out.append(spread)
         out.append('.')
+
         if (prop instanceof ConstantExpression) {
-            // todo duplicated snippet
-            out.append(prop.text)
+            def propName = prop.text
+
+            if (rvalue) {
+                //def setter = GtkUtils.findSetter(expr.objectExpression.type, propName, rvalue)
+                def setter = Inferer.getMeta(expr, AST_NODE_META__SETTER) as MethodNode
+                if (setter) {
+                    out.append(setter.name)
+                    out.append("(")
+                    translateExpr(rvalue)
+                    out.append(")")
+                } else {
+                    out.append(propName)
+                    out.append(' = ')
+                    translateExpr(rvalue)
+                }
+            } else {
+                //def getter = GtkUtils.findGetter(expr.objectExpression.type, propName)
+                def getter = Inferer.getMeta(expr, AST_NODE_META__GETTER) as MethodNode
+                if (getter) {
+                    out.append(getter.name)
+                    out.append("()")
+                } else {
+                    out.append(propName)
+                }
+            }
         } else {
             // translateExpr(expr.property)
             out.append("ERROR(expecting ConstantExpression)")

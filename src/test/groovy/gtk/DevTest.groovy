@@ -51,11 +51,22 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = """
-@Deprecated
 class Main {
-    void main(File f) {
-        if (f.size() == 0) {}
+    Main instance1
+    Main instance2
+    int type
+    void main(Main o) {
+        o.instance1.@type
+        o.instance1.type
+        o.getType()
+        
+        o.instance1.@type = 1
+        o.instance1.type = 2
+        o.setType(3)
     }
+    int getType() { 0 }
+    void setType(int i) {}
+    Main pass() { return this }
 }
 """
         //println(DevMain.toKotlin(source))
@@ -63,7 +74,7 @@ class Main {
         def nodes = Gtk.parseTexts([groovyText])
         def kotlinText = Gtk.toKotlinAsSingleString(nodes)
         println(kotlinText)
-        //def node = nodes[0].classes[0].methods[0].code.statements
+        def node = nodes[0].classes[0].methods[0].code.statements
         int stop = 0
     }
 

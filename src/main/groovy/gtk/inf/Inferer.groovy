@@ -1,6 +1,7 @@
 package gtk.inf
 
 import gtk.DynamicDispatch
+import gtk.GtkConsts
 import gtk.GtkUtils
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.ClassHelper
@@ -8,18 +9,24 @@ import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
+import org.codehaus.groovy.ast.expr.AttributeExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.BooleanExpression
+import org.codehaus.groovy.ast.expr.CastExpression
 import org.codehaus.groovy.ast.expr.ClassExpression
+import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
+import org.codehaus.groovy.ast.expr.ConstructorCallExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
+import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.EmptyStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
+import org.codehaus.groovy.ast.stmt.ForStatement
 import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.classgen.BytecodeSequence
@@ -28,7 +35,7 @@ import java.util.logging.Logger
 
 import static gtk.GtkUtils.tryResolveMethodReturnType
 
-class Inferer {
+class Inferer implements GtkConsts {
 
     private static final Logger log = Logger.getLogger(this.name)
 
@@ -81,6 +88,11 @@ class Inferer {
 
         type = infer(node)
         assert type != null
+        setTypeToExprAndMeta(node, type)
+        return type
+    }
+
+    static ClassNode setTypeToExprAndMeta(ASTNode node, ClassNode type) {
         if (node instanceof Expression) {
             def prevType = node.getType()
             if (prevType != type) {
@@ -88,31 +100,16 @@ class Inferer {
                 node.setType(type)
             }
         }
-        setTypeToMeta(node, type)
+        node.putNodeMetaData(INFERRED_TYPE, type)
         return type
     }
 
-    //@DynamicDispatch
-    //private ClassNode inferType(Expression node) {
-    //    def type = node.type
-    //
-    //    if (type != ClassHelper.OBJECT_TYPE) {
-    //        return type
-    //    }
-    //
-    //    //if (type != null) {
-    //    //    return type
-    //    //}
-    //
-    //    type = infer(node)
-    //    assert type != null
-    //    node.setType(type)
-    //    setTypeToMeta(node, type)
-    //    return type
-    //}
+    static void setMeta(ASTNode node, String key, Object value) {
+        node.putNodeMetaData(key, value)
+    }
 
-    static void setTypeToMeta(ASTNode node, ClassNode type) {
-        node.putNodeMetaData(INFERRED_TYPE, type)
+    static Object getMeta(ASTNode node, String key) {
+        return node.getNodeMetaData(key)
     }
 
     static ClassNode getType(ASTNode node) {
@@ -190,6 +187,30 @@ class Inferer {
     }
 
     @DynamicDispatch
+    ClassNode infer(ForStatement stmt) {
+        // todo infer other things
+        inferType(stmt.loopBlock)
+    }
+
+    @DynamicDispatch
+    ClassNode infer(ConstructorCallExpression stmt) {
+        inferType(stmt.arguments)
+        return stmt.type
+    }
+
+    @DynamicDispatch
+    ClassNode infer(CastExpression expr) {
+        inferType(expr.expression)
+        return expr.type
+    }
+
+    @DynamicDispatch
+    ClassNode infer(ClosureExpression expr) {
+        inferType(expr.code)
+        return RESOLVED_UNKNOWN // todo
+    }
+
+    @DynamicDispatch
     ClassNode infer(TupleExpression expr) {
         inferList(expr.expressions)
         return expr.getType()
@@ -251,21 +272,92 @@ class Inferer {
 
     @DynamicDispatch
     ClassNode infer(BinaryExpression expr) {
-        def type1 = inferType(expr.leftExpression)
-        def type2 = inferType(expr.rightExpression)
-
-        //def x1 = expr.leftExpression.originType as ClassNode
-        //def x1p = ClassHelper.isPrimitiveType(x1)
-
-        //def x2 = expr.rightExpression.originType as ClassNode
-        //def x2p = ClassHelper.isPrimitiveType(x2)
-
-        if (GtkUtils.isBoolean(expr)) {
-            return ClassHelper.boolean_TYPE
+        if (expr.operation.text == '=') {
+            // XXX note the different order for assignment
+            def rt = inferType(expr.rightExpression)
+            def lt = inferAssignment(expr.leftExpression, expr.rightExpression)
+            return rt
         } else {
-            return expr.getType() // todo
+            def type1 = inferType(expr.leftExpression)
+            def type2 = inferType(expr.rightExpression)
+            if (GtkUtils.isBoolean(expr)) {
+                return ClassHelper.boolean_TYPE
+            } else {
+                return type1 // todo randomly picked
+            }
         }
     }
+
+    @DynamicDispatch
+    ClassNode infer(PropertyExpression expr) {
+        return inferAssignment(expr, null)
+    }
+
+    ///////////////////////////////////////////////////
+    // inferAssignment
+    ///////////////////////////////////////////////////
+
+    @DynamicDispatch
+    ClassNode inferAssignment(Expression expr, Expression rvalue) {
+        throw new Exception("${getClass().simpleName}.inferAssignment() not defined for ${expr.class.name}")
+        //log.warning("${getClass().simpleName}::inferAssignment() not defined for ${node?.class?.name}")
+    }
+
+    @DynamicDispatch
+    ClassNode inferAssignment(VariableExpression expr, Expression rvalue) {
+        return inferType(expr)
+    }
+
+    @DynamicDispatch
+    ClassNode inferAssignment(AttributeExpression expr, Expression rvalue) {
+        def objType = inferType(expr.objectExpression)
+        def propName = expr.propertyAsString
+        def field = objType.getField(propName)
+        if (field) {
+            return setTypeToExprAndMeta(expr, field.type)
+        } else {
+            return setTypeToExprAndMeta(expr, RESOLVED_UNKNOWN)
+        }
+    }
+
+    @DynamicDispatch
+    ClassNode inferAssignment(PropertyExpression expr, Expression rvalue) {
+        def objType = inferType(expr.objectExpression)
+        def propName = expr.propertyAsString
+        def field = objType.getField(propName)
+        if (propName == null) {
+            log.warning("property (objectExpression) name is null")
+            return RESOLVED_UNKNOWN
+        } else if (rvalue == null) {
+            // property read
+            def getter = GtkUtils.findGetter(objType, propName)
+            if (getter) {
+                setMeta(expr, AST_NODE_META__GETTER, getter)
+                return setTypeToExprAndMeta(expr, getter.returnType)
+            } else if (field) {
+                //setMeta(expr, AST_NODE_META__GETTER, field)
+                return setTypeToExprAndMeta(expr, field.type)
+            } else {
+                return setTypeToExprAndMeta(expr, RESOLVED_UNKNOWN)
+            }
+        } else {
+            // property write
+            def setter = GtkUtils.findSetter(objType, propName, rvalue)
+            if (setter) {
+                setMeta(expr, AST_NODE_META__SETTER, setter)
+                return setTypeToExprAndMeta(expr, setter.returnType)
+            } else if (field) {
+                //setMeta(expr, AST_NODE_META__SETTER, field)
+                return setTypeToExprAndMeta(expr, field.type)
+            } else {
+                return setTypeToExprAndMeta(expr, RESOLVED_UNKNOWN)
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////
+    //
+    ///////////////////////////////////////////////////
 
     @DynamicDispatch
     ClassNode infer(IfStatement stmt) {
