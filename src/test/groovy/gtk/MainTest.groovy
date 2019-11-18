@@ -26,6 +26,13 @@ class MainTest {
     }
 
     @Test
+    void "SrcBuf"() {
+        def buf = new SrcBuf("\nclass Main {\n}")
+        def pos = buf.getFlatTextPosition(2, 7)
+        assertEquals("Main", buf.text.substring(pos, pos+4))
+    }
+
+    @Test
     void "postfix_expr"() {
         testFromFile("postfix_expr.txt")
     }

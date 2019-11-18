@@ -93,13 +93,18 @@ class GroovyToKotlin implements GtkConsts {
 
     private final Stack<ClassNode> staticContext = new Stack<ClassNode>()
 
+    private final List<SrcBuf> sources
+
+    private SrcBuf currentSource = null
+
     private ClassNode getCurrentStaticContext() {
         def stack = staticContext
         return stack.isEmpty() ? null : stack.peek()
     }
 
-    GroovyToKotlin(List<ModuleNode> modules, Closure getBufName = null) {
+    GroovyToKotlin(List<ModuleNode> modules, List<SrcBuf> sources, Closure getBufName = null) {
         this.modules = modules
+        this.sources = sources
         this._out = null
         this.getBufName = getBufName
     }
@@ -114,13 +119,13 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     private void translateAllToKotlin() {
-        int cnt = 0
-        modules.each {
+        modules.eachWithIndex { ModuleNode it, int cnt ->
+            currentSource = sources[cnt]
             String groovyFileNameAbs = it.description
             def cbuf = new CodeBuffer()
             this._out = cbuf
             this.classCompanions = new HashMap<ClassNode, CodeBuffer.CodePiece>()
-            def bufName = "File${cnt++}.kt".toString() // todo
+            def bufName = "File${cnt}.kt".toString() // todo
             if (getBufName && groovyFileNameAbs) {
                 def bufName2 = getBufName(groovyFileNameAbs)
                 if (bufName2) {
@@ -625,7 +630,8 @@ class GroovyToKotlin implements GtkConsts {
     void translateExpr(ConstructorCallExpression expr) {
         // todo see org.codehaus.groovy.ast.expr.ConstructorCallExpression.getText
         def grType = expr.getType()
-        if (grType instanceof InnerClassNode) {
+        if (expr.isUsingAnonymousInnerClass()) {
+            // grType is InnerClassNode here
             def sc = grType.superClass
             def scKtType = typeToKotlinString(sc)
             append("object : ")
@@ -635,7 +641,8 @@ class GroovyToKotlin implements GtkConsts {
             translateClassBody(grType)
         } else {
             def ktType = typeToKotlinString(grType)
-            append(ktType)
+            def constructorName = GtkUtils.findConstructorName(expr, currentSource) ?: ktType
+            append("$constructorName")
             translateExpr(expr.arguments)
         }
     }

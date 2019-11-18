@@ -20,6 +20,7 @@ import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
+import org.codehaus.groovy.ast.expr.ConstructorCallExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
@@ -535,5 +536,33 @@ class GtkUtils {
             package1 == package2
         }
         return imported
+    }
+
+    static List<SrcBuf> makeSourceBuffers(List<String> texts) {
+        return texts.collect {
+            new SrcBuf(it)
+        }
+    }
+
+    /**
+     * I found no way to retrieve string "super" from a "super(1,2,3)" invocation.
+     * There is just no sych info on the ConstructorCallExpression (a bug?).
+     * So trying to figure it out of the source text:
+     * 1) start from source position of the ConstructorCallExpression
+     * 2) go backward and find what a word precedes the ConstructorCallExpression
+     */
+    static String findConstructorName(ConstructorCallExpression expr, SrcBuf currentSource) {
+        Integer pos = currentSource.getFlatTextPosition(expr.getLineNumber(), expr.getColumnNumber())
+        if (pos == null) {
+            return null
+        }
+        int left = pos - 1
+        while (left >= 0) {
+            def ch = currentSource.text.charAt(left)
+            if (!Character.isJavaIdentifierPart(ch)) break
+            left--
+        }
+        def subs = currentSource.text.substring(left, pos).trim()
+        return subs ?: null
     }
 }

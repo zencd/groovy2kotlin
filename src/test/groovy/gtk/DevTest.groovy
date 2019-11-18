@@ -41,8 +41,10 @@ class Temp {
 }
 """
         //println(DevMain.toKotlin(source))
-        def nodes = Gtk.parseTexts([source1, source2])
-        String kotlinText = Gtk.toKotlinAsSingleString(nodes)
+        def texts = [source1, source2]
+        def nodes = Gtk.parseTexts(texts)
+        def bufs = GtkUtils.makeSourceBuffers(texts)
+        String kotlinText = Gtk.toKotlinAsSingleString(nodes, bufs)
         println("--- Kotlin ---")
         println(kotlinText)
     }
@@ -50,21 +52,24 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = """
-package aa.bb
-import java.lang.reflect.Field
-import java.lang.ref.*
-class LocalExtended extends LocalBase {}
-class LocalBase {}
-class ExtendsExternalDirectlyImportedClass extends Field {}
-class ExtendsExternalWildcardImportedClass extends PhantomReference {}
-class ExtendsExternalNotImportedClass extends java.lang.invoke.CallSite {}
+class Main extends Base {
+    Main() { this(1, 2) }
+    Main(int i, int j) { super(1, 2) }
+    void main() {
+        new Main()
+    }
+}
+class Base {
+    Base(int i, int j) {}
+}
 """
-        //println(DevMain.toKotlin(source))
-        //def nodes = Gtk.parseTexts([source1])
-        def nodes = Gtk.parseTexts([groovyText])
-        def kotlinText = Gtk.toKotlinAsSingleString(nodes)
+        def texts = [groovyText]
+        def bufs = GtkUtils.makeSourceBuffers(texts)
+        def nodes = Gtk.parseTexts(texts)
+        def kotlinText = Gtk.toKotlinAsSingleString(nodes, bufs)
         println(kotlinText)
         //def node = nodes[0].classes[0].methods[0].code.statements
+        def node = nodes[0].classes[0].declaredConstructors*.code
         int stop = 0
         //println "--- tree ---"
         //AstPrinter.print(nodes[0])
@@ -72,6 +77,11 @@ class ExtendsExternalNotImportedClass extends java.lang.invoke.CallSite {}
 
     @Test
     void tmp() {
+        def text = """\nclass Main {\n}"""
+        def buf = new SrcBuf(text)
+        def pos = buf.getFlatTextPosition(2, 7)
+        def substring = text.substring(pos, pos+4)
+        int stop = 0
     }
 
     @Test

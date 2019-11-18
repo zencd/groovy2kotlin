@@ -1,6 +1,5 @@
 package gtk
 
-
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.control.CompilationUnit
 import org.codehaus.groovy.control.CompilePhase
@@ -59,19 +58,20 @@ class Gtk {
         "Script${System.nanoTime()}"
     }
 
-    static GroovyToKotlin toKotlin(List<ModuleNode> modules) {
-        def gtk = new GroovyToKotlin(modules)
+    static GroovyToKotlin toKotlin(List<ModuleNode> modules, List<SrcBuf> sources) {
+        def gtk = new GroovyToKotlin(modules, sources)
         gtk.translateAll()
         return gtk
     }
 
     static String toKotlinAsSingleString(String groovyText) {
+        List<SrcBuf> sources = GtkUtils.makeSourceBuffers([groovyText])
         def nodes = parseTexts([groovyText])
-        return toKotlinAsSingleString(nodes)
+        return toKotlinAsSingleString(nodes, sources)
     }
 
-    static String toKotlinAsSingleString(List<ModuleNode> nodes) {
-        def gtk = toKotlin(nodes)
+    static String toKotlinAsSingleString(List<ModuleNode> nodes, List<SrcBuf> sources) {
+        def gtk = toKotlin(nodes, sources)
         return joinBuffers(gtk)
     }
 
