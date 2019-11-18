@@ -9,7 +9,7 @@ $DEFAULT_IMPORTS
 open class ClassName {
     companion object {
     }
-    var field: Int? = 11
+    var field: Int = 11
     fun main(): Int {
         return this.field
     }

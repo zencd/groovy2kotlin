@@ -22,7 +22,7 @@ open class Main {
     }
     var instance1: Main? = null
     var instance2: Main? = null
-    var type: Int? = 0
+    var type: Int = 0
 
     fun main(o: Main) {
         o.instance1.type

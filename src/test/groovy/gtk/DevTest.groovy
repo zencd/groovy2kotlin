@@ -51,9 +51,10 @@ class Temp {
     void trans_single_string() {
         String groovyText = """
 class Main {
-    def x = InetAddress.localHost
+    int counter = 0
+    int age
     void main() {
-        def z = InetAddress.localHost
+        counter++
     }
 }
 """
@@ -64,6 +65,8 @@ class Main {
         println(kotlinText)
         def node = nodes[0].classes[0].methods[0].code.statements
         int stop = 0
+        //println "--- tree ---"
+        //AstPrinter.print(nodes[0])
     }
 
     @Test

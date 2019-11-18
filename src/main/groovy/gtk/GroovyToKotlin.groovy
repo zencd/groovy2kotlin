@@ -333,8 +333,11 @@ class GroovyToKotlin implements GtkConsts {
         if (mods) {
             out.append(mods + " ")
         }
+
+        def fieldType = field.type
+
         def varOrVal
-        def optional
+        def optional // defines if the type would be marked as `Int` or `Int?`
         if (isFinal(field.modifiers)) {
             varOrVal = 'val'
             optional = false
@@ -342,7 +345,10 @@ class GroovyToKotlin implements GtkConsts {
             varOrVal = 'var'
             optional = true
         }
-        def fieldType = field.type
+        if (ClassHelper.isPrimitiveType(fieldType)) {
+            optional = false
+        }
+
         out.append("$varOrVal ${field.name}")
         def kotlinType = null
         if (!field.dynamicTyped) {
@@ -350,12 +356,12 @@ class GroovyToKotlin implements GtkConsts {
             out.append(": $kotlinType")
         }
         if (field.initialValueExpression == null) {
-            if (optional) {
+            //if (optional) {
                 def initialValue = GtkUtils.makeDefaultInitialValue(kotlinType)
                 if (initialValue) {
                     out.append(" = ${initialValue}")
                 }
-            }
+            //}
         } else {
             def staticContextPushed = false
             if (isStatic(field)) {

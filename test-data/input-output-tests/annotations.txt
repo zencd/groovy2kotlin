@@ -28,7 +28,7 @@ open class Annos {
 
     @java.lang.Deprecated
     @java.lang.annotation.Documented
-    var field: Int? = 0
+    var field: Int = 0
 
     @java.lang.Deprecated
     @java.lang.annotation.Documented

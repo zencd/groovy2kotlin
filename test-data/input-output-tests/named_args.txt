@@ -10,7 +10,7 @@ $DEFAULT_IMPORTS
 open class Temp {
     companion object {
     }
-    var age: Int? = 0
+    var age: Int = 0
     var name: String? = null
     fun main(args: List<String>) {
         Temp(age=21, name="Jo")
