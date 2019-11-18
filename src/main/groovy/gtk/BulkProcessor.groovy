@@ -17,8 +17,11 @@ class BulkProcessor {
         def OUT_DIR = new File(outDir)
         def groovyFiles = listAllGroovyFiles(SRC_DIR1)
         def regularFiles = groovyFiles.collect { it.groovyFile }
+        def bufs = groovyFiles.collect {
+            new SrcBuf(it.groovyFile.text)
+        }
         def modules = Gtk.parseFiles(regularFiles, classLoader)
-        def gtk = new GroovyToKotlin(modules, { String fileName ->
+        def gtk = new GroovyToKotlin(modules, bufs, { String fileName ->
             def kotlinFile = GeneralUtils.relatively(new File(srcDir), new File(fileName))
             kotlinFile = kotlinFile.replace('.groovy', '.kt')
             kotlinFile = "${outDir}/${kotlinFile}"

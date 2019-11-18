@@ -25,5 +25,5 @@ open class Slave {
 open class ClassName {
     companion object {
     }
-    var xxx = java.util.Collections.emptyList()
+    var xxx = emptyList()
 }

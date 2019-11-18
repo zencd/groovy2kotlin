@@ -602,14 +602,17 @@ class GroovyToKotlin implements GtkConsts {
         }
     }
 
+    /**
+     * An invocation like `staticMethod()`.
+     * Note that `Main.staticMethod()` is processed some other way.
+     * Because of this, the preceding `ClassName.` is not needed.
+     */
     @DynamicDispatch
     void translateExpr(StaticMethodCallExpression expr) {
-        out.append(typeToKotlinString(expr.ownerType))
-        out.append(".")
+        //out.append(typeToKotlinString(expr.ownerType))
+        //out.append(".")
         out.append(expr.method)
         translateExpr(expr.arguments)
-
-        //out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
     }
 
     @DynamicDispatch

@@ -6,7 +6,7 @@ class Main {
 $DEFAULT_IMPORTS
 open class Main {
     companion object {
-        val log: Any = Main.makeLogger(Main::class.java)
+        val log: Any = makeLogger(Main::class.java)
         fun makeLogger(clazz: Class): Any {
             return "xxx"
         }

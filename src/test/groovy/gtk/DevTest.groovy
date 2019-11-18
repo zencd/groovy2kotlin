@@ -52,12 +52,13 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = """
-class Main extends Base {
-    Main() { this(1, 2) }
-    Main(int i, int j) { super(1, 2) }
+package aa.bb
+class Main {
     void main() {
-        new Main()
+        Main.some()
+        some()
     }
+    static void some() {}
 }
 class Base {
     Base(int i, int j) {}
@@ -68,8 +69,8 @@ class Base {
         def nodes = Gtk.parseTexts(texts)
         def kotlinText = Gtk.toKotlinAsSingleString(nodes, bufs)
         println(kotlinText)
-        //def node = nodes[0].classes[0].methods[0].code.statements
-        def node = nodes[0].classes[0].declaredConstructors*.code
+        def node = nodes[0].classes[0].methods[0].code.statements
+        //def node = nodes[0].classes[0].declaredConstructors*.code
         int stop = 0
         //println "--- tree ---"
         //AstPrinter.print(nodes[0])

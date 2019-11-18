@@ -28,7 +28,7 @@ open class ClassName {
         }
     }
     fun main() {
-        ClassName.parse()
+        parse()
     }
     fun classUse() {
         println(String::class.java)
