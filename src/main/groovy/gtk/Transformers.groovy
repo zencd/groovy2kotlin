@@ -12,8 +12,8 @@ import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
-
-import java.util.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import static gtk.GtkUtils.isBoolean
 
@@ -21,7 +21,7 @@ import static gtk.GtkUtils.isBoolean
  * AST transformations
  */
 class Transformers implements GtkConsts {
-    private static final Logger log = Logger.getLogger(this.name)
+    private static final Logger log = LoggerFactory.getLogger(this)
 
     /**
      * By some reason groovy parser can produce a tree like this: `{{...}}`.

@@ -27,8 +27,9 @@ import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.classgen.BytecodeExpression
 import org.codehaus.groovy.classgen.Verifier
 import org.codehaus.groovy.syntax.Token
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-import java.util.logging.Logger
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -36,7 +37,7 @@ import java.util.regex.Pattern
  * Utils specific to the project.
  */
 class GtkUtils {
-    private static final Logger log = Logger.getLogger(this.name)
+    private static final Logger log = LoggerFactory.getLogger(this)
 
     private static final Pattern PREV_JAVADOC_COMMENT_PATTERN = Pattern.compile("(?s)/\\*\\*(.*?)\\*/");
 
@@ -295,7 +296,7 @@ class GtkUtils {
         if (res) {
             return res
         } else {
-            log.warning("unrecognized groovy's binary op [$groovyOp]")
+            log.warn("unrecognized groovy's binary op [$groovyOp]")
             return groovyOp
         }
     }
@@ -305,7 +306,7 @@ class GtkUtils {
         if (args instanceof TupleExpression) {
             return args.expressions.size()
         } else {
-            log.warning("expecting arguments as a TupleExpression")
+            log.warn("expecting arguments as a TupleExpression")
             return 0
         }
     }

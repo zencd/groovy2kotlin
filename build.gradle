@@ -17,9 +17,10 @@ repositories {
 }
 
 dependencies {
+    compile 'ch.qos.logback:logback-classic:1.1.2'
     compile 'org.codehaus.groovy:groovy-all:2.5.8'
     testCompile 'junit:junit:4.11'
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.0'
+    testCompile 'org.junit.jupiter:junit-jupiter:5.4.0'
 }
 
 test {

@@ -52,8 +52,8 @@ import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 import org.codehaus.groovy.ast.stmt.WhileStatement
-
-import java.util.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import static GtkUtils.getMethodModifierString
 import static GtkUtils.getModifierString
@@ -70,7 +70,7 @@ import static gtk.GtkUtils.isString
  */
 class GroovyToKotlin implements GtkConsts {
 
-    private static final Logger log = Logger.getLogger(this.name)
+    private static final Logger log = LoggerFactory.getLogger(this)
 
     final List<ModuleNode> modules
     final Inferer inferer = new Inferer()
@@ -1040,7 +1040,7 @@ class GroovyToKotlin implements GtkConsts {
         out.append('(')
         expr.mapEntryExpressions.eachWithIndex { MapEntryExpression entry, int i ->
             if (!(entry.keyExpression instanceof ConstantExpression)) {
-                log.warning("expecting ConstantExpression. not ${entry.keyExpression?.class?.name}")
+                log.warn("expecting ConstantExpression. not ${entry.keyExpression?.class?.name}")
             }
             if (i > 0) out.append(', ')
             out.append(entry.keyExpression.text)
@@ -1068,7 +1068,7 @@ class GroovyToKotlin implements GtkConsts {
         if (nale) {
             translateExpr(nale as NamedArgumentListExpression)
         } else {
-            log.warning("expecting a single NamedArgumentListExpression expression")
+            log.warn("expecting a single NamedArgumentListExpression expression")
             expr.expressions.eachWithIndex { Expression anExpr, int i ->
                 if (i > 0) out.append(', ')
             }
@@ -1091,7 +1091,7 @@ class GroovyToKotlin implements GtkConsts {
      */
     @DynamicDispatch
     void translateExpr(EmptyExpression expr) {
-        log.warning("unreachable code reached: EmptyExpression expected to be detected earlier")
+        log.warn("unreachable code reached: EmptyExpression expected to be detected earlier")
         out.append("TRANSLATION_NOT_IMPLEMENTED('${expr.class.name}')")
     }
 

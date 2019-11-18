@@ -5,12 +5,12 @@ import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.control.CompilationUnit
 import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.CompilerConfiguration
-
-import java.util.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class Gtk {
 
-    private static final Logger log = Logger.getLogger(this.name)
+    private static final Logger log = LoggerFactory.getLogger(this)
 
     /**
      * Stopping at CANONICALIZATION because the further phases will modify AST too much

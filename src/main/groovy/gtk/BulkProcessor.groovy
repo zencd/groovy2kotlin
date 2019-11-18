@@ -1,8 +1,8 @@
 package gtk
 
 import groovy.io.FileType
-
-import java.util.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Processes multiple files.
@@ -10,7 +10,7 @@ import java.util.logging.Logger
  */
 class BulkProcessor {
 
-    private static final Logger log = Logger.getLogger(this.name)
+    private static final Logger log = LoggerFactory.getLogger(this)
 
     static void process(String srcDir, String outDir, ClassLoader classLoader = null) {
         def SRC_DIR1 = new File(srcDir)

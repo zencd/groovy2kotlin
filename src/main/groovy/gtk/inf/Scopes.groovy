@@ -2,12 +2,12 @@ package gtk.inf
 
 import gtk.GtkConsts
 import org.codehaus.groovy.ast.expr.VariableExpression
-
-import java.util.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class Scopes implements GtkConsts {
 
-    private static final Logger log = Logger.getLogger(this.name)
+    private static final Logger log = LoggerFactory.getLogger(this)
 
     static class Scope {
         private final Map<String, VariableExpression> vars = new HashMap<>()
@@ -52,7 +52,7 @@ class Scopes implements GtkConsts {
                 return ve
             }
         }
-        log.warning("no var found in scopes by name ${varName}")
+        log.warn("no var found in scopes by name ${varName}")
         return null
     }
 

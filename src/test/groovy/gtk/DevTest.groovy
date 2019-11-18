@@ -1,13 +1,10 @@
 package gtk
 
 import org.codehaus.groovy.ast.ClassHelper
-import org.codehaus.groovy.ast.expr.ArgumentListExpression
-import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-
-import static gtk.GtkUtils.tryResolveMethodReturnType
-import static org.junit.jupiter.api.Assertions.assertEquals
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @Disabled("not a test actually but added for purposes of development")
 class DevTest {
@@ -16,6 +13,8 @@ class DevTest {
     static final STRING_TYPE = ClassHelper.STRING_TYPE
     static final GSTRING_TYPE = ClassHelper.GSTRING_TYPE
     static final boolean_TYPE = ClassHelper.boolean_TYPE
+
+    private static final Logger log = LoggerFactory.getLogger(this)
 
     @Test
     void process_a_project() {

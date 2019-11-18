@@ -36,14 +36,14 @@ import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 import org.codehaus.groovy.ast.stmt.WhileStatement
 import org.codehaus.groovy.classgen.BytecodeSequence
-
-import java.util.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import static gtk.GtkUtils.tryResolveMethodReturnType
 
 class Inferer implements GtkConsts {
 
-    private static final Logger log = Logger.getLogger(this.name)
+    private static final Logger log = LoggerFactory.getLogger(this)
 
     public static final String INFERRED_TYPE = 'G2K.INFERRED_TYPE'
     
@@ -110,7 +110,7 @@ class Inferer implements GtkConsts {
         if (node instanceof Expression) {
             def prevType = node.getType()
             if (prevType != type) {
-                log.info("rewriting node's type: ${prevType} ==> ${type}")
+                log.debug("rewriting node's type: {} ==> {}", prevType, type)
                 node.setType(type)
             }
         }
@@ -130,7 +130,7 @@ class Inferer implements GtkConsts {
         if (node != null) {
             return node.getNodeMetaData(INFERRED_TYPE) as ClassNode
         } else {
-            log.warning("null ASTNode passed to getType()")
+            log.warn("null ASTNode passed to getType()")
             return RESOLVED_UNKNOWN
         }
     }
@@ -212,7 +212,7 @@ class Inferer implements GtkConsts {
             ClassNode resultType = customResolved ?: originalType
             return resultType
         } else {
-            log.warning("yet unsupported expr.method as ${expr.method.class.name}")
+            log.warn("yet unsupported expr.method as ${expr.method.class.name}")
             return originalType
         }
     }
@@ -281,11 +281,11 @@ class Inferer implements GtkConsts {
             if (ec) {
                 return ec
             } else {
-                log.warning("VariableExpression: no enclosing class found - not processed")
+                log.warn("VariableExpression: no enclosing class found - not processed")
                 return expr.getType()
             }
         } else {
-            log.warning("VariableExpression not recognized and not processed")
+            log.warn("VariableExpression not recognized and not processed")
             return expr.getType()
         }
     }
@@ -333,7 +333,7 @@ class Inferer implements GtkConsts {
             scopes.addLocal(left)
             //setType(expr, type)
         } else if (left instanceof ArgumentListExpression) {
-            log.warning("infer() not impl for ${left.class.name}") // todo
+            log.warn("infer() not impl for ${left.class.name}") // todo
         } else {
             throw new Exception("not impl for ${left.class.name}")
         }
@@ -374,7 +374,7 @@ class Inferer implements GtkConsts {
     @DynamicDispatch
     ClassNode inferAssignment(Expression expr, Expression rvalue) {
         throw new Exception("${getClass().simpleName}.inferAssignment() not defined for ${expr.class.name}")
-        //log.warning("${getClass().simpleName}::inferAssignment() not defined for ${node?.class?.name}")
+        //log.warn("${getClass().simpleName}::inferAssignment() not defined for ${node?.class?.name}")
     }
 
     @DynamicDispatch
@@ -400,7 +400,7 @@ class Inferer implements GtkConsts {
         def propName = expr.propertyAsString
         def field = objType.getField(propName)
         if (propName == null) {
-            log.warning("property (objectExpression) name is null")
+            log.warn("property (objectExpression) name is null")
             return RESOLVED_UNKNOWN
         } else if (rvalue == null) {
             // property read
@@ -455,14 +455,14 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(Expression expr) {
-        log.warning("${getClass().simpleName}::infer() not defined for ${expr?.class?.name}")
+        log.warn("${getClass().simpleName}::infer() not defined for ${expr?.class?.name}")
         return expr.getType()
     }
 
     @DynamicDispatch
     ClassNode infer(ASTNode node) {
         //throw new Exception("${getClass().simpleName}.infer() not defined for ${node.class.name}")
-        log.warning("${getClass().simpleName}::infer() not defined for ${node?.class?.name}")
+        log.warn("${getClass().simpleName}::infer() not defined for ${node?.class?.name}")
         return RESOLVED_UNKNOWN
     }
 
