@@ -688,6 +688,9 @@ class GroovyToKotlin implements GtkConsts {
         if (expr.leftExpression instanceof VariableExpression) {
             def left = expr.leftExpression as VariableExpression
             final leftType = left.originType
+            if (ClassHelper.isPrimitiveType(leftType)) {
+                optional = false
+            }
             leftIsArray = GtkUtils.isArray(leftType)
             if (left.dynamicTyped) {
                 out.append("$varOrVal ${left.name}")
@@ -696,9 +699,12 @@ class GroovyToKotlin implements GtkConsts {
                 out.append("$varOrVal ${left.name}: $st")
             }
         } else if (expr.leftExpression instanceof ArgumentListExpression) {
+            // todo make sure a `Int?` is not emitted for primitive int in this branch
             // def (a, b) = [1, 2]
             out.append("$varOrVal ")
             translateExpr(expr.leftExpression as ArgumentListExpression)
+        } else {
+            log.warn("unexpected case e267e55f-2f53-42ca-a998-64356a3f10c1")
         }
 
         if (hasInitializer) {

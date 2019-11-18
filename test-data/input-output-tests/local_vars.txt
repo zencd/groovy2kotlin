@@ -1,0 +1,64 @@
+﻿class ClassName {
+    void main() {
+        def i = 0
+        def localWithoutInitializer
+    }
+    void local_is_var_when_re_written_later() {
+        def x = 1
+        x = 2
+    }
+    void primitive_initialized() {
+        int i = 0
+        float f = 0
+    }
+    void primitive_rewritten() {
+        int i = 0
+        float f = 0
+        i = 1
+        f = 1
+    }
+    void primitive_not_initialized() {
+        int i
+        float f
+    }
+    void primitive_initialized_later() {
+        int i
+        float f
+        i = 1
+        f = 1
+    }
+}
+-------------------
+$DEFAULT_IMPORTS
+open class ClassName {
+    companion object {
+    }
+    fun main() {
+        val i = 0
+        var localWithoutInitializer
+    }
+    fun local_is_var_when_re_written_later() {
+        var x = 1
+        x = 2
+    }
+    fun primitive_initialized() {
+        val i: Int = 0
+        val f: Float = 0
+    }
+    fun primitive_rewritten() {
+        var i: Int = 0
+        var f: Float = 0
+        i = 1
+        f = 1
+    }
+    fun primitive_not_initialized() {
+        var i: Int
+        var f: Float
+    }
+    fun primitive_initialized_later() {
+        var i: Int
+        var f: Float
+        i = 1
+        f = 1
+    }
+}

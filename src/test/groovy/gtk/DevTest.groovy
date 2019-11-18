@@ -55,13 +55,9 @@ class Temp {
 package aa.bb
 class Main {
     void main() {
-        Main.some()
-        some()
+        int x = 0
+        def z = 0
     }
-    static void some() {}
-}
-class Base {
-    Base(int i, int j) {}
 }
 """
         def texts = [groovyText]

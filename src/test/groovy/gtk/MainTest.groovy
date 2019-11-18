@@ -236,13 +236,8 @@ private val x = "hello"
     }
 
     @Test
-    void "local_var_primitive"() {
-        testFromFile("local_var_primitive.txt")
-    }
-
-    @Test
-    void "local_var_def"() {
-        testFromFile("local_var_def.txt")
+    void "local_vars"() {
+        testFromFile("local_vars.txt")
     }
 
     @Test
