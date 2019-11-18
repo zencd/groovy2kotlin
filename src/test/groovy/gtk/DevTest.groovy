@@ -50,20 +50,21 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = """
-class Main {
-    int counter = 0
-    int age
-    void main() {
-        counter++
-    }
-}
+package aa.bb
+import java.lang.reflect.Field
+import java.lang.ref.*
+class LocalExtended extends LocalBase {}
+class LocalBase {}
+class ExtendsExternalDirectlyImportedClass extends Field {}
+class ExtendsExternalWildcardImportedClass extends PhantomReference {}
+class ExtendsExternalNotImportedClass extends java.lang.invoke.CallSite {}
 """
         //println(DevMain.toKotlin(source))
         //def nodes = Gtk.parseTexts([source1])
         def nodes = Gtk.parseTexts([groovyText])
         def kotlinText = Gtk.toKotlinAsSingleString(nodes)
         println(kotlinText)
-        def node = nodes[0].classes[0].methods[0].code.statements
+        //def node = nodes[0].classes[0].methods[0].code.statements
         int stop = 0
         //println "--- tree ---"
         //AstPrinter.print(nodes[0])

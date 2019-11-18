@@ -14,6 +14,7 @@ import org.codehaus.groovy.ast.GenericsType
 import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
+import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.decompiled.DecompiledClassNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
@@ -507,5 +508,32 @@ class GtkUtils {
     static String getPropertySetterName(String propName) {
         // from org.codehaus.groovy.ast.tools.GeneralUtils.getGetterName()
         return "set" + Verifier.capitalize(propName)
+    }
+
+    static String getRelativeClassName(ClassNode target, ClassNode relativeTo, ModuleNode module) {
+        if (target.packageName == relativeTo.packageName) {
+            return target.nameWithoutPackage
+        } else if (isImported(target, module)) {
+            return target.nameWithoutPackage
+        } else {
+            return target.name
+        }
+    }
+
+    static boolean isImported(ClassNode type, ModuleNode module) {
+        def imported = module.imports.any {
+            def t1 = it.type.name
+            def t2 = type.name
+            t1 == t2
+        }
+        if (imported) {
+            return true
+        }
+        imported = module.starImports.any {
+            def package1 = it.getPackageName() // like "java.lang.ref."
+            def package2 = type.packageName + "."
+            package1 == package2
+        }
+        return imported
     }
 }

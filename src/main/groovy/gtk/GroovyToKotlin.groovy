@@ -195,11 +195,13 @@ class GroovyToKotlin implements GtkConsts {
 
         List<String> extendList = []
         if (classNode.superClass && !classNode.interface && classNode.superClass != ClassHelper.OBJECT_TYPE) {
-            extendList.add("${classNode.superClass.name}()")
+            def cn = GtkUtils.getRelativeClassName(classNode.superClass, classNode, classNode.module)
+            extendList.add("${cn}()")
         }
         for (ClassNode iface : classNode.interfaces) {
             if (iface.name != 'groovy.lang.GroovyObject') {
-                extendList.add(iface.name)
+                def cn = GtkUtils.getRelativeClassName(iface, classNode, classNode.module)
+                extendList.add(cn)
             }
         }
         def extendPadded = extendList ? " : ${extendList.join(', ')}" : ""

@@ -27,7 +27,7 @@ class BulkProcessor {
         gtk.translateAll()
         gtk.outBuffers.each { String filePath, CodeBuffer buf ->
             def text = buf.composeFinalText()
-            log.info("writing ${text.size()} chars to ${filePath}")
+            log.debug("writing ${text.size()} chars to ${filePath}")
             def f = new File(filePath)
             GeneralUtils.makeDirsForRegularFile(f)
             f.text = text
