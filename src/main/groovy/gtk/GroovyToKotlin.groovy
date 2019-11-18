@@ -502,7 +502,8 @@ class GroovyToKotlin implements GtkConsts {
     private void translateMethodParam(Parameter node) {
         def predefinedKotlinType = node.getNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
         String name = node.getName() == null ? "<unknown>" : node.getName()
-        String type = predefinedKotlinType ?: typeToKotlinString(node.getType())
+        boolean mutable = GtkUtils.isMutable(node)
+        String type = predefinedKotlinType ?: typeToKotlinString(node.getType(), false, mutable)
         if (node.getInitialExpression() == null) {
             out.append("${name}: ${type}")
         } else {
@@ -597,6 +598,7 @@ class GroovyToKotlin implements GtkConsts {
                 out.append(' ')
                 translateExpr(singleClosureArg)
             } else {
+                // ArgumentListExpression usually
                 translateExpr(expr.arguments)
             }
         }
@@ -695,7 +697,8 @@ class GroovyToKotlin implements GtkConsts {
             if (left.dynamicTyped) {
                 out.append("$varOrVal ${left.name}")
             } else {
-                def st = typeToKotlinString(leftType, optional)
+                def mutable = GtkUtils.isMutable(left)
+                def st = typeToKotlinString(leftType, optional, mutable)
                 out.append("$varOrVal ${left.name}: $st")
             }
         } else if (expr.leftExpression instanceof ArgumentListExpression) {

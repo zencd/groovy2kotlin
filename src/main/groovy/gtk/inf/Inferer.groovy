@@ -39,6 +39,7 @@ import org.codehaus.groovy.classgen.BytecodeSequence
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.tryResolveMethodReturnType
 
 class Inferer implements GtkConsts {
@@ -176,6 +177,9 @@ class Inferer implements GtkConsts {
     @DynamicDispatch
     ClassNode infer(MethodNode method) {
         scopes.pushScope()
+        for (param in method.parameters) {
+            scopes.addLocal(param)
+        }
         if (method.code != null) {
             inferType(method.code)
         }
@@ -202,14 +206,20 @@ class Inferer implements GtkConsts {
     @DynamicDispatch
     ClassNode infer(MethodCallExpression expr) {
         final originalType = expr.type
-        final objTypeWas = expr.objectExpression.type
-        final objType = inferType(expr.objectExpression)
+        def oe = expr.objectExpression
+        final objTypeWas = oe.type
+        final objType = inferType(oe)
         // todo find method from expr.methodAsString
         if (expr.method instanceof ConstantExpression) {
             String methodName = expr.method.value
             inferType(expr.arguments)
             def customResolved = tryResolveMethodReturnType(objType, methodName, expr.arguments)
             ClassNode resultType = customResolved ?: originalType
+            if (isList(objType) && (methodName == 'add' || methodName == 'addAll')) {
+                if (oe instanceof VariableExpression) {
+                    scopes.markAsMutable(oe.name)
+                }
+            }
             return resultType
         } else {
             log.warn("yet unsupported expr.method as ${expr.method.class.name}")

@@ -236,6 +236,11 @@ private val x = "hello"
     }
 
     @Test
+    void "mutable"() {
+        testFromFile("mutable.txt")
+    }
+
+    @Test
     void "local_vars"() {
         testFromFile("local_vars.txt")
     }

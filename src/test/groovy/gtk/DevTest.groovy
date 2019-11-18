@@ -54,9 +54,10 @@ class Temp {
         String groovyText = """
 package aa.bb
 class Main {
-    void main() {
-        int x = 0
-        def z = 0
+    void main(List<Integer> list) {
+        List<Integer> list2 = []
+        list.add(1)
+        list2.add(2)
     }
 }
 """

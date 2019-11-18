@@ -1,0 +1,18 @@
+class Main {
+    void main(List<Integer> list1) {
+        List<Integer> list2 = []
+        list1.add(1)
+        list2.add(2)
+    }
+}
+--------------
+$DEFAULT_IMPORTS
+open class Main {
+    companion object {
+    }
+    fun main(list1: MutableList<Integer>) {
+        val list2: MutableList<Integer> = listOf()
+        list1.add(1)
+        list2.add(2)
+    }
+}

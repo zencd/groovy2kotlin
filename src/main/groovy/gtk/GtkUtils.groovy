@@ -2,6 +2,7 @@ package gtk
 
 import groovy.transform.CompileStatic
 import groovyjarjarasm.asm.Opcodes
+import gtk.inf.Inferer
 import org.codehaus.groovy.antlr.LineColumn
 import org.codehaus.groovy.antlr.SourceBuffer
 import org.codehaus.groovy.ast.ASTNode
@@ -15,6 +16,7 @@ import org.codehaus.groovy.ast.ImportNode
 import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
+import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.decompiled.DecompiledClassNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
@@ -24,6 +26,7 @@ import org.codehaus.groovy.ast.expr.ConstructorCallExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
+import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.classgen.BytecodeExpression
@@ -38,7 +41,7 @@ import java.util.regex.Pattern
 /**
  * Utils specific to the project.
  */
-class GtkUtils {
+class GtkUtils implements GtkConsts {
     private static final Logger log = LoggerFactory.getLogger(this)
 
     private static final Pattern PREV_JAVADOC_COMMENT_PATTERN = Pattern.compile("(?s)/\\*\\*(.*?)\\*/");
@@ -73,7 +76,7 @@ class GtkUtils {
         return "import " + typeName
     }
 
-    static String typeToKotlinString(ClassNode classNode, boolean optional = false) {
+    static String typeToKotlinString(ClassNode classNode, boolean optional = false, boolean mutable = false) {
         String optionalStr = optional ? '?' : ''
 
         if (classNode == ClassHelper.OBJECT_TYPE) {
@@ -128,7 +131,7 @@ class GtkUtils {
         // toString(false) or getName() returns fully qualified name
         def s
         if (classNode.usingGenerics) {
-            s = toString(classNode)
+            s = toString(classNode, mutable)
         } else {
             try {
                 s = classNode.@name + optionalStr
@@ -142,7 +145,7 @@ class GtkUtils {
         return s
     }
 
-    private static String toString(ClassNode classNode) {
+    private static String toString(ClassNode classNode, boolean mutable = false) {
         boolean showRedirect = false
 
         if (classNode instanceof DecompiledClassNode) {
@@ -152,7 +155,11 @@ class GtkUtils {
         if (classNode.isArray()) {
             return classNode.componentType.toString(showRedirect)+"[]";
         }
-        StringBuilder ret = new StringBuilder(classNode.@name);
+        def name = classNode.@name
+        if (mutable && classNode.name == 'java.util.List') {
+            name = 'MutableList'
+        }
+        StringBuilder ret = new StringBuilder(name);
         if (classNode.placeholder) ret = new StringBuilder(classNode.getUnresolvedName());
         if (!classNode.placeholder && classNode.genericsTypes != null) {
             ret.append("<");
@@ -564,5 +571,15 @@ class GtkUtils {
         }
         def subs = currentSource.text.substring(left, pos).trim()
         return subs ?: null
+    }
+
+    static boolean isMutable(Parameter param) {
+        def mutable = Inferer.getMeta(param, AST_NODE_META__MUTABLE)
+        return mutable != null ? mutable : false
+    }
+
+    static boolean isMutable(VariableExpression param) {
+        def mutable = Inferer.getMeta(param, AST_NODE_META__MUTABLE)
+        return mutable != null ? mutable : false
     }
 }
