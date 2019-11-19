@@ -64,6 +64,7 @@ import static GtkUtils.typeToKotlinString
 import static gtk.GtkUtils.isAnyString
 import static gtk.GtkUtils.isFile
 import static gtk.GtkUtils.isList
+import static gtk.GtkUtils.isLogicalBinaryExpr
 import static gtk.GtkUtils.isLogicalBinaryOp
 import static gtk.GtkUtils.isString
 import static gtk.GtkUtils.isPrimitive
@@ -885,20 +886,34 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(BooleanExpression expr) {
-        transAsGroovyTruth(expr.expression)
+        transAsGroovyTruth(expr.expression, true)
     }
 
-    private void transAsGroovyTruth(Expression expr) {
+    private void transAsGroovyTruth(Expression expr, boolean first = false) {
         def type = expr.type
+        Expression expr2
         if (isAnyString(type)) {
-            translateExpr(Transformers.makeGroovyTruthSubTreeForString(expr))
+            expr2 = Transformers.makeGroovyTruthSubTreeForString(expr)
         } else if (isPrimitive(type) || isWrapper(type)) {
             // todo currently producing invalid Kotlin code; it's ok now but do a valid translation
-            translateExpr(expr)
+            expr2 = expr
         } else if (GtkUtils.isObject(type)) {
-            translateExpr(expr)
+            // todo due to internal errors, some nodes are mistakenly inferred as Object now; need to be translated in Groovy truth logic later
+            // keep
+            expr2 = expr
         } else {
-            translateExpr(Transformers.makeGroovyTruthSubTreeForAnyObject(expr))
+            expr2 = Transformers.makeGroovyTruthSubTreeForAnyObject(expr)
+        }
+
+        def surroundWithBraces = !first && isLogicalBinaryExpr(expr2)
+        if (surroundWithBraces) {
+            out.append("(")
+        }
+
+        translateExpr(expr2)
+
+        if (surroundWithBraces) {
+            out.append(")")
         }
     }
 

@@ -605,4 +605,8 @@ class GtkUtils implements GtkConsts {
     static boolean isLogicalBinaryOp(String op) {
         op in LOGICAL_BINARY_OPS
     }
+
+    static boolean isLogicalBinaryExpr(Expression expr) {
+        (expr instanceof BinaryExpression) && (expr.operation.text in LOGICAL_BINARY_OPS)
+    }
 }

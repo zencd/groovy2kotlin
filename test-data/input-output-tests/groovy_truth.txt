@@ -6,11 +6,11 @@ class Main {
         if (i) {}
         if (date) {}
 
-        if (true && o) {}
-        if (true && s) {}
-        if (true && I) {}
-        if (true && i) {}
-        if (true && date) {}
+        if (true && true || o) {}
+        if (true && true || s) {}
+        if (true && true || I) {}
+        if (true && true || i) {}
+        if (true && true || date) {}
     }
 }
 ---------------
@@ -29,15 +29,15 @@ open class Main {
         }
         if (date != null) {
         }
-        if (true && o) {
+        if ((true && true) || o) {
         }
-        if (true && s != null && s.length > 0) {
+        if ((true && true) || (s != null && s.length > 0)) {
         }
-        if (true && I) {
+        if ((true && true) || I) {
         }
-        if (true && i) {
+        if ((true && true) || i) {
         }
-        if (true && date != null) {
+        if ((true && true) || date != null) {
         }
     }
 }
