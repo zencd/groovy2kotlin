@@ -53,7 +53,36 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    def x = 22.intValue()
+    String s
+    int i
+    ArrayList list
+    HashMap map
+    boolean b
+    Boolean B
+    Class anyObject
+
+    void main() {
+        anyObject && anyObject
+        list && map
+        b && b
+        B && B
+        i || i
+        s || s
+        s && s && s
+        s && s || s
+        s || s && s
+        (s || s) && s
+    }
+    void not() {
+        !s
+        !i
+    }
+    void double_not() {
+        !!anyObject
+        !!s
+        !!i
+        !!list && !!map
+    }
 }
 '''
         def texts = [groovyText]

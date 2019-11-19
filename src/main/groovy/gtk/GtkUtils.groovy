@@ -475,7 +475,7 @@ class GtkUtils implements GtkConsts {
         classNode == ClassHelper.Boolean_TYPE || classNode == ClassHelper.boolean_TYPE
     }
 
-    private static final def BOOLEAN_OPS = ['==', '!=', '<', '>', '<=', '>=', '!', 'instanceof']
+    private static final def BOOLEAN_OPS = ['&&', '||', '==', '!=', '<', '>', '<=', '>=', '!', 'instanceof']
 
     static boolean isBoolean(BinaryExpression expr) {
         return (expr.operation.text in BOOLEAN_OPS)

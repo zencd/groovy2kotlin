@@ -911,7 +911,9 @@ class GroovyToKotlin implements GtkConsts {
     private void transAsGroovyTruth(Expression expr, boolean first = false) {
         def type = expr.type
         Expression expr2
-        if (isAnyString(type)) {
+        if (type == ClassHelper.boolean_TYPE) {
+            expr2 = expr
+        } else if (isAnyString(type)) {
             expr2 = Transformers.makeGroovyTruthSubTreeForString(expr)
         } else if (isPrimitive(type) || isWrapper(type)) {
             // todo currently producing invalid Kotlin code; it's ok now but do a valid translation

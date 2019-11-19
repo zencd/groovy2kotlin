@@ -48,6 +48,11 @@ class MainTest {
     }
 
     @Test
+    void "boolean_expr"() {
+        testFromFile("boolean_expr.txt")
+    }
+
+    @Test
     void "regressions"() {
         testFromFile("regressions.txt")
     }

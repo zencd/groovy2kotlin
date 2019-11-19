@@ -1,0 +1,72 @@
+class Main {
+    String s
+    int i
+    ArrayList list
+    HashMap map
+    boolean b
+    Boolean B
+    Class anyObject
+
+    void main() {
+        anyObject && anyObject
+        list && map
+        b && b
+        B && B
+        i || i
+        s || s
+        s && s && s
+        s && s || s
+        s || s && s
+        (s || s) && s
+    }
+
+    void not() {
+        !s
+        !i
+    }
+
+    void double_not() {
+        !!anyObject
+        !!s
+        !!i
+        !!list && !!map
+    }
+}
+-----------------
+$DEFAULT_IMPORTS
+open class Main {
+    companion object {
+    }
+    var s: String? = null
+    var i: Int = 0
+    var list: ArrayList? = null
+    var map: HashMap? = null
+    var b: Boolean = false
+    var B: Boolean? = false
+    var anyObject: Class? = null
+
+    fun main() {
+        anyObject != null && anyObject != null
+        list != null && map != null
+        b && b
+        B && B
+        i || i
+        (s != null && s.length > 0) || (s != null && s.length > 0)
+        ((s != null && s.length > 0) && (s != null && s.length > 0)) && (s != null && s.length > 0)
+        ((s != null && s.length > 0) && (s != null && s.length > 0)) || (s != null && s.length > 0)
+        (s != null && s.length > 0) || ((s != null && s.length > 0) && (s != null && s.length > 0))
+        ((s != null && s.length > 0) || (s != null && s.length > 0)) && (s != null && s.length > 0)
+    }
+
+    fun not() {
+        !s
+        !i
+    }
+
+    fun double_not() {
+        !!anyObject
+        !!s
+        !!i
+        !!list && !!map
+    }
+}
