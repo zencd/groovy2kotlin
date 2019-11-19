@@ -61,6 +61,8 @@ import static GtkUtils.isFinal
 import static GtkUtils.isStatic
 import static GtkUtils.makeImportText
 import static GtkUtils.typeToKotlinString
+import static gtk.GtkUtils.dropFirstArgument
+import static gtk.GtkUtils.getClassExtendedByAnonymousClass
 import static gtk.GtkUtils.isAnyString
 import static gtk.GtkUtils.isFile
 import static gtk.GtkUtils.isList
@@ -642,7 +644,6 @@ class GroovyToKotlin implements GtkConsts {
 
     /**
      * {@link org.codehaus.groovy.ast.expr.ConstructorCallExpression#getText}
-     * @param expr
      */
     @DynamicDispatch
     void translateExpr(ConstructorCallExpression expr) {
@@ -650,11 +651,15 @@ class GroovyToKotlin implements GtkConsts {
         def grType = expr.getType()
         if (expr.isUsingAnonymousInnerClass()) {
             // grType is InnerClassNode here
-            def sc = grType.superClass
-            def scKtType = typeToKotlinString(sc)
+            def baseClass = getClassExtendedByAnonymousClass(grType)
+            def scKtType = typeToKotlinString(baseClass)
             append("object : ")
             append(scKtType)
-            translateExpr(expr.arguments)
+            def newArgs = dropFirstArgument(expr.arguments as TupleExpression)
+            if (newArgs.size() > 0) {
+                // Kotlin prohibits empty `()` args for anonymous classes
+                translateExpr(newArgs)
+            }
             append(" ")
             translateClassBody(grType)
         } else {

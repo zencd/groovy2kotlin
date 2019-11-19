@@ -92,10 +92,10 @@ Others may be supported but was not tested.
 - Groovy's special use of bitwise operators on lists, streams, etc
 - Translate Groovy's implicit `return` (solved for certain cases)
 - Implement "Groovy truth" behaviour for:
-    - ~~String, GString
+    - ~~String, GString~~
     - List and Map ancestors
     - Object
-- ~~Kotlin's `open` and `override` (a common, type-aware algorithm)
+- ~~Kotlin's `open` and `override` (a common, type-aware algorithm)~~
 
 ## Some history
 

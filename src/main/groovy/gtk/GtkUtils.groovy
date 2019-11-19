@@ -609,4 +609,27 @@ class GtkUtils implements GtkConsts {
     static boolean isLogicalBinaryExpr(Expression expr) {
         (expr instanceof BinaryExpression) && (expr.operation.text in LOGICAL_BINARY_OPS)
     }
+
+    static ClassNode getClassExtendedByAnonymousClass(ClassNode anonymousClass) {
+        def sc = anonymousClass.superClass
+        if (!isObject(sc)) {
+            return sc
+        } else if (anonymousClass.interfaces.size() == 1) {
+            return anonymousClass.interfaces[0]
+        } else {
+            return sc
+        }
+    }
+
+    /**
+     * Create a new arg list, dropping the first item (if presented) from the original args.
+     */
+    static TupleExpression dropFirstArgument(TupleExpression argListExpr) {
+        if (argListExpr.expressions.size() <= 0) {
+            log.warn("#dropFirstArgument: expecting at least 1 argument")
+            return argListExpr
+        }
+        final newArgs = argListExpr.expressions.subList(1, argListExpr.expressions.size())
+        return new ArgumentListExpression(newArgs)
+    }
 }

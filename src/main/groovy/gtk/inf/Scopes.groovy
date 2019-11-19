@@ -37,10 +37,6 @@ class Scopes implements GtkConsts {
         scopes.pop()
     }
 
-    void put() {
-    }
-
-    // todo rename to addName
     void addName(Variable expr) {
         scope.addName(expr)
     }

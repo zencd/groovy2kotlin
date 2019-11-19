@@ -1,18 +1,24 @@
 class Temp {
-    static def obj = new ArrayList<String>() {
+    static def anon = new ArrayList<String>() {
         String toString() {
             return "xxx"
         }
     }
+    static def withArgs = new HashMap(20) {}
+    static def fromInterface = new Cloneable() {}
 }
 ------------
 $DEFAULT_IMPORTS
 open class Temp {
     companion object {
-        var obj = object : java.util.ArrayList <E extends java.lang.Object>(Temp::class.java) {
+        var anon = object : java.util.ArrayList <E extends java.lang.Object> {
             override fun toString(): String {
                 return "xxx"
             }
+        }
+        var withArgs = object : java.util.HashMap <K extends java.lang.Object, V extends java.lang.Object>(20) {
+        }
+        var fromInterface = object : Cloneable {
         }
     }
 }
