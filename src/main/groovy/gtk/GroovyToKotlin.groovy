@@ -64,6 +64,7 @@ import static GtkUtils.typeToKotlinString
 import static gtk.GtkUtils.isAnyString
 import static gtk.GtkUtils.isFile
 import static gtk.GtkUtils.isList
+import static gtk.GtkUtils.isLogicalBinaryOp
 import static gtk.GtkUtils.isString
 import static gtk.GtkUtils.isPrimitive
 import static gtk.GtkUtils.isWrapper
@@ -731,10 +732,12 @@ class GroovyToKotlin implements GtkConsts {
     @DynamicDispatch
     void translateExpr(BinaryExpression expr) {
         if (tryTranslateSpecialLeftShift(expr)) {
-            // performed already
+            // nop as performed already
         } else if (expr.operation.text == GR_INDEX_OP) {
+            // var[i]
             translateIndexingExpr(expr)
         } else if (expr.operation.text == GR_REGEX_TEST) {
+            // str ==~ regex
             translateMatchOperator(expr)
         } else if (expr.operation.text == '=~') {
             // converts:
@@ -764,14 +767,19 @@ class GroovyToKotlin implements GtkConsts {
     private void translateRegularBinaryExpr(BinaryExpression expr) {
         def left = expr.leftExpression
         def right = expr.rightExpression
+        def op = expr.operation.text
 
-        def ktOp = GtkUtils.translateOperator(expr.operation.text)
-        if (expr.operation.text == GR_INSTANCEOF) {
+        def ktOp = GtkUtils.translateOperator(op)
+        if (op == GR_INSTANCEOF) {
             right.putNodeMetaData(AST_NODE_META_DONT_ADD_JAVA_CLASS, true)
         }
 
-        if (expr.operation.text == '=') {
+        if (op == '=') {
             translateAssignment(left, right)
+        } else if (isLogicalBinaryOp(op)) {
+            transAsGroovyTruth(left)
+            out.append(" ${ktOp} ")
+            transAsGroovyTruth(right)
         } else {
             translateExpr(left)
             out.append(" ${ktOp} ")
@@ -877,14 +885,18 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(BooleanExpression expr) {
-        def type = expr.expression.type
+        transAsGroovyTruth(expr.expression)
+    }
+
+    private void transAsGroovyTruth(Expression expr) {
+        def type = expr.type
         if (isAnyString(type)) {
             translateExpr(Transformers.makeGroovyTruthSubTreeForString(expr))
         } else if (isPrimitive(type) || isWrapper(type)) {
             // todo currently producing invalid Kotlin code; it's ok now but do a valid translation
-            translateExpr(expr.expression)
+            translateExpr(expr)
         } else if (GtkUtils.isObject(type)) {
-            translateExpr(expr.expression)
+            translateExpr(expr)
         } else {
             translateExpr(Transformers.makeGroovyTruthSubTreeForAnyObject(expr))
         }

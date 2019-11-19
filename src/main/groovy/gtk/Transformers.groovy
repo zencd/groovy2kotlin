@@ -82,23 +82,23 @@ class Transformers implements GtkConsts {
         }
     }
 
-    static Expression makeGroovyTruthSubTreeForAnyObject(BooleanExpression expr) {
+    static Expression makeGroovyTruthSubTreeForAnyObject(Expression expr) {
         def notNull = new BinaryExpression(
-                expr.expression,
+                expr,
                 GtkUtils.makeToken("!="),
                 ConstantExpression.NULL
         )
         return notNull
     }
 
-    static Expression makeGroovyTruthSubTreeForString(BooleanExpression expr) {
+    static Expression makeGroovyTruthSubTreeForString(Expression expr) {
         def notNull = new BinaryExpression(
-                expr.expression,
+                expr,
                 GtkUtils.makeToken("!="),
                 ConstantExpression.NULL
         )
         def getLength = new AttributeExpression(
-                expr.expression, new ConstantExpression('length')
+                expr, new ConstantExpression('length')
         )
         // todo kotlin prefers `.isNotEmpty`
         def lengthNotZero = new BinaryExpression(

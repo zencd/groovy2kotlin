@@ -55,19 +55,17 @@ class Temp {
 package aa.bb
 class Main {
     void main(Object o, String s, Integer I, int i, Date date) {
+        /*
         if (o) {}
         if (s) {}
         if (I) {}
         if (i) {}
         if (date) {}
-        
-        /*
-        if (true && o) {}
-        if (true && s) {}
-        if (true && I) {}
-        if (true && i) {}
-        if (true && date) {}
         */
+        
+        if (true || i) {}
+        if (true || s) {}
+        if (true || date) {}
     }
 }
 """

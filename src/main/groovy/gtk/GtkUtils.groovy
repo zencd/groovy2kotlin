@@ -48,6 +48,8 @@ class GtkUtils implements GtkConsts {
 
     public static final ClassNode FILE_TYPE = ClassHelper.makeCached(File.class)
 
+    private static final def LOGICAL_BINARY_OPS = ['&&', '||'] as Set<String>
+
     // todo make it non static
     static lastLineCol = new LineColumn(1, 1)
 
@@ -598,5 +600,9 @@ class GtkUtils implements GtkConsts {
 
     static boolean isObject(ClassNode classNode) {
         return classNode == ClassHelper.OBJECT_TYPE
+    }
+
+    static boolean isLogicalBinaryOp(String op) {
+        op in LOGICAL_BINARY_OPS
     }
 }
