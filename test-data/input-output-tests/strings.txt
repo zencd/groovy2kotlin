@@ -3,8 +3,11 @@ class Strings {
         def jStringEscape = '\\d\\d'
         def gStringEscape = "\\d\\d"
         def regex = /[-]?\d\d+/
-        def gString = "$a$b${toString()}text$c\\d"
         def crlf = '\r\n'
+    }
+    void gstring() {
+        "${a}$b${toString()}text$c\\d"
+        "${this.class}" // property translated to method inside a GString
     }
 }
 -----------
@@ -15,8 +18,11 @@ open class Strings {
             val jStringEscape = "\\d\\d"
             val gStringEscape = "\\d\\d"
             val regex = "[-]?\\d\\d+"
-            val gString = "${a}${b}${toString()}text${c}\\d"
             val crlf = "\r\n"
         }
+    }
+    fun gstring() {
+        "${a}${b}${toString()}text${c}\\d"
+        "${this.getClass()}"
     }
 }

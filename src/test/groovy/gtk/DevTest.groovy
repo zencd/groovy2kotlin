@@ -51,14 +51,14 @@ class Temp {
 
     @Test
     void trans_single_string() {
-        String groovyText = """
+        String groovyText = '''
 package aa.bb
 class Main {
     void main() {
-        "\${this.class.simpleName}"
+        "${this.class}"
     }
 }
-"""
+'''
         def texts = [groovyText]
         def bufs = GtkUtils.makeSourceBuffers(texts)
         def nodes = Gtk.parseTexts(texts)

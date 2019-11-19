@@ -21,6 +21,7 @@ import org.codehaus.groovy.ast.expr.ConstructorCallExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.expr.EmptyExpression
 import org.codehaus.groovy.ast.expr.Expression
+import org.codehaus.groovy.ast.expr.GStringExpression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.TernaryExpression
@@ -461,6 +462,12 @@ class Inferer implements GtkConsts {
 
     ClassNode infer(EmptyStatement stmt) {
         return RESOLVED_UNKNOWN
+    }
+
+    @DynamicDispatch
+    ClassNode infer(GStringExpression expr) {
+        inferList(expr.values)
+        return expr.getType()
     }
 
     @DynamicDispatch
