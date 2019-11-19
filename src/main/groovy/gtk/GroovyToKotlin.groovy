@@ -63,6 +63,7 @@ import static GtkUtils.makeImportText
 import static GtkUtils.typeToKotlinString
 import static gtk.GtkUtils.dropFirstArgument
 import static gtk.GtkUtils.getClassExtendedByAnonymousClass
+import static gtk.GtkUtils.isAnyNumber
 import static gtk.GtkUtils.isAnyString
 import static gtk.GtkUtils.isFile
 import static gtk.GtkUtils.isList
@@ -590,6 +591,9 @@ class GroovyToKotlin implements GtkConsts {
             else if (isFile(objType) && name == 'getText') {
                 name = 'readText'
             }
+            else if (isAnyNumber(objType) && (name in GtkUtils.GROOVY_NUMBER_CONVERTERS) && numParams == 0) {
+                name = GtkUtils.GROOVY_TO_KOTLIN_NUMBER_CONVERTERS[name]
+            }
             else if (isList(objType) && name == 'size' && numParams == 0) {
                 // name stays the same
                 methodWasConvertedToAttribute = true
@@ -601,6 +605,7 @@ class GroovyToKotlin implements GtkConsts {
             else if (singleClosureArg) {
                 name = GtkUtils.tryRewriteMethodNameWithSingleClosureArg(name)
             }
+            assert name
             out.append(name)
         } else {
             // no clue what is the case

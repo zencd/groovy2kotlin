@@ -53,8 +53,7 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    static XXX = new HashMap(20) {}
-    void main() {}
+    def x = 22.intValue()
 }
 '''
         def texts = [groovyText]
@@ -70,7 +69,7 @@ class Main {
         //AstPrinter.print(nodes[0])
     }
 
-    static XXX = new HashMap(20) {}
+    def x = 22
 
     @Test
     void tmp() {

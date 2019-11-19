@@ -43,6 +43,11 @@ class MainTest {
     }
 
     @Test
+    void "number_conversion"() {
+        testFromFile("number_conversion.txt")
+    }
+
+    @Test
     void "regressions"() {
         testFromFile("regressions.txt")
     }

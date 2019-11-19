@@ -50,6 +50,35 @@ class GtkUtils implements GtkConsts {
 
     private static final def LOGICAL_BINARY_OPS = ['&&', '||'] as Set<String>
 
+    private static final ALL_NUMBER_TYPES = [
+            ClassHelper.boolean_TYPE,
+            ClassHelper.byte_TYPE,
+            ClassHelper.short_TYPE,
+            ClassHelper.int_TYPE,
+            ClassHelper.long_TYPE,
+            ClassHelper.double_TYPE,
+            ClassHelper.float_TYPE,
+            ClassHelper.Byte_TYPE,
+            ClassHelper.Short_TYPE,
+            ClassHelper.Integer_TYPE,
+            ClassHelper.Long_TYPE,
+            ClassHelper.Double_TYPE,
+            ClassHelper.Float_TYPE,
+            ClassHelper.BigDecimal_TYPE,
+            ClassHelper.BigInteger_TYPE,
+    ] as Set<ClassNode>
+
+    static final Map<String, String> GROOVY_TO_KOTLIN_NUMBER_CONVERTERS = [
+            'intValue': 'toInt',
+            'doubleValue': 'toDouble',
+            'floatValue': 'toFloat',
+            'longValue': 'toLong',
+            'shortValue': 'toShort',
+            'byteValue': 'toByte',
+    ]
+
+    static final GROOVY_NUMBER_CONVERTERS = GROOVY_TO_KOTLIN_NUMBER_CONVERTERS.keySet()
+
     // todo make it non static
     static lastLineCol = new LineColumn(1, 1)
 
@@ -500,6 +529,10 @@ class GtkUtils implements GtkConsts {
 
     static boolean isFile(ClassNode type) {
         type.isDerivedFrom(FILE_TYPE)
+    }
+
+    static boolean isAnyNumber(ClassNode type) {
+        return type in ALL_NUMBER_TYPES
     }
 
     static boolean shouldBeConst(FieldNode field) {

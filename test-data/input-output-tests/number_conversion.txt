@@ -85,3 +85,94 @@ class ClassName {
         D.doubleValue()
     }
 }
+---------------
+$DEFAULT_IMPORTS
+open class ClassName {
+    companion object {
+    }
+    fun main(b: Byte, B: Byte, s: Short, S: Short, i: Int, I: Integer, l: Long, L: Long, f: Float, F: Float, d: Double, D: Double) {
+        b.toByte()
+        b.toShort()
+        b.toInt()
+        b.toLong()
+        b.toFloat()
+        b.toDouble()
+
+        B.toByte()
+        B.toShort()
+        B.toInt()
+        B.toLong()
+        B.toFloat()
+        B.toDouble()
+
+        s.toByte()
+        s.toShort()
+        s.toInt()
+        s.toLong()
+        s.toFloat()
+        s.toDouble()
+
+        S.toByte()
+        S.toShort()
+        S.toInt()
+        S.toLong()
+        S.toFloat()
+        S.toDouble()
+
+        i.toByte()
+        i.toShort()
+        i.toInt()
+        i.toLong()
+        i.toFloat()
+        i.toDouble()
+
+        I.toByte()
+        I.toShort()
+        I.toInt()
+        I.toLong()
+        I.toFloat()
+        I.toDouble()
+
+        l.toByte()
+        l.toShort()
+        l.toInt()
+        l.toLong()
+        l.toFloat()
+        l.toDouble()
+
+        L.toByte()
+        L.toShort()
+        L.toInt()
+        L.toLong()
+        L.toFloat()
+        L.toDouble()
+
+        f.toByte()
+        f.toShort()
+        f.toInt()
+        f.toLong()
+        f.toFloat()
+        f.toDouble()
+
+        F.toByte()
+        F.toShort()
+        F.toInt()
+        F.toLong()
+        F.toFloat()
+        F.toDouble()
+
+        d.toByte()
+        d.toShort()
+        d.toInt()
+        d.toLong()
+        d.toFloat()
+        d.toDouble()
+
+        D.toByte()
+        D.toShort()
+        D.toInt()
+        D.toLong()
+        D.toFloat()
+        D.toDouble()
+    }
+}
