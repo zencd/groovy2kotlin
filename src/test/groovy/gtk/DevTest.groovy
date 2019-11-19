@@ -54,9 +54,9 @@ class Temp {
         String groovyText = '''
 package aa.bb
 class Main {
+    String s = "xxx"
     void main() {
-        this.class
-        this.getClass()
+        s = null
     }
 }
 '''
@@ -74,10 +74,8 @@ class Main {
 
     @Test
     void tmp() {
-        def text = """\nclass Main {\n}"""
-        def buf = new SrcBuf(text)
-        def pos = buf.getFlatTextPosition(2, 7)
-        def substring = text.substring(pos, pos+4)
+        def res = GeneralUtils.escapeAsJavaStringContent("hello\nпривет")
+        println(res)
         int stop = 0
     }
 

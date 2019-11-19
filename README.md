@@ -67,6 +67,7 @@ Others may be supported but was not tested.
 - `File` mapping:
     - `size()` → `length()`
     - `File.text`
+    - `eachLine` → `forEachLine`
 - `String` mapping:
     - `length()` → `length` attr
     - `String.execute()`

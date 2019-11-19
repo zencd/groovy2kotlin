@@ -7,8 +7,39 @@ import groovy.json.StringEscapeUtils
  */
 class GeneralUtils {
 
+    /**
+     * There is no currently a way to get the 100% original string as it was in the input source.
+     * We could translate non-unicode chars either to unicode, or to the "\u044C" form.
+     * Neither way is perfect but currently I choose the unicode one.
+     * Another possibility is to re-parse a part of source text by hands.
+     */
     static String escapeAsJavaStringContent(String s) {
+        //return escapeJavaStringAllAscii(s)
+        return escapeAsJavaStringUnicode(s)
+
+    }
+
+    /**
+     * Escapes Java string to a form like "hello\nЖердь".
+     */
+    static String escapeJavaStringAllAscii(String s) {
         return StringEscapeUtils.escapeJava(s)
+    }
+
+    /**
+     * Escapes Java string to a form like "hello\n\u0416\u0435\u0440\u0434\u044C".
+     */
+    static String escapeAsJavaStringUnicode(String s) {
+        def buf = new StringBuilder()
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i)
+            if (Character.isLetterOrDigit(ch)) {
+                buf.append(ch)
+            } else {
+                buf.append(StringEscapeUtils.escapeJava(Character.toString(ch)))
+            }
+        }
+        return buf
     }
 
     static String tryCutFromEnd(String s, String pattern) {

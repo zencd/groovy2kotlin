@@ -33,6 +33,11 @@ class MainTest {
     }
 
     @Test
+    void javaStringEscape() {
+        assertEquals("hello\\nЖердь", GeneralUtils.escapeAsJavaStringContent("hello\nЖердь"))
+    }
+
+    @Test
     void "postfix_expr"() {
         testFromFile("postfix_expr.txt")
     }

@@ -152,10 +152,8 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(ClassNode classNode) {
+        scopes.pushScope()
         enclosingClasses.push(classNode)
-        for (MethodNode method : classNode.methods) {
-            inferType(method)
-        }
         for (field in classNode.fields) {
             inferType(field)
         }
@@ -165,12 +163,17 @@ class Inferer implements GtkConsts {
         for (def objInit : classNode.objectInitializerStatements) {
             // todo
         }
+        for (MethodNode method : classNode.methods) {
+            inferType(method)
+        }
         enclosingClasses.pop()
+        scopes.popScope()
         return RESOLVED_UNKNOWN
     }
 
     @DynamicDispatch
     ClassNode infer(FieldNode field) {
+        scopes.addName(field)
         inferTypeOptional(field.initialValueExpression)
         return RESOLVED_UNKNOWN
     }
@@ -179,7 +182,7 @@ class Inferer implements GtkConsts {
     ClassNode infer(MethodNode method) {
         scopes.pushScope()
         for (param in method.parameters) {
-            scopes.addLocal(param)
+            scopes.addName(param)
         }
         if (method.code != null) {
             inferType(method.code)
@@ -341,7 +344,7 @@ class Inferer implements GtkConsts {
 
         def type = inferType(expr.rightExpression)
         if (left instanceof VariableExpression) {
-            scopes.addLocal(left)
+            scopes.addName(left)
             //setType(expr, type)
         } else if (left instanceof ArgumentListExpression) {
             log.warn("infer() not impl for ${left.class.name}") // todo

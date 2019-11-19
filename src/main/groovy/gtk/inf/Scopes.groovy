@@ -12,7 +12,7 @@ class Scopes implements GtkConsts {
 
     static class Scope {
         private final Map<String, Variable> vars = new HashMap<>()
-        void addLocal(Variable expr) {
+        void addName(Variable expr) {
             if (expr.name in vars) {
                 // nop
             } else {
@@ -40,8 +40,9 @@ class Scopes implements GtkConsts {
     void put() {
     }
 
-    void addLocal(Variable expr) {
-        scope.addLocal(expr)
+    // todo rename to addName
+    void addName(Variable expr) {
+        scope.addName(expr)
     }
 
     private Variable findVar(String varName) {

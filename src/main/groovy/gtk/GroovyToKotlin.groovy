@@ -764,6 +764,7 @@ class GroovyToKotlin implements GtkConsts {
 
     private boolean tryTranslateSpecialLeftShift(BinaryExpression expr) {
         if (isList(expr.leftExpression.type) && expr.operation.text == GR_SHIFT_LEFT) {
+            // todo must be rewritten with a sub-tree replacement
             translateExpr(expr.leftExpression)
             out.append(".add(")
             translateExpr(expr.rightExpression)
