@@ -106,9 +106,9 @@ Others may be supported but was not tested.
 ✔ Range expression
 ✔ In-string expressions
 ✔ Bitwise expressions
-✔ Operator `in`
-✔ Operator `==~`
-✔ Operator `is`
+✔ `in`
+✔ `==~`
+✔ `is`
 ✔ Arrays
 ✔ Local vars
 ✔ Multiple value assignment
@@ -117,10 +117,10 @@ Others may be supported but was not tested.
 ✔ `while`
 ✔ `for(;;)`
 ✔ `break` ✔ `continue`
-✔ loop labels
+✔ Loop labels
 ✔ `throws`
-✔ overriding
-✔ standard methods
+✔ Overriding
+✔ Standard methods
 
 ## Progress on a project
 
