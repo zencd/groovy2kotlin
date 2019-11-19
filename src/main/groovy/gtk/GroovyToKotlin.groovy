@@ -582,6 +582,9 @@ class GroovyToKotlin implements GtkConsts {
             else if (isFile(objType) && name == 'size' && numParams == 0) {
                 name = 'length'
             }
+            else if (isFile(objType) && name == 'setText') {
+                name = 'writeText'
+            }
             else if (isFile(objType) && name == 'getText') {
                 name = 'readText'
             }

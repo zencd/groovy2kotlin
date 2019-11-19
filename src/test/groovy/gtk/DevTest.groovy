@@ -54,18 +54,8 @@ class Temp {
         String groovyText = """
 package aa.bb
 class Main {
-    void main(Object o, String s, Integer I, int i, Date date) {
-        /*
-        if (o) {}
-        if (s) {}
-        if (I) {}
-        if (i) {}
-        if (date) {}
-        */
-        
-        if (true || i) {}
-        if (true || s) {}
-        if (true || date) {}
+    void main() {
+        "\${this.class.simpleName}"
     }
 }
 """
