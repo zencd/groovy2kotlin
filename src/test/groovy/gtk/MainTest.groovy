@@ -241,6 +241,11 @@ private val x = "hello"
     }
 
     @Test
+    void "groovy_truth"() {
+        testFromFile("groovy_truth.txt")
+    }
+
+    @Test
     void "local_vars"() {
         testFromFile("local_vars.txt")
     }

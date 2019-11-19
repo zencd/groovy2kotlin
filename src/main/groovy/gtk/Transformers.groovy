@@ -82,6 +82,15 @@ class Transformers implements GtkConsts {
         }
     }
 
+    static Expression makeGroovyTruthSubTreeForAnyObject(BooleanExpression expr) {
+        def notNull = new BinaryExpression(
+                expr.expression,
+                GtkUtils.makeToken("!="),
+                ConstantExpression.NULL
+        )
+        return notNull
+    }
+
     static Expression makeGroovyTruthSubTreeForString(BooleanExpression expr) {
         def notNull = new BinaryExpression(
                 expr.expression,

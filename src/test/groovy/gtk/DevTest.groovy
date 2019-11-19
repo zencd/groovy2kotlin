@@ -54,9 +54,20 @@ class Temp {
         String groovyText = """
 package aa.bb
 class Main {
-    void main(Object o) {
-        //new URL('http://ya.ru')
-        main(new URL('http://ya.ru'))
+    void main(Object o, String s, Integer I, int i, Date date) {
+        if (o) {}
+        if (s) {}
+        if (I) {}
+        if (i) {}
+        if (date) {}
+        
+        /*
+        if (true && o) {}
+        if (true && s) {}
+        if (true && I) {}
+        if (true && i) {}
+        if (true && date) {}
+        */
     }
 }
 """

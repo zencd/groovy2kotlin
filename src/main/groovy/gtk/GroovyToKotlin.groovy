@@ -61,9 +61,12 @@ import static GtkUtils.isFinal
 import static GtkUtils.isStatic
 import static GtkUtils.makeImportText
 import static GtkUtils.typeToKotlinString
+import static gtk.GtkUtils.isAnyString
 import static gtk.GtkUtils.isFile
 import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isString
+import static gtk.GtkUtils.isPrimitive
+import static gtk.GtkUtils.isWrapper
 
 /**
  * The core code of the translator.
@@ -875,18 +878,15 @@ class GroovyToKotlin implements GtkConsts {
     @DynamicDispatch
     void translateExpr(BooleanExpression expr) {
         def type = expr.expression.type
-        if (type == ClassHelper.STRING_TYPE || type == ClassHelper.GSTRING_TYPE) {
+        if (isAnyString(type)) {
             translateExpr(Transformers.makeGroovyTruthSubTreeForString(expr))
-        } else if (ClassHelper.isPrimitiveType(type)) {
+        } else if (isPrimitive(type) || isWrapper(type)) {
+            // todo currently producing invalid Kotlin code; it's ok now but do a valid translation
+            translateExpr(expr.expression)
+        } else if (GtkUtils.isObject(type)) {
             translateExpr(expr.expression)
         } else {
-            //def notNull = new BinaryExpression(
-            //        expr.expression,
-            //        GtkUtils.makeToken("!="),
-            //        ConstantExpression.NULL
-            //)
-            //translateExpr(notNull)
-            translateExpr(expr.expression)
+            translateExpr(Transformers.makeGroovyTruthSubTreeForAnyObject(expr))
         }
     }
 

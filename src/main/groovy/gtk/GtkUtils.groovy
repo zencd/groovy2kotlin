@@ -583,4 +583,20 @@ class GtkUtils implements GtkConsts {
         def mutable = Inferer.getMeta(param, AST_NODE_META__MUTABLE)
         return mutable != null ? mutable : false
     }
+
+    static boolean isPrimitive(ClassNode type) {
+        ClassHelper.isPrimitiveType(type)
+    }
+
+    static boolean isWrapper(ClassNode classNode) {
+        classNode in ClassHelper.PRIMITIVE_TYPE_TO_WRAPPER_TYPE_MAP.values()
+    }
+
+    static boolean isAnyString(ClassNode type) {
+        type == ClassHelper.STRING_TYPE || type == ClassHelper.GSTRING_TYPE
+    }
+
+    static boolean isObject(ClassNode classNode) {
+        return classNode == ClassHelper.OBJECT_TYPE
+    }
 }
