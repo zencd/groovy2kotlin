@@ -55,7 +55,8 @@ class Temp {
 package aa.bb
 class Main {
     void main() {
-        "${this.class}"
+        this.class
+        this.getClass()
     }
 }
 '''

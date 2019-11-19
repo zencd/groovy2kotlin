@@ -10,6 +10,10 @@ class Misc {
     void main(Object o) {
         main(new URL('http://ya.ru'))
     }
+    void accessingClassOfObject() {
+        this.class
+        this.getClass()
+    }
 }
 ---------
 $DEFAULT_IMPORTS
@@ -31,5 +35,9 @@ open class Misc {
     }
     fun main(o: Any) {
         main(URL("http://ya.ru"))
+    }
+    fun accessingClassOfObject() {
+        this.javaClass
+        this.javaClass
     }
 }

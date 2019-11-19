@@ -23,6 +23,6 @@ open class Strings {
     }
     fun gstring() {
         "${a}${b}${toString()}text${c}\\d"
-        "${this.getClass()}"
+        "${this.javaClass}"
     }
 }

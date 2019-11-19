@@ -589,6 +589,11 @@ class GroovyToKotlin implements GtkConsts {
                 name = 'readText'
             }
             else if (isList(objType) && name == 'size' && numParams == 0) {
+                // name stays the same
+                methodWasConvertedToAttribute = true
+            }
+            else if (name == 'getClass' && numParams == 0) {
+                name = KT_javaClass
                 methodWasConvertedToAttribute = true
             }
             else if (singleClosureArg) {
@@ -1038,8 +1043,12 @@ class GroovyToKotlin implements GtkConsts {
                 //def getter = GtkUtils.findGetter(expr.objectExpression.type, propName)
                 def getter = Inferer.getMeta(expr, AST_NODE_META__GETTER) as MethodNode
                 if (getter) {
-                    out.append(getter.name)
-                    out.append("()")
+                    if (getter.name == 'getClass') {
+                        out.append(KT_javaClass) // a special case
+                    } else {
+                        out.append(getter.name)
+                        out.append("()")
+                    }
                 } else {
                     out.append(propName)
                 }
