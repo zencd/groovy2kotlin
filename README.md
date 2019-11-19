@@ -91,10 +91,10 @@ Others may be supported but was not tested.
 - Groovy's special use of bitwise operators on lists, streams, etc
 - Translate Groovy's implicit `return` (solved for certain cases)
 - Implement "Groovy truth" behaviour for:
-    - String, GString
+    - ~~String, GString
     - List and Map ancestors
     - Object
-- Kotlin's `open` and `override` (a common, type-aware algorithm)
+- ~~Kotlin's `open` and `override` (a common, type-aware algorithm)
 
 ## Some history
 
@@ -119,17 +119,13 @@ Others may be supported but was not tested.
 ✔ `break` ✔ `continue`
 ✔ loop labels
 ✔ `throws`
-✔ `String.replaceAll()`
-✔ `equals()`
-✔ `hashCode()`
-✔ `toString()`
-✔ `String.join` → `joinToString` 
-✔ `Some.class`
+✔ overriding
+✔ standard methods
 
 ## Progress on a project
 
-	2019-11-10 - 4734 Kotlin errors
-	2019-11-12 - 848
+    2019-11-10 - 4734 Kotlin errors
+    2019-11-12 - 848
     2019-11-15 - 714
     2019-11-16 - 619
     2019-11-17 - 526
