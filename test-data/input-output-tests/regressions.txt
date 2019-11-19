@@ -6,6 +6,11 @@ class RegressionTests {
 class PropertyAccessInField {
     def x = InetAddress.localHost
 }
+class Misc {
+    void main(Object o) {
+        main(new URL('http://ya.ru'))
+    }
+}
 ---------
 $DEFAULT_IMPORTS
 open class RegressionTests {
@@ -20,4 +25,11 @@ open class PropertyAccessInField {
     companion object {
     }
     var x = InetAddress.getLocalHost()
+}
+open class Misc {
+    companion object {
+    }
+    fun main(o: Any) {
+        main(URL("http://ya.ru"))
+    }
 }

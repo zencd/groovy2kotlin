@@ -552,8 +552,9 @@ class GtkUtils implements GtkConsts {
     }
 
     /**
-     * I found no way to retrieve string "super" from a "super(1,2,3)" invocation.
-     * There is just no sych info on the ConstructorCallExpression (a bug?).
+     * I found no way to retrieve string `super` from a `super(1,2,3)` invocation.
+     * The same for `this`.
+     * There is just no such info on the ConstructorCallExpression (a bug?).
      * So trying to figure it out of the source text:
      * 1) start from source position of the ConstructorCallExpression
      * 2) go backward and find what a word precedes the ConstructorCallExpression

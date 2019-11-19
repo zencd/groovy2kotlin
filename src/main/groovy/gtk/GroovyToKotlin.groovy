@@ -645,8 +645,14 @@ class GroovyToKotlin implements GtkConsts {
             append(" ")
             translateClassBody(grType)
         } else {
-            def ktType = typeToKotlinString(grType)
-            def constructorName = GtkUtils.findConstructorName(expr, currentSource) ?: ktType
+            def constructorName
+            if (grType == ClassHelper.OBJECT_TYPE) {
+                // actual for `this` and `super`
+                constructorName = GtkUtils.findConstructorName(expr, currentSource) ?: 'constructor'
+            } else {
+                constructorName = typeToKotlinString(grType)
+
+            }
             append("$constructorName")
             translateExpr(expr.arguments)
         }
