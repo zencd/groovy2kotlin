@@ -2,23 +2,25 @@
 
 An utility converting [Groovy](http://groovy-lang.org/) sources to [Kotlin](https://kotlinlang.org/) language.
 
+Started Nov 2019 by [zencd](https://github.com/zencd) in order to convert a project of mine
+because I've not found any existing tools (and it's easy to write one by myself).
 The result of translation *isn't 100%* Kotlin-correct usually and user is required to review the result,
 but a significant amount of work can be saved for free.
 
-Started Nov 2019 by [zencd](https://github.com/zencd) in order to convert a project of mine
-because I've not found any existing tools (and it's easy to write one by myself).
-The current implementation is simple: it uses Groovy's internal
-libs to parse source text into a well designed AST, then the tree is traversed and
-translated to Kotlin. Type inference is performed.
+The policy:
+- Don't loose any piece of code;
+- Produced code could be partially invalid in syntax/linking;
+- But it is acceptable since an operator can easily find and review it;
+- Silent behavioural changes are unacceptable;
+- Try do the best to emit valid, readable code.
+
+The current implementation's passes:
+- One or multiple modules are parsed into AST by the Groovy itself;
+- All types are resolved, including dependent libs;
+- AST traversed to resolve types of locals and expressions;
+- Kotlin code generated.
 
 Feel free to submit a bug, ticket and do all the github things.
-
-| Covered  | Covered
-|----------|------------- 
-| ✔ Control structures | ✔ Expressions
-| ✔ Classes            | ✔ Bitwise expressions
-| ✔ Closures           | ✔ Static members grouped within companion
-| ✔ Groovy's implicit imports | ✔ Groovy's standard functions (WIP)
 
 ## Requirements
 
