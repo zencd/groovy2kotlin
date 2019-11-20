@@ -65,13 +65,11 @@ class Main {
         if (!anyObject) {}
         */
 
-        if (s) {}
-        if (!s) {}
+        //if (s) {}
+        //if (!s) {}
         
-        //if (list) {}
-        //if (!list) {}
-        
-
+        if (list) {}
+        if (!list) {}
 
         /*
         if (anyObject) {}
@@ -99,8 +97,9 @@ class Main {
 
     @Test
     void tmp() {
-        def res = GeneralUtils.escapeAsJavaStringContent("hello\nпривет")
-        println(res)
+        def collection = ClassHelper.makeCached(Collection.class)
+        def arrayList = ClassHelper.makeCached(ArrayList.class)
+        def ok = arrayList.isDerivedFrom(collection) || arrayList.implementsInterface(collection)
         int stop = 0
     }
 

@@ -66,10 +66,12 @@ import static gtk.GtkUtils.getClassExtendedByAnonymousClass
 import static gtk.GtkUtils.isAnyNumber
 import static gtk.GtkUtils.isAnyString
 import static gtk.GtkUtils.isBinary
+import static gtk.GtkUtils.isCollection
 import static gtk.GtkUtils.isFile
 import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isLogicalBinaryExpr
 import static gtk.GtkUtils.isLogicalBinaryOp
+import static gtk.GtkUtils.isMap
 import static gtk.GtkUtils.isPrimitive
 import static gtk.GtkUtils.isWrapper
 
@@ -938,6 +940,8 @@ class GroovyToKotlin implements GtkConsts {
         } else if (isPrimitive(type) || isWrapper(type)) {
             // todo currently producing invalid Kotlin code; it's ok now but start doing a valid translation
             return new TransformResult(expr, false)
+        } else if (isCollection(type) || isMap(type)) {
+            return Transformers.makeGroovyTruthSubTreeForListOrMap(expr, invert)
         } else if (GtkUtils.isObject(type)) {
             // todo due to internal errors, some nodes are mistakenly inferred as Object now; need to be translated in Groovy truth logic later
             // keep

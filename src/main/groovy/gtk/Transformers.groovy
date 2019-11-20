@@ -130,4 +130,33 @@ class Transformers implements GtkConsts {
         )
         return new TransformResult(andExpr, inverted)
     }
+
+    static TransformResult makeGroovyTruthSubTreeForListOrMap(Expression expr, boolean invert = false) {
+        // todo kotlin prefers `.isNotEmpty`
+        def nullCheck = invert ? '==' : '!='
+        def sizeCheck = invert ? '==' : '>'
+        def logical = invert ? '||' : '&&'
+        def inverted = invert
+
+        def notNull = new BinaryExpression(
+                expr,
+                GtkUtils.makeToken(nullCheck),
+                ConstantExpression.NULL
+        )
+        def getLength = new AttributeExpression(
+                expr, new ConstantExpression('size')
+        )
+        def lengthNotZero = new BinaryExpression(
+                getLength,
+                GtkUtils.makeToken(sizeCheck),
+                new ConstantExpression(0)
+        )
+        def andExpr = new BinaryExpression(
+                notNull,
+                GtkUtils.makeToken(logical),
+                lengthNotZero
+        )
+        return new TransformResult(andExpr, inverted)
+    }
+
 }

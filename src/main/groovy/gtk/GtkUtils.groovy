@@ -47,6 +47,7 @@ class GtkUtils implements GtkConsts {
     private static final Pattern PREV_JAVADOC_COMMENT_PATTERN = Pattern.compile("(?s)/\\*\\*(.*?)\\*/");
 
     public static final ClassNode FILE_TYPE = ClassHelper.makeCached(File.class)
+    public static final ClassNode Collection_TYPE = ClassHelper.makeCached(Collection.class)
 
     /**
      * Binary logical operators: AND and OR only.
@@ -522,15 +523,26 @@ class GtkUtils implements GtkConsts {
     }
 
     static boolean isList(ClassNode type) {
-        type.isDerivedFrom(ClassHelper.LIST_TYPE)
+        isDerivedFrom(type, ClassHelper.LIST_TYPE)
+    }
+
+    static boolean isCollection(ClassNode type) {
+        isDerivedFrom(type, Collection_TYPE)
     }
 
     static boolean isMap(ClassNode type) {
-        type.isDerivedFrom(ClassHelper.MAP_TYPE)
+        isDerivedFrom(type, ClassHelper.MAP_TYPE)
     }
 
     static boolean isFile(ClassNode type) {
-        type.isDerivedFrom(FILE_TYPE)
+        isDerivedFrom(type, FILE_TYPE)
+    }
+
+    /**
+     * Added because ClassNode's isDerivedFrom() only checks for super classes
+     */
+    static boolean isDerivedFrom(ClassNode subject, ClassNode from) {
+        return subject.isDerivedFrom(from) || subject.implementsInterface(from)
     }
 
     static boolean isAnyNumber(ClassNode type) {
