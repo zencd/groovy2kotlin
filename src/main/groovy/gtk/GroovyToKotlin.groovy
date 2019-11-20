@@ -566,6 +566,9 @@ class GroovyToKotlin implements GtkConsts {
                 // todo move to Transformers, generalize tree transformations
                 name = 'replace' // Kotlin has no replaceAll(), but replace() looks the same
             }
+            else if (isAnyString(objType) && name == 'readLines' && numParams == 0) {
+                name = 'lines'
+            }
             else if (isList(objType) && name == 'findAll' && numParams == 1) {
                 name = 'filter'
             }
