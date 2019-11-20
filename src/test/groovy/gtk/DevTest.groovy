@@ -49,36 +49,16 @@ class Temp {
         println(kotlinText)
     }
 
+    // nodes[0].classes[0].methods[0].code.statements[0].expression.leftExpression
+
     @Test
     void trans_single_string() {
         String groovyText = '''
 class Main {
     void main(Class anyObject, String s, int i, ArrayList list) {
-        /*
-        if (1 == 2 || (3 == 4 && 5 == 6)) {}
-        if (!(1 == 2)) {}
-        !i
-        !s
-        if (i) {}
-        if (!i) {}
-        if (anyObject) {}
-        if (!anyObject) {}
-        */
-
-        //if (s) {}
-        //if (!s) {}
-        
-        if (list) {}
-        if (!list) {}
-
-        /*
-        if (anyObject) {}
-        if (!anyObject) {}
-        if (!!anyObject) {}
-        if (anyObject || anyObject) {}
-        if (anyObject && !anyObject) {}
-        if (anyObject && anyObject || anyObject) {}
-        */
+        def text = new File('')
+        //def text = 'xxx'
+        println(text)
     }
 }
 '''
@@ -97,6 +77,9 @@ class Main {
 
     @Test
     void tmp() {
+        def rgm = ClassHelper.makeCached(org.codehaus.groovy.runtime.ResourceGroovyMethods.class)
+        new File('.').directorySize()
+
         def collection = ClassHelper.makeCached(Collection.class)
         def arrayList = ClassHelper.makeCached(ArrayList.class)
         def ok = arrayList.isDerivedFrom(collection) || arrayList.implementsInterface(collection)

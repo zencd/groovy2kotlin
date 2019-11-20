@@ -41,7 +41,7 @@ class Scopes implements GtkConsts {
         scope.addName(expr)
     }
 
-    private Variable findVar(String varName) {
+    Variable findVar(String varName) {
         ListIterator listIterator = scopes.listIterator(scopes.size());
         while (listIterator.hasPrevious()) {
             def aScope = listIterator.previous()

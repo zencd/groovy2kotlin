@@ -7,6 +7,10 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+/**
+ * USEFUL:
+ * {@link org.codehaus.groovy.antlr.java.Java2GroovyProcessor}
+ */
 class Gtk {
 
     private static final Logger log = LoggerFactory.getLogger(this)
