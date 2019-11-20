@@ -85,13 +85,22 @@ class Transformers implements GtkConsts {
         }
     }
 
-    static Expression makeGroovyTruthSubTreeForAnyObject(Expression expr) {
-        def notNull = new BinaryExpression(
-                expr,
-                GtkUtils.makeToken("!="),
-                ConstantExpression.NULL
-        )
-        return notNull
+    static TransformResult makeGroovyTruthSubTreeForAnyObject(Expression expr, boolean invert = false) {
+        if (invert) {
+            def notNull = new BinaryExpression(
+                    expr,
+                    GtkUtils.makeToken("=="),
+                    ConstantExpression.NULL
+            )
+            return new TransformResult(notNull, true)
+        } else {
+            def notNull = new BinaryExpression(
+                    expr,
+                    GtkUtils.makeToken("!="),
+                    ConstantExpression.NULL
+            )
+            return new TransformResult(notNull, false)
+        }
     }
 
     static Expression makeMethodCall(Expression expr, List<Expression> argList) {
@@ -104,7 +113,7 @@ class Transformers implements GtkConsts {
         return call
     }
 
-    static Expression makeGroovyTruthSubTreeForString(Expression expr) {
+    static TransformResult makeGroovyTruthSubTreeForString(Expression expr, boolean invert = false) {
         def notNull = new BinaryExpression(
                 expr,
                 GtkUtils.makeToken("!="),
@@ -124,6 +133,6 @@ class Transformers implements GtkConsts {
                 GtkUtils.makeToken("&&"),
                 lengthNotZero
         )
-        return andExpr
+        return new TransformResult(andExpr, false)
     }
 }

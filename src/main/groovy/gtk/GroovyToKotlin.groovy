@@ -796,9 +796,9 @@ class GroovyToKotlin implements GtkConsts {
         if (op == '=') {
             translateAssignment(left, right)
         } else if (isLogicalBinaryOp(op)) {
-            transAsGroovyTruth(left)
+            transAsGroovyTruth(left, false)
             out.append(" ${ktOp} ")
-            transAsGroovyTruth(right)
+            transAsGroovyTruth(right, false)
         } else {
             translateExpr(left)
             out.append(" ${ktOp} ")
@@ -896,12 +896,14 @@ class GroovyToKotlin implements GtkConsts {
     void translateExpr(NotExpression expr) {
         // XXX groovy parser omits parenthesis expression `()`, so let's add it by ourselves here
 
-        Expression expr2 = tryRebuildGroovyTruthSubTree(expr.expression)
-        boolean surroundWithParenthesis = expr2 instanceof BinaryExpression
+        TransformResult trRes = tryRebuildGroovyTruthSubTree(expr.expression, true)
+        boolean surroundWithParenthesis = (trRes.newExpression instanceof BinaryExpression) && !trRes.inverted
 
-        out.append("!")
+        if (!trRes.inverted) {
+            out.append("!")
+        }
         if (surroundWithParenthesis) out.append("(")
-        transAsGroovyTruth(expr2, true)
+        transAsGroovyTruth(trRes.newExpression, true)
         if (surroundWithParenthesis) out.append(")")
     }
 
@@ -910,36 +912,36 @@ class GroovyToKotlin implements GtkConsts {
         transAsGroovyTruth(expr.expression, true)
     }
 
-    private void transAsGroovyTruth(Expression expr, boolean first = false) {
-        Expression expr2 = tryRebuildGroovyTruthSubTree(expr)
+    private void transAsGroovyTruth(Expression expr, boolean first) {
+        TransformResult trRes = tryRebuildGroovyTruthSubTree(expr)
 
-        def surroundWithBraces = !first && isLogicalBinaryExpr(expr2)
+        def surroundWithBraces = !first && isLogicalBinaryExpr(trRes.newExpression)
         if (surroundWithBraces) {
             out.append("(")
         }
 
-        translateExpr(expr2)
+        translateExpr(trRes.newExpression)
 
         if (surroundWithBraces) {
             out.append(")")
         }
     }
 
-    static Expression tryRebuildGroovyTruthSubTree(Expression expr) {
+    static TransformResult tryRebuildGroovyTruthSubTree(Expression expr, boolean invert = false) {
         def type = expr.type
         if (type == ClassHelper.boolean_TYPE) {
-            return expr
+            return new TransformResult(expr, false)
         } else if (isAnyString(type)) {
-            return Transformers.makeGroovyTruthSubTreeForString(expr)
+            return Transformers.makeGroovyTruthSubTreeForString(expr, invert)
         } else if (isPrimitive(type) || isWrapper(type)) {
             // todo currently producing invalid Kotlin code; it's ok now but do a valid translation
-            return expr
+            return new TransformResult(expr, false)
         } else if (GtkUtils.isObject(type)) {
             // todo due to internal errors, some nodes are mistakenly inferred as Object now; need to be translated in Groovy truth logic later
             // keep
-            return expr
+            return new TransformResult(expr, false)
         } else {
-            return Transformers.makeGroovyTruthSubTreeForAnyObject(expr)
+            return Transformers.makeGroovyTruthSubTreeForAnyObject(expr, invert)
         }
     }
 

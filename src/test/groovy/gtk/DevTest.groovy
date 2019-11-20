@@ -54,8 +54,7 @@ class Temp {
         String groovyText = '''
 class Main {
     void main(Class anyObject, String s) {
-        if (!anyObject) {}
-        if (!s) {}
+        if (!!anyObject) {}
     }
 }
 '''

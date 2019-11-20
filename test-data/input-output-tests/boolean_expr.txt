@@ -61,10 +61,10 @@ open class Main {
     }
 
     fun not() {
-        !(anyObject != null)
+        anyObject == null
         !(s != null && s.length > 0)
         !i
-        !(list != null) && !(map != null)
+        list == null && map == null
     }
 
     fun double_not() {
