@@ -302,10 +302,6 @@ class GtkUtils implements GtkConsts {
         return isStatic(method.modifiers)
     }
 
-    static boolean isString(ClassNode type) {
-        return type == ClassHelper.STRING_TYPE || type == ClassHelper.GSTRING_TYPE
-    }
-
     static String translateOperator(String groovyOp) {
         def map = [
                 '+': '+',

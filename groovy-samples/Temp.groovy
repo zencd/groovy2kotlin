@@ -1,87 +1,16 @@
-class ClassName {
-    void main(byte b, Byte B, short s, Short S, int i, Integer I, long l, Long L, float f, Float F, double d, Double D) {
-        b.byteValue()
-        b.shortValue()
-        b.intValue()
-        b.longValue()
-        b.floatValue()
-        b.doubleValue()
-
-        B.byteValue()
-        B.shortValue()
-        B.intValue()
-        B.longValue()
-        B.floatValue()
-        B.doubleValue()
-
-        s.byteValue()
-        s.shortValue()
-        s.intValue()
-        s.longValue()
-        s.floatValue()
-        s.doubleValue()
-
-        S.byteValue()
-        S.shortValue()
-        S.intValue()
-        S.longValue()
-        S.floatValue()
-        S.doubleValue()
-
-        i.byteValue()
-        i.shortValue()
-        i.intValue()
-        i.longValue()
-        i.floatValue()
-        i.doubleValue()
-
-        I.byteValue()
-        I.shortValue()
-        I.intValue()
-        I.longValue()
-        I.floatValue()
-        I.doubleValue()
-
-        l.byteValue()
-        l.shortValue()
-        l.intValue()
-        l.longValue()
-        l.floatValue()
-        l.doubleValue()
-
-        L.byteValue()
-        L.shortValue()
-        L.intValue()
-        L.longValue()
-        L.floatValue()
-        L.doubleValue()
-
-        f.byteValue()
-        f.shortValue()
-        f.intValue()
-        f.longValue()
-        f.floatValue()
-        f.doubleValue()
-
-        F.byteValue()
-        F.shortValue()
-        F.intValue()
-        F.longValue()
-        F.floatValue()
-        F.doubleValue()
-
-        d.byteValue()
-        d.shortValue()
-        d.intValue()
-        d.longValue()
-        d.floatValue()
-        d.doubleValue()
-
-        D.byteValue()
-        D.shortValue()
-        D.intValue()
-        D.longValue()
-        D.floatValue()
-        D.doubleValue()
+class Main extends Base {
+    Main() {
+        super()
     }
+    Main(String name) {
+        super(name)
+    }
+    Main(int i) {
+        this("invoking this()")
+    }
+}
+
+class Base {
+    Base() {}
+    Base(String name) {}
 }

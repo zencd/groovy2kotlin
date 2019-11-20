@@ -10,9 +10,10 @@ but a significant amount of work can be saved for free.
 The policy:
 - Don't loose any piece of code;
 - Produced code could be partially invalid in syntax/linking;
-- But it is acceptable since an operator can easily find and review it;
-- Silent behavioural changes are unacceptable;
-- Try do the best to emit valid, readable code.
+- But it is acceptable since an operator can easily review such errors;
+- Silent behavioural changes are highly undesirable;
+- But they are still possible because Groovy can do unpredictable things in runtime;
+- Nevertheless do the best to emit valid, readable code.
 
 The current implementation's passes:
 - One or multiple modules are parsed into AST by the Groovy itself;

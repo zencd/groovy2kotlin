@@ -1,0 +1,36 @@
+class Main extends Base {
+    Main() {
+        super()
+    }
+    Main(String name) {
+        super  (name)
+    }
+    Main(int i) {
+        this  ("invoking this()")
+    }
+}
+
+class Base {
+    Base() {}
+    Base(String name) {}
+}
+---------------
+$DEFAULT_IMPORTS
+open class Main : Base {
+    companion object {
+    }
+    constructor(): super() {
+    }
+    constructor(name: String): super(name) {
+    }
+    constructor(i: Int): this("invoking this()") {
+    }
+}
+open class Base {
+    companion object {
+    }
+    constructor() {
+    }
+    constructor(name: String) {
+    }
+}

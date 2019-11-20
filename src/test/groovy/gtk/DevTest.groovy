@@ -53,35 +53,9 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    String s
-    int i
-    ArrayList list
-    HashMap map
-    boolean b
-    Boolean B
-    Class anyObject
-
-    void main() {
-        anyObject && anyObject
-        list && map
-        b && b
-        B && B
-        i || i
-        s || s
-        s && s && s
-        s && s || s
-        s || s && s
-        (s || s) && s
-    }
-    void not() {
-        !s
-        !i
-    }
-    void double_not() {
-        !!anyObject
-        !!s
-        !!i
-        !!list && !!map
+    void main(Class anyObject, String s) {
+        if (!anyObject) {}
+        if (!s) {}
     }
 }
 '''
@@ -90,12 +64,10 @@ class Main {
         def nodes = Gtk.parseTexts(texts)
         def kotlinText = Gtk.toKotlinAsSingleString(nodes, bufs)
         println(kotlinText)
-        def node = nodes[0].classes[0]
-        //def node = nodes[0].classes[0].methods[0].code.statements
+        //def node = nodes[0].classes[0]
+        def node = nodes[0].classes[0].methods[0].code.statements
         //def node = nodes[0].classes[0].declaredConstructors*.code
         int stop = 0
-        //println "--- tree ---"
-        //AstPrinter.print(nodes[0])
     }
 
     def x = 22
@@ -109,8 +81,9 @@ class Main {
 
     @Test
     void trans_test_file() {
-        def source = new File("test-data/input-output-tests/regular_import.txt").text
-        source = MainTest.splitGroovyAndKotlin(source)[0]
+        //def source = new File("test-data/input-output-tests/regular_import.txt").text
+        //source = MainTest.splitGroovyAndKotlin(source)[0]
+        def source = new File("groovy-samples/Temp.groovy").text
         println(Gtk.toKotlinAsSingleString(source))
     }
 }

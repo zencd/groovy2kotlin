@@ -69,7 +69,6 @@ import static gtk.GtkUtils.isFile
 import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isLogicalBinaryExpr
 import static gtk.GtkUtils.isLogicalBinaryOp
-import static gtk.GtkUtils.isString
 import static gtk.GtkUtils.isPrimitive
 import static gtk.GtkUtils.isWrapper
 
@@ -579,7 +578,7 @@ class GroovyToKotlin implements GtkConsts {
             else if (isList(objType) && name == 'join' && numParams == 1) {
                 name = 'joinToString'
             }
-            else if (isString(objType) && name == 'getBytes' && numParams == 1) {
+            else if (isAnyString(objType) && name == 'getBytes' && numParams == 1) {
                 name = 'toByteArray'
             }
             else if (isFile(objType) && name == 'size' && numParams == 0) {
@@ -881,7 +880,7 @@ class GroovyToKotlin implements GtkConsts {
     @DynamicDispatch
     void translateExpr(ConstantExpression expr) {
         // todo use expr.constantName probably
-        if (GtkUtils.isString(expr.type)) {
+        if (isAnyString(expr.type)) {
             if (expr.value != null) {
                 out.append("\"${GeneralUtils.escapeAsJavaStringContent((String) expr.value)}\"")
             } else {
@@ -896,10 +895,13 @@ class GroovyToKotlin implements GtkConsts {
     @DynamicDispatch
     void translateExpr(NotExpression expr) {
         // XXX groovy parser omits parenthesis expression `()`, so let's add it by ourselves here
+
+        Expression expr2 = tryRebuildGroovyTruthSubTree(expr.expression)
+        boolean surroundWithParenthesis = expr2 instanceof BinaryExpression
+
         out.append("!")
-        boolean surroundWithParenthesis = expr.expression instanceof BinaryExpression
         if (surroundWithParenthesis) out.append("(")
-        translateExpr(expr.expression)
+        transAsGroovyTruth(expr2, true)
         if (surroundWithParenthesis) out.append(")")
     }
 
@@ -909,22 +911,7 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     private void transAsGroovyTruth(Expression expr, boolean first = false) {
-        def type = expr.type
-        Expression expr2
-        if (type == ClassHelper.boolean_TYPE) {
-            expr2 = expr
-        } else if (isAnyString(type)) {
-            expr2 = Transformers.makeGroovyTruthSubTreeForString(expr)
-        } else if (isPrimitive(type) || isWrapper(type)) {
-            // todo currently producing invalid Kotlin code; it's ok now but do a valid translation
-            expr2 = expr
-        } else if (GtkUtils.isObject(type)) {
-            // todo due to internal errors, some nodes are mistakenly inferred as Object now; need to be translated in Groovy truth logic later
-            // keep
-            expr2 = expr
-        } else {
-            expr2 = Transformers.makeGroovyTruthSubTreeForAnyObject(expr)
-        }
+        Expression expr2 = tryRebuildGroovyTruthSubTree(expr)
 
         def surroundWithBraces = !first && isLogicalBinaryExpr(expr2)
         if (surroundWithBraces) {
@@ -935,6 +922,24 @@ class GroovyToKotlin implements GtkConsts {
 
         if (surroundWithBraces) {
             out.append(")")
+        }
+    }
+
+    static Expression tryRebuildGroovyTruthSubTree(Expression expr) {
+        def type = expr.type
+        if (type == ClassHelper.boolean_TYPE) {
+            return expr
+        } else if (isAnyString(type)) {
+            return Transformers.makeGroovyTruthSubTreeForString(expr)
+        } else if (isPrimitive(type) || isWrapper(type)) {
+            // todo currently producing invalid Kotlin code; it's ok now but do a valid translation
+            return expr
+        } else if (GtkUtils.isObject(type)) {
+            // todo due to internal errors, some nodes are mistakenly inferred as Object now; need to be translated in Groovy truth logic later
+            // keep
+            return expr
+        } else {
+            return Transformers.makeGroovyTruthSubTreeForAnyObject(expr)
         }
     }
 

@@ -21,8 +21,10 @@ class Main {
     }
 
     void not() {
+        !anyObject
         !s
         !i
+        !list && !map
     }
 
     void double_not() {
@@ -59,14 +61,16 @@ open class Main {
     }
 
     fun not() {
-        !s
+        !(anyObject != null)
+        !(s != null && s.length > 0)
         !i
+        !(list != null) && !(map != null)
     }
 
     fun double_not() {
-        !!anyObject
-        !!s
+        !!(anyObject != null)
+        !!(s != null && s.length > 0)
         !!i
-        !!list && !!map
+        !!(list != null) && !!(map != null)
     }
 }
