@@ -86,53 +86,48 @@ class Transformers implements GtkConsts {
     }
 
     static TransformResult makeGroovyTruthSubTreeForAnyObject(Expression expr, boolean invert = false) {
-        if (invert) {
-            def notNull = new BinaryExpression(
-                    expr,
-                    GtkUtils.makeToken("=="),
-                    ConstantExpression.NULL
-            )
-            return new TransformResult(notNull, true)
-        } else {
-            def notNull = new BinaryExpression(
-                    expr,
-                    GtkUtils.makeToken("!="),
-                    ConstantExpression.NULL
-            )
-            return new TransformResult(notNull, false)
-        }
+        def nullCheck = invert ? '==' : '!='
+        def inverted = invert
+        def notNull = new BinaryExpression(
+                expr,
+                GtkUtils.makeToken(nullCheck),
+                ConstantExpression.NULL
+        )
+        return new TransformResult(notNull, inverted)
     }
 
     static Expression makeMethodCall(Expression expr, List<Expression> argList) {
         def var = expr as VariableExpression
         def args = new ArgumentListExpression(argList)
         def call = new MethodCallExpression(var, "add", args)
-        //expr,
-        //GtkUtils.makeToken("!="),
-        //ConstantExpression.NULL
         return call
     }
 
     static TransformResult makeGroovyTruthSubTreeForString(Expression expr, boolean invert = false) {
+        // todo kotlin prefers `.isNotEmpty`
+        def nullCheck = invert ? '==' : '!='
+        def sizeCheck = invert ? '==' : '>'
+        def logical = invert ? '||' : '&&'
+        def inverted = invert
+
         def notNull = new BinaryExpression(
                 expr,
-                GtkUtils.makeToken("!="),
+                GtkUtils.makeToken(nullCheck),
                 ConstantExpression.NULL
         )
         def getLength = new AttributeExpression(
                 expr, new ConstantExpression('length')
         )
-        // todo kotlin prefers `.isNotEmpty`
         def lengthNotZero = new BinaryExpression(
                 getLength,
-                GtkUtils.makeToken(">"),
+                GtkUtils.makeToken(sizeCheck),
                 new ConstantExpression(0)
         )
         def andExpr = new BinaryExpression(
                 notNull,
-                GtkUtils.makeToken("&&"),
+                GtkUtils.makeToken(logical),
                 lengthNotZero
         )
-        return new TransformResult(andExpr, false)
+        return new TransformResult(andExpr, inverted)
     }
 }

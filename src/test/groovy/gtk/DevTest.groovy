@@ -53,21 +53,24 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    void main(Class anyObject, String s, int i) {
+    void main(Class anyObject, String s, int i, ArrayList list) {
+        /*
         if (1 == 2 || (3 == 4 && 5 == 6)) {}
-        
         if (!(1 == 2)) {}
-
         !i
         !s
         if (i) {}
         if (!i) {}
-        if (s) {}
-        if (!s) {}
         if (anyObject) {}
         if (!anyObject) {}
-        /*
         */
+
+        if (s) {}
+        if (!s) {}
+        
+        //if (list) {}
+        //if (!list) {}
+        
 
 
         /*

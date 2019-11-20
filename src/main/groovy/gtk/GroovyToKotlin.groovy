@@ -908,7 +908,6 @@ class GroovyToKotlin implements GtkConsts {
             transAsGroovyTruth(expr.expression, false, !invert)
         } else {
             TransformResult trRes = tryRebuildGroovyTruthSubTree(expr, invert)
-            def expr2 = trRes.newExpression
             def lbe = isLogicalBinaryExpr(trRes.newExpression)
             def binary = isBinary(trRes.newExpression)
             def emitBang = invert && !trRes.inverted

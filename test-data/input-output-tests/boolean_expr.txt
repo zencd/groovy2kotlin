@@ -62,7 +62,7 @@ open class Main {
 
     fun not() {
         anyObject == null
-        !(s != null && s.length > 0)
+        s == null || s.length == 0
         !i
         list == null && map == null
     }
