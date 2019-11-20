@@ -48,7 +48,15 @@ class GtkUtils implements GtkConsts {
 
     public static final ClassNode FILE_TYPE = ClassHelper.makeCached(File.class)
 
+    /**
+     * Binary logical operators: AND and OR only.
+     */
     private static final def LOGICAL_BINARY_OPS = ['&&', '||'] as Set<String>
+
+    /**
+     * All operators (binary and unary) producing a boolean value.
+     */
+    private static final def BOOLEAN_OPS = ['&&', '||', '==', '!=', '<', '>', '<=', '>=', '!', 'instanceof'] as Set<String>
 
     private static final ALL_NUMBER_TYPES = [
             ClassHelper.boolean_TYPE,
@@ -471,8 +479,6 @@ class GtkUtils implements GtkConsts {
         classNode == ClassHelper.Boolean_TYPE || classNode == ClassHelper.boolean_TYPE
     }
 
-    private static final def BOOLEAN_OPS = ['&&', '||', '==', '!=', '<', '>', '<=', '>=', '!', 'instanceof']
-
     static boolean isBoolean(BinaryExpression expr) {
         return (expr.operation.text in BOOLEAN_OPS)
     }
@@ -637,6 +643,10 @@ class GtkUtils implements GtkConsts {
 
     static boolean isLogicalBinaryExpr(Expression expr) {
         (expr instanceof BinaryExpression) && (expr.operation.text in LOGICAL_BINARY_OPS)
+    }
+
+    static boolean isBinary(Expression expr) {
+        expr instanceof BinaryExpression
     }
 
     static ClassNode getClassExtendedByAnonymousClass(ClassNode anonymousClass) {

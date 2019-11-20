@@ -68,9 +68,9 @@ open class Main {
     }
 
     fun double_not() {
-        !!(anyObject != null)
-        !!(s != null && s.length > 0)
-        !!i
-        !!(list != null) && !!(map != null)
+        anyObject != null
+        (s != null && s.length > 0)
+        i
+        list != null && map != null
     }
 }

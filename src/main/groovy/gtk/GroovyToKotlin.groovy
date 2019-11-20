@@ -65,6 +65,7 @@ import static gtk.GtkUtils.dropFirstArgument
 import static gtk.GtkUtils.getClassExtendedByAnonymousClass
 import static gtk.GtkUtils.isAnyNumber
 import static gtk.GtkUtils.isAnyString
+import static gtk.GtkUtils.isBinary
 import static gtk.GtkUtils.isFile
 import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isLogicalBinaryExpr
@@ -894,17 +895,7 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(NotExpression expr) {
-        // XXX groovy parser omits parenthesis expression `()`, so let's add it by ourselves here
-
-        TransformResult trRes = tryRebuildGroovyTruthSubTree(expr.expression, true)
-        boolean surroundWithParenthesis = (trRes.newExpression instanceof BinaryExpression) && !trRes.inverted
-
-        if (!trRes.inverted) {
-            out.append("!")
-        }
-        if (surroundWithParenthesis) out.append("(")
-        transAsGroovyTruth(trRes.newExpression, true)
-        if (surroundWithParenthesis) out.append(")")
+        transAsGroovyTruth(expr.expression, true, true)
     }
 
     @DynamicDispatch
@@ -912,18 +903,30 @@ class GroovyToKotlin implements GtkConsts {
         transAsGroovyTruth(expr.expression, true)
     }
 
-    private void transAsGroovyTruth(Expression expr, boolean first) {
-        TransformResult trRes = tryRebuildGroovyTruthSubTree(expr)
+    private void transAsGroovyTruth(Expression expr, boolean first, boolean invert = false) {
+        if (expr instanceof NotExpression) {
+            transAsGroovyTruth(expr.expression, false, !invert)
+        } else {
+            TransformResult trRes = tryRebuildGroovyTruthSubTree(expr, invert)
+            def expr2 = trRes.newExpression
+            def lbe = isLogicalBinaryExpr(trRes.newExpression)
+            def binary = isBinary(trRes.newExpression)
+            def emitBang = invert && !trRes.inverted
+            def surroundWithBraces = (lbe && !first) || (emitBang && binary)
+            // XXX the groovy parser omits parenthesis expression `()`, so we must add them by ourselves
 
-        def surroundWithBraces = !first && isLogicalBinaryExpr(trRes.newExpression)
-        if (surroundWithBraces) {
-            out.append("(")
-        }
+            if (emitBang) {
+                out.append("!")
+            }
+            if (surroundWithBraces) {
+                out.append("(")
+            }
 
-        translateExpr(trRes.newExpression)
+            translateExpr(trRes.newExpression)
 
-        if (surroundWithBraces) {
-            out.append(")")
+            if (surroundWithBraces) {
+                out.append(")")
+            }
         }
     }
 
@@ -934,7 +937,7 @@ class GroovyToKotlin implements GtkConsts {
         } else if (isAnyString(type)) {
             return Transformers.makeGroovyTruthSubTreeForString(expr, invert)
         } else if (isPrimitive(type) || isWrapper(type)) {
-            // todo currently producing invalid Kotlin code; it's ok now but do a valid translation
+            // todo currently producing invalid Kotlin code; it's ok now but start doing a valid translation
             return new TransformResult(expr, false)
         } else if (GtkUtils.isObject(type)) {
             // todo due to internal errors, some nodes are mistakenly inferred as Object now; need to be translated in Groovy truth logic later
