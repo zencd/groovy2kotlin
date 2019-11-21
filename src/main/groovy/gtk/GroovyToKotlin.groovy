@@ -589,6 +589,12 @@ class GroovyToKotlin implements GtkConsts {
             else if (isAnyString(objType) && name == 'getBytes' && numParams == 1) {
                 name = 'toByteArray'
             }
+            else if (isAnyString(objType) && name == 'padLeft') {
+                name = 'padStart'
+            }
+            else if (isAnyString(objType) && name == 'padRight') {
+                name = 'padEnd'
+            }
             else if (isFile(objType) && name == 'size' && numParams == 0) {
                 name = 'length'
             }

@@ -1,5 +1,6 @@
 ## Todo
 
+- Convert `"a"` to `'a'` if acceptor's type is `char`
 - Fix `constructors.txt`
 - Logical NOT, double NOT
 - Special treatment of `expr as boolean`, `(boolean)expr`, `boolean x = expr`  in Groovy
