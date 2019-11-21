@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory
 
 import static gtk.GtkUtils.getCachedClass
 import static gtk.GtkUtils.isList
+import static gtk.GtkUtils.isNullConstant
 import static gtk.GtkUtils.tryResolveMethodReturnType
 
 class Inferer implements GtkConsts {
@@ -348,7 +349,11 @@ class Inferer implements GtkConsts {
         def type = inferType(expr.rightExpression)
         if (left instanceof VariableExpression) {
             scopes.addName(left)
-            //setTypeToExprAndMeta(left, type) // todo enable but check arrays won't fail
+            if (isNullConstant(expr.rightExpression)) {
+                // keep the left type
+            } else {
+                setTypeToExprAndMeta(left, type)
+            }
         } else if (left instanceof ArgumentListExpression) {
             log.warn("infer() not impl for ${left.class.name}") // todo
         } else {

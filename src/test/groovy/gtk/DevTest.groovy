@@ -57,7 +57,7 @@ class Temp {
         String groovyText = '''
 class Main {
     void main() {
-        new File('').newWriter()
+        String[][] arr = null
     }
 }
 '''
