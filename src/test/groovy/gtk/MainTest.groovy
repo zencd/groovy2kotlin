@@ -2,6 +2,7 @@ package gtk
 
 import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.ast.ClassHelper
+import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -330,8 +331,25 @@ class Main {
         def bufs = GtkUtils.makeSourceBuffers(texts)
         def nodes = Gtk.parseTexts(texts)
         Gtk.toKotlinAsSingleString(nodes, bufs)
-        def varExpr = nodes[0].classes[0].methods[0].code.statements[0].expression.leftExpression as VariableExpression
+        def declExpr = nodes[0].classes[0].methods[0].code.statements[0].expression
+        def varExpr = declExpr.leftExpression as VariableExpression
         assertEquals(ClassHelper.STRING_TYPE, varExpr.type)
+    }
+
+    @Test
+    void standard_java_classes_gets_extended() {
+        String groovyText = '''
+class Main {
+    void main() {
+        new File('').newWriter()
+    }
+}'''
+        def texts = [groovyText]
+        def bufs = GtkUtils.makeSourceBuffers(texts)
+        def nodes = Gtk.parseTexts(texts)
+        Gtk.toKotlinAsSingleString(nodes, bufs)
+        def callExpr = nodes[0].classes[0].methods[0].code.statements[0].expression as MethodCallExpression
+        assertEquals(GtkUtils.BufferedWriter_TYPE, callExpr.type)
     }
 
     @Test

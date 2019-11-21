@@ -53,12 +53,11 @@ class Temp {
 
     @Test
     void trans_single_string() {
+        //new File('').newWriter()
         String groovyText = '''
 class Main {
-    void main(Class anyObject, String s, int i, ArrayList list) {
-        def text = new File('')
-        //def text = 'xxx'
-        println(text)
+    void main() {
+        new File('').newWriter()
     }
 }
 '''

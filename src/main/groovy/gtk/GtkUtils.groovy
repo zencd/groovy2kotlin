@@ -48,6 +48,7 @@ class GtkUtils implements GtkConsts {
 
     public static final ClassNode FILE_TYPE = ClassHelper.makeCached(File.class)
     public static final ClassNode Collection_TYPE = ClassHelper.makeCached(Collection.class)
+    public static final ClassNode BufferedWriter_TYPE = ClassHelper.makeCached(BufferedWriter.class)
 
     /**
      * Binary logical operators: AND and OR only.
@@ -117,10 +118,14 @@ class GtkUtils implements GtkConsts {
     }
 
     static String typeToKotlinString(ClassNode classNode, boolean optional = false, boolean mutable = false) {
+        if (Inferer.RESOLVED_UNKNOWN.is(classNode)) {
+            log.warn("#typeToKotlinString: got internal RESOLVED_UNKNOWN as param - shouldn't happen")
+        }
+
         String optionalStr = optional ? '?' : ''
 
         if (classNode == ClassHelper.OBJECT_TYPE) {
-            return "${GtkConsts.KT_ANY}${optionalStr}"
+            return "${KT_ANY}${optionalStr}"
         }
 
         if (classNode.componentType != null) {
@@ -225,7 +230,7 @@ class GtkUtils implements GtkConsts {
     static String getMethodModifierString(MethodNode method) {
         boolean allowAbstract = !method.declaringClass.interface
         String javaMods = getModifierString(method.modifiers, false, false, true, allowAbstract)
-        String overrideStr = isOverridingMethod(method) ? GtkConsts.KT_OVERRIDE : ''
+        String overrideStr = isOverridingMethod(method) ? KT_OVERRIDE : ''
         return [overrideStr, javaMods].findAll { it }.join(' ')
     }
 
@@ -683,4 +688,27 @@ class GtkUtils implements GtkConsts {
         final newArgs = argListExpr.expressions.subList(1, argListExpr.expressions.size())
         return new ArgumentListExpression(newArgs)
     }
+
+    static Parameter[] shiftParams(Parameter[] origParams) {
+        return origParams.toList().subList(1, origParams.length).toArray() as Parameter[]
+    }
+
+    /**
+     * I do extend some java classes, like File, as Groovy do.
+     * So it's needed to refer to a single, cached class.
+     * Currently the standard Groovy parser/resolver doesn't use the cache, so forcing it.
+     */
+    static ClassNode getCachedClass(ClassNode type) {
+        if (type == null || ClassHelper.isPrimitiveType(type) || type.is(Inferer.RESOLVED_UNKNOWN)) {
+            return type
+        } else {
+            try {
+                return ClassHelper.makeCached(Class.forName(type.name))
+            } catch(ClassNotFoundException e) {
+                // that's ok generally - when trying to load a class being under translation, for example
+                return type
+            }
+        }
+    }
+
 }

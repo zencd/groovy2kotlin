@@ -1,6 +1,7 @@
 package gtk.inf
 
 import gtk.DynamicDispatch
+import gtk.GroovyExtensions
 import gtk.GtkConsts
 import gtk.GtkUtils
 import org.codehaus.groovy.ast.ASTNode
@@ -40,6 +41,7 @@ import org.codehaus.groovy.classgen.BytecodeSequence
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import static gtk.GtkUtils.getCachedClass
 import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.tryResolveMethodReturnType
 
@@ -62,6 +64,7 @@ class Inferer implements GtkConsts {
 
     static {
         initMetaClasses()
+        GroovyExtensions.forceLoad()
     }
 
     void doInference(List<ModuleNode> modules) {
@@ -99,13 +102,13 @@ class Inferer implements GtkConsts {
 
         def type = node.getNodeMetaData(INFERRED_TYPE) as ClassNode
         if (type != null) {
-            return type
+            return getCachedClass(type)
         }
 
         type = infer(node)
         assert type != null
         setTypeToExprAndMeta(node, type)
-        return type
+        return getCachedClass(type)
     }
 
     static ClassNode setTypeToExprAndMeta(ASTNode node, ClassNode type) {
@@ -212,7 +215,7 @@ class Inferer implements GtkConsts {
         final originalType = expr.type
         def oe = expr.objectExpression
         final objTypeWas = oe.type
-        final objType = inferType(oe)
+        def objType = inferType(oe)
         // todo find method from expr.methodAsString
         if (expr.method instanceof ConstantExpression) {
             String methodName = expr.method.value
@@ -345,7 +348,7 @@ class Inferer implements GtkConsts {
         def type = inferType(expr.rightExpression)
         if (left instanceof VariableExpression) {
             scopes.addName(left)
-            //setType(expr, type)
+            //setTypeToExprAndMeta(left, type) // todo enable but check arrays won't fail
         } else if (left instanceof ArgumentListExpression) {
             log.warn("infer() not impl for ${left.class.name}") // todo
         } else {
