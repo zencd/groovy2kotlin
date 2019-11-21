@@ -23,7 +23,12 @@ import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.expr.EmptyExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.GStringExpression
+import org.codehaus.groovy.ast.expr.ListExpression
+import org.codehaus.groovy.ast.expr.MapEntryExpression
+import org.codehaus.groovy.ast.expr.MapExpression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
+import org.codehaus.groovy.ast.expr.PostfixExpression
+import org.codehaus.groovy.ast.expr.PrefixExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.StaticMethodCallExpression
 import org.codehaus.groovy.ast.expr.TernaryExpression
@@ -554,6 +559,35 @@ class Inferer implements GtkConsts {
             log.warn("no method {} found for {}", methodName, expr.ownerType.name)
             return RESOLVED_ERROR
         }
+    }
+
+    @DynamicDispatch
+    ClassNode infer(PostfixExpression expr) {
+        return inferType(expr.expression)
+    }
+
+    @DynamicDispatch
+    ClassNode infer(PrefixExpression expr) {
+        return inferType(expr.expression)
+    }
+
+    @DynamicDispatch
+    ClassNode infer(ListExpression expr) {
+        inferList(expr.expressions)
+        return ClassHelper.LIST_TYPE // todo provide generics info
+    }
+
+    @DynamicDispatch
+    ClassNode infer(MapExpression expr) {
+        inferList(expr.mapEntryExpressions)
+        return ClassHelper.MAP_TYPE // todo provide generics info
+    }
+
+    @DynamicDispatch
+    ClassNode infer(MapEntryExpression expr) {
+        inferType(expr.keyExpression)
+        inferType(expr.valueExpression)
+        return RESOLVED_NO_TYPE
     }
 
     @DynamicDispatch
