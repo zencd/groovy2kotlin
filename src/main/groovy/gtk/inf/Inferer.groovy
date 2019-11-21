@@ -1,5 +1,6 @@
 package gtk.inf
 
+import org.codehaus.groovy.ast.DynamicVariable
 import gtk.DynamicDispatch
 import gtk.GroovyExtensions
 import gtk.GtkConsts
@@ -10,6 +11,8 @@ import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
+import org.codehaus.groovy.ast.Parameter
+import org.codehaus.groovy.ast.PropertyNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.AttributeExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
@@ -305,13 +308,31 @@ class Inferer implements GtkConsts {
         return type
     }
 
+    /**
+     * Use of either local, field or property.
+     * The `accessedVariable` can be:
+     * - {@link PropertyNode}
+     * - {@link Parameter}
+     * - {@link FieldNode}
+     * - {@link DynamicVariable}
+     */
     @DynamicDispatch
     ClassNode infer(VariableExpression expr) {
-        if (expr.accessedVariable) {
-            def av = expr.accessedVariable
-            def ty = av.originType
-            def prim = ClassHelper.isPrimitiveType(ty)
-            return av.originType
+        def av = expr.accessedVariable
+        if (av) {
+            if (av instanceof PropertyNode) {
+                // a property accessed
+                return av.originType
+            } else if (av instanceof Parameter) {
+                // a local accessed
+                return av.originType
+            } else if (av instanceof FieldNode) {
+                // a field accessed
+                return av.originType
+            } else {
+                log.error("internal error: unrecognized VariableExpression.accessedVariable: {}", av)
+                return av.originType
+            }
         } else if (expr.name == "this") {
             // `this` is accessed this way
             def ec = getEnclosingClass()

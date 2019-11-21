@@ -55,9 +55,12 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    void main(File f) {
-        f.file
+    int field
+    void main(int i) {
+        name = 1
     }
+    String getName() { "xxx" }
+    void setName(int i) {}
 }
 '''
         def texts = [groovyText]

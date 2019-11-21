@@ -1,6 +1,7 @@
 package gtk
 
 import gtk.inf.Inferer
+import org.codehaus.groovy.ast.DynamicVariable
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
@@ -10,6 +11,7 @@ import org.codehaus.groovy.ast.InnerClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.Parameter
+import org.codehaus.groovy.ast.PropertyNode
 import org.codehaus.groovy.ast.VariableScope
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.AttributeExpression
@@ -66,6 +68,7 @@ import static GtkUtils.isStatic
 import static GtkUtils.makeImportText
 import static GtkUtils.typeToKotlinString
 import static gtk.GtkUtils.dropFirstArgument
+import static gtk.GtkUtils.findGetter
 import static gtk.GtkUtils.getClassExtendedByAnonymousClass
 import static gtk.GtkUtils.isAnyNumber
 import static gtk.GtkUtils.isAnyString
@@ -882,7 +885,12 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     /**
-     * Use of a local variable.
+     * Use of a local variable, property or field.
+     * The `accessedVariable` can be:
+     * - {@link PropertyNode}
+     * - {@link Parameter}
+     * - {@link FieldNode}
+     * - {@link DynamicVariable}
      */
     @DynamicDispatch
     void translateExpr(VariableExpression expr) {
@@ -893,7 +901,20 @@ class GroovyToKotlin implements GtkConsts {
             out.append(csc.nameWithoutPackage)
             out.append('::class.java')
         } else {
-            out.append(expr.name)
+            def av = expr.accessedVariable
+            // accessedVariable can be: PropertyNode, Parameter, FieldNode
+            if (av instanceof PropertyNode) {
+                def method = findGetter(av.field.declaringClass, expr.name)
+                if (method) {
+                    //out.append(method.name)
+                    //out.append("()")
+                    out.append(expr.name)
+                } else {
+                    out.append(expr.name)
+                }
+            } else {
+                out.append(expr.name)
+            }
         }
         //if (!expr.dynamicTyped) {
         //    out.append(": ${typeToKotlinString(expr.type)}")
