@@ -1,0 +1,75 @@
+class Test {
+    void full_switch(String s, int i) {
+        switch (s) {
+            case "x":
+                i += 1
+                break
+            case "z":
+                i += 2
+            default:
+                break
+        }
+    }
+    void no_default(String s, int i) {
+        switch (s) {
+            case "x":
+                i += 1
+                break
+        }
+    }
+    void only_default(String s, int i) {
+        switch (s) {
+            default:
+                i += 1
+                break
+        }
+    }
+    void empty_switch(String s, int i) {
+        switch (s) {
+        }
+    }
+}
+-----------------------
+$DEFAULT_IMPORTS
+open class Test {
+    companion object {
+    }
+
+    fun full_switch(s: String, i: Int) {
+        when (s) {
+            "x" -> {
+                i += 1
+                break
+            }
+            "z" -> {
+                i += 2
+            }
+            else -> {
+                break
+            }
+        }
+    }
+
+    fun no_default(s: String, i: Int) {
+        when (s) {
+            "x" -> {
+                i += 1
+                break
+            }
+        }
+    }
+
+    fun only_default(s: String, i: Int) {
+        when (s) {
+            else -> {
+                i += 1
+                break
+            }
+        }
+    }
+
+    fun empty_switch(s: String, i: Int) {
+        when (s) {
+        }
+    }
+}

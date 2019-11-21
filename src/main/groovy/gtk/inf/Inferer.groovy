@@ -30,12 +30,16 @@ import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.AssertStatement
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.BreakStatement
+import org.codehaus.groovy.ast.stmt.CaseStatement
 import org.codehaus.groovy.ast.stmt.CatchStatement
+import org.codehaus.groovy.ast.stmt.ContinueStatement
 import org.codehaus.groovy.ast.stmt.EmptyStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ForStatement
 import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
+import org.codehaus.groovy.ast.stmt.SwitchStatement
 import org.codehaus.groovy.ast.stmt.ThrowStatement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 import org.codehaus.groovy.ast.stmt.WhileStatement
@@ -46,6 +50,7 @@ import org.slf4j.LoggerFactory
 import static gtk.GtkUtils.getCachedClass
 import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isNullConstant
+import static gtk.GtkUtils.isNullOrEmptyStatement
 import static gtk.GtkUtils.isObject
 import static gtk.GtkUtils.tryResolveMethodReturnType
 
@@ -61,6 +66,7 @@ class Inferer implements GtkConsts {
     public static final ClassNode TMP = ClassHelper.int_TYPE
 
     public static final ClassNode RESOLVED_UNKNOWN = new ClassNode(ResolvedUnknownMarker.class)
+    public static final ClassNode RESOLVED_NO_TYPE = RESOLVED_UNKNOWN
 
     private final Stack<ClassNode> enclosingClasses = new Stack<ClassNode>()
 
@@ -476,19 +482,51 @@ class Inferer implements GtkConsts {
         return RESOLVED_UNKNOWN
     }
 
+    @DynamicDispatch
     ClassNode infer(EmptyStatement stmt) {
         return RESOLVED_UNKNOWN
     }
 
+    @DynamicDispatch
     ClassNode infer(AssertStatement stmt) {
         inferType(stmt.booleanExpression)
         inferType(stmt.messageExpression)
         return RESOLVED_UNKNOWN
     }
 
+    @DynamicDispatch
     ClassNode infer(ThrowStatement stmt) {
         inferType(stmt.expression)
         return RESOLVED_UNKNOWN
+    }
+
+    @DynamicDispatch
+    ClassNode infer(SwitchStatement stmt) {
+        inferType(stmt.expression)
+        for (CaseStatement aCase : stmt.caseStatements) {
+            inferType(aCase)
+        }
+        if (stmt.defaultStatement != null) {
+            inferType(stmt.defaultStatement)
+        }
+        return RESOLVED_NO_TYPE
+    }
+
+    @DynamicDispatch
+    ClassNode infer(CaseStatement stmt) {
+        inferType(stmt.expression)
+        inferType(stmt.code)
+        return RESOLVED_NO_TYPE
+    }
+
+    @DynamicDispatch
+    ClassNode infer(BreakStatement stmt) {
+        return RESOLVED_NO_TYPE
+    }
+
+    @DynamicDispatch
+    ClassNode infer(ContinueStatement stmt) {
+        return RESOLVED_NO_TYPE
     }
 
     @DynamicDispatch

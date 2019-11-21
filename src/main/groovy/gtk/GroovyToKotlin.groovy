@@ -43,6 +43,7 @@ import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.AssertStatement
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.BreakStatement
+import org.codehaus.groovy.ast.stmt.CaseStatement
 import org.codehaus.groovy.ast.stmt.CatchStatement
 import org.codehaus.groovy.ast.stmt.ContinueStatement
 import org.codehaus.groovy.ast.stmt.EmptyStatement
@@ -51,6 +52,7 @@ import org.codehaus.groovy.ast.stmt.ForStatement
 import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
+import org.codehaus.groovy.ast.stmt.SwitchStatement
 import org.codehaus.groovy.ast.stmt.ThrowStatement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 import org.codehaus.groovy.ast.stmt.WhileStatement
@@ -75,6 +77,7 @@ import static gtk.GtkUtils.isLogicalBinaryExpr
 import static gtk.GtkUtils.isLogicalBinaryOp
 import static gtk.GtkUtils.isMap
 import static gtk.GtkUtils.isNullConstant
+import static gtk.GtkUtils.isNullOrEmptyStatement
 import static gtk.GtkUtils.isPrimitive
 import static gtk.GtkUtils.isWrapper
 
@@ -1290,6 +1293,43 @@ class GroovyToKotlin implements GtkConsts {
         if (first) {
             out.lineBreak()
         }
+    }
+
+    /**
+     * Produced code:
+     *   when (s) {
+     *       "xx" -> i++
+     *       else -> i++
+     *   }
+     */
+    @DynamicDispatch
+    void translateStatement(SwitchStatement stmt) {
+        out.newLine("when (")
+        translateExpr(stmt.expression)
+        out.appendLn(") {")
+        out.push()
+
+        for (CaseStatement aCase : stmt.caseStatements) {
+            translateStatement(aCase)
+        }
+
+        if (!isNullOrEmptyStatement(stmt.defaultStatement)) {
+            out.newLine("else -> ")
+            translateStatement(stmt.defaultStatement)
+            out.lineBreak()
+        }
+
+        out.pop()
+        out.newLineCrlf("}")
+    }
+
+    @DynamicDispatch
+    void translateStatement(CaseStatement stmt) {
+        out.newLine("")
+        translateExpr(stmt.expression)
+        out.append(" -> ")
+        translateStatement(stmt.code)
+        out.lineBreak()
     }
 
     @DynamicDispatch

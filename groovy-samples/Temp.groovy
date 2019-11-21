@@ -1,16 +1,7 @@
 class Main extends Base {
-    Main() {
-        super()
+    void main(String s) {
+        int i = 0
+        switch (s) {
+        }
     }
-    Main(String name) {
-        super(name)
-    }
-    Main(int i) {
-        this("invoking this()")
-    }
-}
-
-class Base {
-    Base() {}
-    Base(String name) {}
 }

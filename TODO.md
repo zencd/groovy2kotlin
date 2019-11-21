@@ -1,5 +1,6 @@
 ## Todo
 
+- `switch`: breaks could be safely removed in certain cases
 - Convert `"a"` to `'a'` if acceptor's type is `char`
 - Fix `constructors.txt`
 - Logical NOT, double NOT

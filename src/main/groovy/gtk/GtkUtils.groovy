@@ -27,6 +27,7 @@ import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
+import org.codehaus.groovy.ast.stmt.EmptyStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.classgen.BytecodeExpression
@@ -342,6 +343,8 @@ class GtkUtils implements GtkConsts {
                 '~': 'inv',
                 'instanceof': 'is',
                 'in': 'in',
+                '+=': '+=',
+                '-=': '-=',
         ]
         def res = map[groovyOp]
         if (res) {
@@ -397,6 +400,10 @@ class GtkUtils implements GtkConsts {
 
     static boolean isArray(ClassNode type) {
         return type.componentType != null
+    }
+
+    static boolean isNullOrEmptyStatement(Statement stmt) {
+        stmt == null || stmt instanceof EmptyStatement
     }
 
     static boolean isNullConstant(Expression expr) {

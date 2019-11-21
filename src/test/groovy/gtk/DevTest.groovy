@@ -54,9 +54,35 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = '''
-class Exception {
-    void throwSome() {
-        throw new RuntimeException("hi")
+class Test {
+    void full_switch(String s, int i) {
+        switch (s) {
+            case "x":
+                i += 1
+                break
+            case "z":
+                i += 2
+            default:
+                break
+        }
+    }
+    void no_default(String s, int i) {
+        switch (s) {
+            case "x":
+                i += 1
+                break
+        }
+    }
+    void only_default(String s, int i) {
+        switch (s) {
+            default:
+                i += 1
+                break
+        }
+    }
+    void empty_switch(String s, int i) {
+        switch (s) {
+        }
     }
 }
 '''

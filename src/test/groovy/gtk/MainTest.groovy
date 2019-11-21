@@ -54,6 +54,11 @@ class MainTest {
         testFromFile("exceptions.txt")
     }
 
+    @Test
+    void "switch"() {
+        testFromFile("switch.txt")
+    }
+
     @Disabled
     @Test
     void "constructors"() {
