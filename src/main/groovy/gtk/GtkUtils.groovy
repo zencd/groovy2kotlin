@@ -734,4 +734,7 @@ class GtkUtils implements GtkConsts {
         }
     }
 
+    static boolean hasExplicitConstructor(ClassNode classNode) {
+        classNode.declaredConstructors.size() > 0
+    }
 }

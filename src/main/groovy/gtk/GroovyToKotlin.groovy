@@ -218,10 +218,12 @@ class GroovyToKotlin implements GtkConsts {
         def modStr = GtkUtils.getClassModifierString(classNode)
         def modStrPadded = modStr ? "$modStr " : ""
 
+        def superArgsStr = GtkUtils.hasExplicitConstructor(classNode) ? '' : '()'
+
         List<String> extendList = []
         if (classNode.superClass && !classNode.interface && classNode.superClass != ClassHelper.OBJECT_TYPE) {
             def cn = GtkUtils.getRelativeClassName(classNode.superClass, classNode, classNode.module)
-            extendList.add("${cn}()")
+            extendList.add("${cn}${superArgsStr}")
         }
         for (ClassNode iface : classNode.interfaces) {
             if (iface.name != 'groovy.lang.GroovyObject') {

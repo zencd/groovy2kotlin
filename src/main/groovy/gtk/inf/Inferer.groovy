@@ -329,8 +329,11 @@ class Inferer implements GtkConsts {
             } else if (av instanceof FieldNode) {
                 // a field accessed
                 return av.originType
+            } else if (av instanceof DynamicVariable) {
+                // an implicit variable accessed
+                return av.originType
             } else {
-                log.error("internal error: unrecognized VariableExpression.accessedVariable: {}", av)
+                log.error("warning: unrecognized VariableExpression.accessedVariable: {}", av)
                 return av.originType
             }
         } else if (expr.name == "this") {
