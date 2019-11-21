@@ -70,6 +70,7 @@ import static gtk.GtkUtils.getClassExtendedByAnonymousClass
 import static gtk.GtkUtils.isAnyNumber
 import static gtk.GtkUtils.isAnyString
 import static gtk.GtkUtils.isBinary
+import static gtk.GtkUtils.isCharSequence
 import static gtk.GtkUtils.isCollection
 import static gtk.GtkUtils.isFile
 import static gtk.GtkUtils.isList
@@ -617,6 +618,10 @@ class GroovyToKotlin implements GtkConsts {
             }
             else if (name == 'getClass' && numParams == 0) {
                 name = KT_javaClass
+                methodWasConvertedToAttribute = true
+            }
+            else if (isCharSequence(objType) && name == 'length' && numParams == 0) {
+                // name stays the same
                 methodWasConvertedToAttribute = true
             }
             else if (singleClosureArg) {
