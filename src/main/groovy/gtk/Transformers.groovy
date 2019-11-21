@@ -12,6 +12,8 @@ import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.BreakStatement
+import org.codehaus.groovy.ast.stmt.CaseStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
@@ -157,6 +159,37 @@ class Transformers implements GtkConsts {
                 lengthNotZero
         )
         return new TransformResult(andExpr, inverted)
+    }
+
+    /**
+     * Statement `break` can't be used in Kotlin's `when`, so try to reduce them safely.
+     */
+    static List<CaseStatement> tryRemoveCaseBreaks(List<CaseStatement> cases) {
+        def suitable = everyCaseEndsWithBreak(cases)
+        if (suitable) {
+            cases.each {
+                def code = it.code
+                if (code instanceof BlockStatement) {
+                    def last = code.statements.size() - 1
+                    code.statements.remove(last)
+                }
+            }
+        }
+        return cases
+    }
+
+    private static boolean everyCaseEndsWithBreak(List<CaseStatement> cases) {
+        return cases.every {
+            if (it.code instanceof BlockStatement) {
+                endsWithBreak(it.code as BlockStatement)
+            } else {
+                false
+            }
+        }
+    }
+
+    private static boolean endsWithBreak(BlockStatement block) {
+        block.statements.size() > 0 && block.statements.last() instanceof BreakStatement
     }
 
 }

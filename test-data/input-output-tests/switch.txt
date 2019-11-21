@@ -54,7 +54,6 @@ open class Test {
         when (s) {
             "x" -> {
                 i += 1
-                break
             }
         }
     }

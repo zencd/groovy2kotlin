@@ -1309,7 +1309,9 @@ class GroovyToKotlin implements GtkConsts {
         out.appendLn(") {")
         out.push()
 
-        for (CaseStatement aCase : stmt.caseStatements) {
+        def stmts = Transformers.tryRemoveCaseBreaks(stmt.caseStatements)
+
+        for (CaseStatement aCase : stmts) {
             translateStatement(aCase)
         }
 
