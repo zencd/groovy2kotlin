@@ -55,11 +55,8 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    void main(int i) {
-        switch (i) {
-        case 1: i+=1; break
-        case 2: i+=2; break
-        }
+    void main(File f) {
+        f.file
     }
 }
 '''

@@ -71,6 +71,8 @@
 ✔ Standard methods
 ✔ `const` for constants
 ✔ Groovy truth (partial support yet)
+✔ Groovy's property-style method access
+
 
 ## Progress on a project
 

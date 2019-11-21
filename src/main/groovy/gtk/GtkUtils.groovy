@@ -506,8 +506,13 @@ class GtkUtils implements GtkConsts {
     }
 
     static MethodNode findGetter(ClassNode objectType, String propName) {
-        def methodName = getPropertyGetterName(propName)
-        return objectType.tryFindPossibleMethod(methodName, ArgumentListExpression.EMPTY_ARGUMENTS)
+        for (methodName in getPropertyGetterNames(propName)) {
+            def m = objectType.tryFindPossibleMethod(methodName, ArgumentListExpression.EMPTY_ARGUMENTS)
+            if (m) {
+                return m
+            }
+        }
+        return null
     }
 
     static MethodNode findSetter(ClassNode objectType, String propName, Expression rvalueExpr) {
@@ -574,9 +579,10 @@ class GtkUtils implements GtkConsts {
         return true
     }
 
-    static String getPropertyGetterName(String propName) {
+    static String[] getPropertyGetterNames(String propName) {
         // from org.codehaus.groovy.ast.tools.GeneralUtils.getGetterName()
-        return "get" + Verifier.capitalize(propName)
+        return ["get" + Verifier.capitalize(propName),
+                "is" + Verifier.capitalize(propName)]
     }
 
     static String getPropertySetterName(String propName) {

@@ -11,6 +11,9 @@
         o.instance1.type = 2
         o.setType(3)
     }
+    void methodsPrefixedByIs(File f) {
+        f.file
+    }
     int getType() { 0 }
     void setType(int i) {}
     Main pass() { return this }
@@ -31,6 +34,10 @@ open class Main {
         o.instance1.type = 1
         o.instance1.setType(2)
         o.setType(3)
+    }
+
+    fun methodsPrefixedByIs(f: File) {
+        f.isFile()
     }
 
     fun getType(): Int {
