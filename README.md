@@ -49,13 +49,3 @@ Others may be supported but was not tested.
 ## Todo
 
 [See here](TODO.md)
-
-## Progress on a project
-
-    2019-11-10 - 4734 Kotlin errors
-    2019-11-12 - 848
-    2019-11-15 - 714
-    2019-11-16 - 619
-    2019-11-17 - 526
-    2019-11-19 - 487
-    2019-11-21 - 443

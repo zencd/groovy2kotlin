@@ -25,6 +25,7 @@ import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.GStringExpression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
+import org.codehaus.groovy.ast.expr.StaticMethodCallExpression
 import org.codehaus.groovy.ast.expr.TernaryExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
@@ -61,12 +62,14 @@ class Inferer implements GtkConsts {
     public static final String INFERRED_TYPE = 'G2K.INFERRED_TYPE'
     
     private static class ResolvedUnknownMarker {}
+    private static class ResolvedErrorMarker {}
 
     @Deprecated
     public static final ClassNode TMP = ClassHelper.int_TYPE
 
     public static final ClassNode RESOLVED_UNKNOWN = new ClassNode(ResolvedUnknownMarker.class)
     public static final ClassNode RESOLVED_NO_TYPE = RESOLVED_UNKNOWN
+    public static final ClassNode RESOLVED_ERROR = new ClassNode(ResolvedErrorMarker.class)
 
     private final Stack<ClassNode> enclosingClasses = new Stack<ClassNode>()
 
@@ -533,6 +536,24 @@ class Inferer implements GtkConsts {
     ClassNode infer(GStringExpression expr) {
         inferList(expr.values)
         return expr.getType()
+    }
+
+    @DynamicDispatch
+    ClassNode infer(StaticMethodCallExpression expr) {
+        inferType(expr.arguments)
+        final methodName = expr.method
+        final method = expr.ownerType.tryFindPossibleMethod(methodName, expr.arguments)
+        if (method) {
+            if (method.isStatic()) {
+                return method.returnType
+            } else {
+                log.warn("method is not static: {}", method)
+                return RESOLVED_ERROR
+            }
+        } else {
+            log.warn("no method {} found for {}", methodName, expr.ownerType.name)
+            return RESOLVED_ERROR
+        }
     }
 
     @DynamicDispatch

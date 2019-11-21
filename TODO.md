@@ -72,3 +72,13 @@
 ✔ Standard methods
 ✔ `const` for constants
 ✔ Groovy truth (partial support yet)
+
+## Progress on a project
+
+    2019-11-10 - 4734 Kotlin errors
+    2019-11-12 - 848
+    2019-11-15 - 714
+    2019-11-16 - 619
+    2019-11-17 - 526
+    2019-11-19 - 487
+    2019-11-21 - 443
