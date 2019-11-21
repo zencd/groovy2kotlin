@@ -44,7 +44,7 @@ class GroovyExtensions {
                     def mods = aMethod.modifiers &= ~Opcodes.ACC_STATIC // unset static
                     def newMethod = new MethodNode(aMethod.name, mods, aMethod.returnType, newParams, aMethod.exceptions, emptyCode)
                     typeToModify.addMethod(newMethod)
-                    log.debug("added groovy method to ClassNode: ${typeToModify.name}.${newMethod.name}(${newParams.length} args)")
+                    log.trace("added groovy method to ClassNode: ${typeToModify.name}.${newMethod.name}(${newParams.length} args)")
                     int stop = 0
                 }
             }

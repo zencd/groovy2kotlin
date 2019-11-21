@@ -44,6 +44,11 @@ class MainTest {
         testFromFile("postfix_expr.txt")
     }
 
+    @Test
+    void "assert"() {
+        testFromFile("assert.txt")
+    }
+
     @Disabled
     @Test
     void "constructors"() {

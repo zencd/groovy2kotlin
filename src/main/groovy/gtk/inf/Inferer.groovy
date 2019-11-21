@@ -28,6 +28,7 @@ import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.TernaryExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
+import org.codehaus.groovy.ast.stmt.AssertStatement
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.CatchStatement
 import org.codehaus.groovy.ast.stmt.EmptyStatement
@@ -472,6 +473,12 @@ class Inferer implements GtkConsts {
     }
 
     ClassNode infer(EmptyStatement stmt) {
+        return RESOLVED_UNKNOWN
+    }
+
+    ClassNode infer(AssertStatement stmt) {
+        inferType(stmt.booleanExpression)
+        inferType(stmt.messageExpression)
         return RESOLVED_UNKNOWN
     }
 

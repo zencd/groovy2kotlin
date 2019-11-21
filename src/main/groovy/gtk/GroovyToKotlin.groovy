@@ -40,6 +40,7 @@ import org.codehaus.groovy.ast.expr.StaticMethodCallExpression
 import org.codehaus.groovy.ast.expr.TernaryExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
+import org.codehaus.groovy.ast.stmt.AssertStatement
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.BreakStatement
 import org.codehaus.groovy.ast.stmt.CatchStatement
@@ -72,6 +73,7 @@ import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isLogicalBinaryExpr
 import static gtk.GtkUtils.isLogicalBinaryOp
 import static gtk.GtkUtils.isMap
+import static gtk.GtkUtils.isNullConstant
 import static gtk.GtkUtils.isPrimitive
 import static gtk.GtkUtils.isWrapper
 
@@ -1383,6 +1385,18 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     @DynamicDispatch
+    void translateStatement(AssertStatement stmt) {
+        out.newLine("assert (")
+        transAsGroovyTruth(stmt.booleanExpression, true)
+        out.append(")")
+        if (stmt.messageExpression != null && !isNullConstant(stmt.messageExpression)) {
+            out.append(" : ")
+            translateExpr(stmt.messageExpression)
+        }
+        out.lineBreak()
+    }
+
+    @DynamicDispatch
     void translateStatement(TryCatchStatement stmt) {
         def valName = stmt.tryStatement
         out.newLine("try ")
@@ -1425,7 +1439,7 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateStatement(Statement stmt) {
-        out.newLineCrlf("/* not implemented for: ${stmt.class.name} */")
+        out.newLineCrlf("/* groovy2kotlin: not implemented for: ${stmt.class.name} */")
     }
 
     private void append(String s) {

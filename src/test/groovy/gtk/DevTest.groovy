@@ -53,11 +53,11 @@ class Temp {
 
     @Test
     void trans_single_string() {
-        //new File('').newWriter()
         String groovyText = '''
 class Main {
     void main() {
-        String[][] arr = null
+        assert 1 == 2
+        assert 1 == 2 && 3 == 4 : "hello" + 2
     }
 }
 '''
@@ -76,12 +76,7 @@ class Main {
 
     @Test
     void tmp() {
-        def rgm = ClassHelper.makeCached(org.codehaus.groovy.runtime.ResourceGroovyMethods.class)
-        new File('.').directorySize()
-
-        def collection = ClassHelper.makeCached(Collection.class)
-        def arrayList = ClassHelper.makeCached(ArrayList.class)
-        def ok = arrayList.isDerivedFrom(collection) || arrayList.implementsInterface(collection)
+        ''.split()
         int stop = 0
     }
 

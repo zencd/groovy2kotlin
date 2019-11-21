@@ -1,0 +1,16 @@
+class Main {
+    void main() {
+        assert 1 == 2
+        assert 1 == 2 && 3 == 4 : "hello" + 2
+    }
+}
+--------------
+$DEFAULT_IMPORTS
+open class Main {
+    companion object {
+    }
+    fun main() {
+        assert (1 == 2)
+        assert (1 == 2 && 3 == 4) : "hello" + 2
+    }
+}

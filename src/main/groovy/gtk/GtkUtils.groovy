@@ -47,6 +47,7 @@ class GtkUtils implements GtkConsts {
     private static final Pattern PREV_JAVADOC_COMMENT_PATTERN = Pattern.compile("(?s)/\\*\\*(.*?)\\*/");
 
     public static final ClassNode FILE_TYPE = ClassHelper.makeCached(File.class)
+    public static final ClassNode URL_TYPE = ClassHelper.makeCached(URL.class)
     public static final ClassNode Collection_TYPE = ClassHelper.makeCached(Collection.class)
     public static final ClassNode BufferedWriter_TYPE = ClassHelper.makeCached(BufferedWriter.class)
 
@@ -541,6 +542,10 @@ class GtkUtils implements GtkConsts {
 
     static boolean isFile(ClassNode type) {
         isDerivedFrom(type, FILE_TYPE)
+    }
+
+    static boolean isURL(ClassNode type) {
+        isDerivedFrom(type, URL_TYPE)
     }
 
     /**
