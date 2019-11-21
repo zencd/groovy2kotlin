@@ -54,10 +54,9 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = '''
-class Main {
-    void main() {
-        assert 1 == 2
-        assert 1 == 2 && 3 == 4 : "hello" + 2
+class Exception {
+    void throwSome() {
+        throw new RuntimeException("hi")
     }
 }
 '''

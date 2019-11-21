@@ -1,0 +1,14 @@
+class Exception {
+    void throwSome() {
+        throw new RuntimeException("hi")
+    }
+}
+----------------------
+$DEFAULT_IMPORTS
+open class Exception {
+    companion object {
+    }
+    fun throwSome() {
+        throw RuntimeException("hi")
+    }
+}

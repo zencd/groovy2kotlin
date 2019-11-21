@@ -36,6 +36,7 @@ import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ForStatement
 import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
+import org.codehaus.groovy.ast.stmt.ThrowStatement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 import org.codehaus.groovy.ast.stmt.WhileStatement
 import org.codehaus.groovy.classgen.BytecodeSequence
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory
 import static gtk.GtkUtils.getCachedClass
 import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isNullConstant
+import static gtk.GtkUtils.isObject
 import static gtk.GtkUtils.tryResolveMethodReturnType
 
 class Inferer implements GtkConsts {
@@ -117,7 +119,9 @@ class Inferer implements GtkConsts {
         if (node instanceof Expression) {
             def prevType = node.getType()
             if (prevType != type) {
-                log.debug("rewriting node's type: {} ==> {}", prevType, type)
+                if (!isObject(prevType)) { // reducing trivial flood
+                    log.debug("rewriting node's type: {} ==> {}", prevType, type)
+                }
                 node.setType(type)
             }
         }
@@ -479,6 +483,11 @@ class Inferer implements GtkConsts {
     ClassNode infer(AssertStatement stmt) {
         inferType(stmt.booleanExpression)
         inferType(stmt.messageExpression)
+        return RESOLVED_UNKNOWN
+    }
+
+    ClassNode infer(ThrowStatement stmt) {
+        inferType(stmt.expression)
         return RESOLVED_UNKNOWN
     }
 

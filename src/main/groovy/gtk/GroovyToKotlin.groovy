@@ -51,6 +51,7 @@ import org.codehaus.groovy.ast.stmt.ForStatement
 import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
+import org.codehaus.groovy.ast.stmt.ThrowStatement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 import org.codehaus.groovy.ast.stmt.WhileStatement
 import org.slf4j.Logger
@@ -1388,6 +1389,13 @@ class GroovyToKotlin implements GtkConsts {
         def type = typeToKotlinString(stmt.variable.type)
         out.append(" catch ($name: $type) ")
         translateStatement(stmt.code)
+    }
+
+    @DynamicDispatch
+    void translateStatement(ThrowStatement stmt) {
+        out.newLine("throw ")
+        translateExpr(stmt.expression)
+        out.lineBreak()
     }
 
     @DynamicDispatch

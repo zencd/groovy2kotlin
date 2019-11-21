@@ -52,6 +52,7 @@
 ✔ Range expression
 ✔ In-string expressions
 ✔ Bitwise expressions
+✔ Exceptions
 ✔ `in`
 ✔ `==~`
 ✔ `=~`

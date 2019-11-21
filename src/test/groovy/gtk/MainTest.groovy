@@ -49,6 +49,11 @@ class MainTest {
         testFromFile("assert.txt")
     }
 
+    @Test
+    void "exceptions"() {
+        testFromFile("exceptions.txt")
+    }
+
     @Disabled
     @Test
     void "constructors"() {
