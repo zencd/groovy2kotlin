@@ -412,6 +412,7 @@ class Inferer implements GtkConsts {
      * - {@link Parameter}
      * - {@link FieldNode}
      * - {@link DynamicVariable}
+     * - {@link VariableExpression}
      */
     @DynamicDispatch
     ClassNode inferAssignment(VariableExpression expr, Expression rvalue) {
@@ -437,8 +438,12 @@ class Inferer implements GtkConsts {
                     def field = GtkUtils.findField(ec, expr.name)
                 }
                 return av.originType
+            } else if (av instanceof VariableExpression) {
+                // VariableExpression can have accessedVariable with endless nesting
+                // not sure what is the case here
+                return av.originType
             } else {
-                log.error("warning: unrecognized VariableExpression.accessedVariable: {}", av)
+                log.warn("unrecognized VariableExpression.accessedVariable: {}", av?.class?.name)
                 return av.originType
             }
         } else if (expr.name == "this") {

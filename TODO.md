@@ -15,7 +15,6 @@
 - Replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
 - Probably translate `def` → `Any` in formal params, not `Object`
 - Groovy allows implicit conversions like `String s = 1L`
-- Groovy comparison operator `<=>`
 - `static` can't be applied to static inner classes
 - Check a field is never rewritten thru code, and mark it as `val` then
 - Groovy's special use of bitwise operators on lists, streams, etc
@@ -70,9 +69,10 @@
 ✔ `throws`
 ✔ Overriding
 ✔ Standard methods
-✔ `const` for constants
-✔ Groovy truth (partial support yet)
+✔ Kotlin `const` for constants
+✔ Groovy truth
 ✔ Groovy's property-style method access
+✔ Groovy diamond operator
 
 
 ## Progress on a project

@@ -50,7 +50,7 @@ class Scopes implements GtkConsts {
                 return ve
             }
         }
-        log.warn("no var found in scopes by name ${varName}")
+        log.warn("no var found in scopes by name [${varName}]")
         return null
     }
 

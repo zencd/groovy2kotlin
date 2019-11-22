@@ -6,6 +6,7 @@ class Temp {
         'xxx111' ==~ '.*xxx.*'
         1.is(2)
         def m = summary =~ /.+/
+        100 <=> 200
     }
 }
 ------------
@@ -20,5 +21,6 @@ open class Temp {
         ".*xxx.*".toRegex().matches("xxx111")
         1 === 2
         val m = ".+".toRegex().matchEntire(summary)
+        100.compareTo(200)
     }
 }

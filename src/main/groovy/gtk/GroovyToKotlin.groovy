@@ -798,6 +798,11 @@ class GroovyToKotlin implements GtkConsts {
             out.append(".toRegex().matchEntire(")
             translateExpr(expr.leftExpression)
             out.append(")")
+        } else if (expr.operation.text == GR_DIAMOND_OP) {
+            translateExpr(expr.leftExpression)
+            out.append(".compareTo(")
+            translateExpr(expr.rightExpression)
+            out.append(")")
         } else {
             translateRegularBinaryExpr(expr)
         }
@@ -897,6 +902,7 @@ class GroovyToKotlin implements GtkConsts {
      * - {@link Parameter}
      * - {@link FieldNode}
      * - {@link DynamicVariable}
+     * - {@link VariableExpression}
      */
     @DynamicDispatch
     void translateExpr(VariableExpression expr) {

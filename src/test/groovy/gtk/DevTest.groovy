@@ -55,10 +55,8 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    int rw = 0
-    Main() {
-    }
-    void main(Main o) {
+    void main(Main o, Main x) {
+        o <=> x
     }
 }
 '''
