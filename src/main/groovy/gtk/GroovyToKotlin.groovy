@@ -733,11 +733,11 @@ class GroovyToKotlin implements GtkConsts {
     @DynamicDispatch
     void translateExpr(DeclarationExpression expr) {
         def rightExpr = expr.rightExpression
-        def assignedByNull = GtkUtils.isNullConstant(rightExpr)
+        def assignedByNull = isNullConstant(rightExpr)
         def hasInitializer = rightExpr != null && !(rightExpr instanceof EmptyExpression)
         String varOrVal
         boolean optional
-        def writable = Inferer.getMeta(expr.leftExpression, AST_NODE_META__WRITABLE) == true
+        def writable = Inferer.isMarkedRW(expr.leftExpression)
         if (!hasInitializer || assignedByNull || writable) {
             varOrVal = 'var'
             optional = true
@@ -789,7 +789,7 @@ class GroovyToKotlin implements GtkConsts {
         } else if (expr.operation.text == GR_REGEX_TEST) {
             // str ==~ regex
             translateMatchOperator(expr)
-        } else if (expr.operation.text == '=~') {
+        } else if (expr.operation.text == GR_REGEX_MATCH) {
             // converts:
             //   input =~ regex
             // into:

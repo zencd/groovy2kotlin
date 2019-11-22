@@ -28,6 +28,7 @@ interface GtkConsts {
     // For expr like `this.javaClass`
     static final String KT_javaClass = 'javaClass'
 
+    static final String GR_REGEX_MATCH = '=~'
     static final String GR_REGEX_TEST = '==~'
     static final String GR_DIAMOND_OP = '<=>'
     static final String GR_SHIFT_LEFT = '<<'

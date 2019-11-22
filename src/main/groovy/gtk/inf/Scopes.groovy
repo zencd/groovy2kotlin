@@ -57,7 +57,7 @@ class Scopes implements GtkConsts {
     void markVarAsWritable(String varName) {
         def expr = findVar(varName)
         if (expr) {
-            Inferer.setMeta(expr as ASTNode, AST_NODE_META__WRITABLE, true)
+            Inferer.markAsRW(expr as ASTNode)
         }
     }
 

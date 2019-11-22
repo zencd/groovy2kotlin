@@ -646,11 +646,11 @@ class Inferer implements GtkConsts {
         return stack.isEmpty() ? null : stack.peek()
     }
 
-    static void markAsRW(FieldNode field) {
-        setMeta(field, AST_NODE_META__WRITABLE, true)
+    static void markAsRW(ASTNode node) {
+        setMeta(node, AST_NODE_META__WRITABLE, true)
     }
 
-    static boolean isMarkedRW(FieldNode field) {
-        getMeta(field, AST_NODE_META__WRITABLE, false)
+    static boolean isMarkedRW(ASTNode node) {
+        getMeta(node, AST_NODE_META__WRITABLE, false)
     }
 }
