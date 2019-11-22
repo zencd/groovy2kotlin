@@ -357,6 +357,8 @@ class GroovyToKotlin implements GtkConsts {
         def constStr = beConst ? "const " : ""
         out.append(constStr)
 
+        boolean rw = Inferer.isMarkedRW(field)
+
         // XXX we don't need private fields because a field is private in Groovy if no access modifier given
         def mods = getModifierString(field.modifiers, false, false, false)
         if (mods) {
@@ -365,13 +367,15 @@ class GroovyToKotlin implements GtkConsts {
 
         def fieldType = field.type
 
-        def varOrVal
+        // todo temporarily disabled: this is the strategy to always emit `val`, unless the field is rewritten in the code
+        //final varOrVal = (rw && !isFinal(field.modifiers) && !field.hasInitialExpression()) ? 'var' : 'val'
+
+        final varOrVal = isFinal(field.modifiers) ? 'val' : 'var'
+
         def optional // defines if the type would be marked as `Int` or `Int?`
         if (isFinal(field.modifiers)) {
-            varOrVal = 'val'
             optional = false
         } else {
-            varOrVal = 'var'
             optional = true
         }
         if (ClassHelper.isPrimitiveType(fieldType)) {
@@ -384,14 +388,7 @@ class GroovyToKotlin implements GtkConsts {
             kotlinType = typeToKotlinString(fieldType, optional)
             out.append(": $kotlinType")
         }
-        if (field.initialValueExpression == null) {
-            //if (optional) {
-                def initialValue = GtkUtils.makeDefaultInitialValue(kotlinType)
-                if (initialValue) {
-                    out.append(" = ${initialValue}")
-                }
-            //}
-        } else {
+        if (field.hasInitialExpression()) {
             def staticContextPushed = false
             if (isStatic(field)) {
                 staticContext.push(field.declaringClass)
@@ -408,6 +405,13 @@ class GroovyToKotlin implements GtkConsts {
             if (staticContextPushed) {
                 staticContext.pop()
             }
+        } else {
+            //if (optional) {
+                def initialValue = GtkUtils.makeDefaultInitialValue(kotlinType)
+                if (initialValue) {
+                    out.append(" = ${initialValue}")
+                }
+            //}
         }
         out.lineBreak()
     }

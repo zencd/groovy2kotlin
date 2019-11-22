@@ -1,5 +1,6 @@
 package gtk.inf
 
+import gtk.FieldUse
 import org.codehaus.groovy.ast.DynamicVariable
 import gtk.DynamicDispatch
 import gtk.GroovyExtensions
@@ -59,7 +60,6 @@ import org.slf4j.LoggerFactory
 import static gtk.GtkUtils.getCachedClass
 import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isNullConstant
-import static gtk.GtkUtils.isNullOrEmptyStatement
 import static gtk.GtkUtils.isObject
 import static gtk.GtkUtils.tryResolveMethodReturnType
 
@@ -150,8 +150,9 @@ class Inferer implements GtkConsts {
         node.putNodeMetaData(key, value)
     }
 
-    static Object getMeta(ASTNode node, String key) {
-        return node.getNodeMetaData(key)
+    static <T> Object getMeta(ASTNode node, String key, T defVal = null) {
+        T val = node.getNodeMetaData(key)
+        return val == null ? defVal : val
     }
 
     static ClassNode getType(ASTNode node) {
@@ -308,50 +309,9 @@ class Inferer implements GtkConsts {
         return type
     }
 
-    /**
-     * Use of either local, field or property.
-     * The `accessedVariable` can be:
-     * - {@link PropertyNode}
-     * - {@link Parameter}
-     * - {@link FieldNode}
-     * - {@link DynamicVariable}
-     */
     @DynamicDispatch
     ClassNode infer(VariableExpression expr) {
-        def ec = getEnclosingClass()
-        def av = expr.accessedVariable
-        if (av) {
-            if (av instanceof PropertyNode) {
-                // a property accessed
-                return av.originType
-            } else if (av instanceof Parameter) {
-                // a local accessed
-                return av.originType
-            } else if (av instanceof FieldNode) {
-                // a field accessed
-                return av.originType
-            } else if (av instanceof DynamicVariable) {
-                // an implicit variable accessed
-                if (ec) {
-                    def field = GtkUtils.findField(ec, expr.name)
-                }
-                return av.originType
-            } else {
-                log.error("warning: unrecognized VariableExpression.accessedVariable: {}", av)
-                return av.originType
-            }
-        } else if (expr.name == "this") {
-            // `this` is accessed this way
-            if (ec) {
-                return ec
-            } else {
-                log.warn("VariableExpression: no enclosing class found - not processed")
-                return expr.getType()
-            }
-        } else {
-            log.warn("VariableExpression not recognized and not processed")
-            return expr.getType()
-        }
+        return inferAssignment(expr, null)
     }
 
     @DynamicDispatch
@@ -445,9 +405,54 @@ class Inferer implements GtkConsts {
         //log.warn("${getClass().simpleName}::inferAssignment() not defined for ${node?.class?.name}")
     }
 
+    /**
+     * Use of either local, field or property.
+     * The `accessedVariable` can be:
+     * - {@link PropertyNode}
+     * - {@link Parameter}
+     * - {@link FieldNode}
+     * - {@link DynamicVariable}
+     */
     @DynamicDispatch
     ClassNode inferAssignment(VariableExpression expr, Expression rvalue) {
-        return inferType(expr)
+        //ClassNode infer(VariableExpression expr) {
+        def ec = getEnclosingClass()
+        def av = expr.accessedVariable
+        if (av) {
+            if (av instanceof PropertyNode) {
+                // a property accessed
+                return av.originType
+            } else if (av instanceof Parameter) {
+                // a local accessed
+                return av.originType
+            } else if (av instanceof FieldNode) {
+                // a field accessed
+                if (rvalue) {
+                    markAsRW(av)
+                }
+                return av.originType
+            } else if (av instanceof DynamicVariable) {
+                // an implicit variable accessed
+                if (ec) {
+                    def field = GtkUtils.findField(ec, expr.name)
+                }
+                return av.originType
+            } else {
+                log.error("warning: unrecognized VariableExpression.accessedVariable: {}", av)
+                return av.originType
+            }
+        } else if (expr.name == "this") {
+            // `this` is accessed this way
+            if (ec) {
+                return ec
+            } else {
+                log.warn("VariableExpression: no enclosing class found - not processed")
+                return expr.getType()
+            }
+        } else {
+            log.warn("VariableExpression not recognized and not processed")
+            return expr.getType()
+        }
     }
 
     @DynamicDispatch
@@ -468,10 +473,10 @@ class Inferer implements GtkConsts {
         def propName = expr.propertyAsString
         def field = objType.getField(propName)
         if (propName == null) {
-            log.warn("property (objectExpression) name is null")
+            log.warn("property (objectExpression) name is null") // todo check the case
             return RESOLVED_UNKNOWN
         } else if (rvalue == null) {
-            // property read
+            // property read (applicable for fields too)
             def getter = GtkUtils.findGetter(objType, propName)
             if (getter) {
                 setMeta(expr, AST_NODE_META__GETTER, getter)
@@ -483,12 +488,13 @@ class Inferer implements GtkConsts {
                 return setTypeToExprAndMeta(expr, RESOLVED_UNKNOWN)
             }
         } else {
-            // property write
+            // property write (applicable for fields too)
             def setter = GtkUtils.findSetter(objType, propName, rvalue)
             if (setter) {
                 setMeta(expr, AST_NODE_META__SETTER, setter)
                 return setTypeToExprAndMeta(expr, setter.returnType)
             } else if (field) {
+                markAsRW(field)
                 //setMeta(expr, AST_NODE_META__SETTER, field)
                 return setTypeToExprAndMeta(expr, field.type)
             } else {
@@ -633,5 +639,13 @@ class Inferer implements GtkConsts {
     private ClassNode getEnclosingClass() {
         def stack = enclosingClasses
         return stack.isEmpty() ? null : stack.peek()
+    }
+
+    static void markAsRW(FieldNode field) {
+        setMeta(field, AST_NODE_META__WRITABLE, true)
+    }
+
+    static boolean isMarkedRW(FieldNode field) {
+        getMeta(field, AST_NODE_META__WRITABLE, false)
     }
 }

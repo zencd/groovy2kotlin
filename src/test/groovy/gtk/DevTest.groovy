@@ -54,16 +54,12 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = '''
-class Main implements Base {
-    int xxx = 0
-    void main(Main o) {
-        xxx
-        o.xxx
-        o.xxx = 1
+class Main {
+    int rw = 0
+    Main() {
     }
-}
-interface Base {
-    static final String NAME = "Joe"
+    void main(Main o) {
+    }
 }
 '''
         def texts = [groovyText]
