@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 /**
  * USEFUL:
  * {@link org.codehaus.groovy.antlr.java.Java2GroovyProcessor}
+ * {@link org.codehaus.groovy.ast.Variable#isInStaticContext()}
  */
 class Gtk {
 

@@ -54,10 +54,16 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = '''
-class Main extends Base {
-    Main() {}
+class Main implements Base {
+    int xxx = 0
+    void main(Main o) {
+        xxx
+        o.xxx
+        o.xxx = 1
+    }
 }
-class Base {
+interface Base {
+    static final String NAME = "Joe"
 }
 '''
         def texts = [groovyText]
@@ -66,7 +72,7 @@ class Base {
         def kotlinText = Gtk.toKotlinAsSingleString(nodes, bufs)
         println(kotlinText)
         //def node = nodes[0].classes[0]
-        //def node = nodes[0].classes[0].methods[0].code.statements
+        def node = nodes[0].classes[0].methods[0].code.statements
         //def node = nodes[0].classes[0].declaredConstructors*.code
         int stop = 0
     }

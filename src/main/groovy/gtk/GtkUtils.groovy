@@ -737,4 +737,28 @@ class GtkUtils implements GtkConsts {
     static boolean hasExplicitConstructor(ClassNode classNode) {
         classNode.declaredConstructors.size() > 0
     }
+
+    /**
+     * Lokks for a field in class:
+     * 1) in the class and its superclasses
+     * 2) in all implemented interfaces
+     * 3) in outer classes
+     */
+    static FieldNode findField(ClassNode classNode, String name) {
+        FieldNode field = classNode.getField(name)
+        if (field) {
+            return field
+        }
+        for (iface in classNode.interfaces) {
+            field = iface.getField(name)
+            if (field) {
+                return field
+            }
+        }
+        if (classNode.declaringClass) {
+            return findField(classNode.declaringClass, name)
+        } else {
+            return null
+        }
+    }
 }

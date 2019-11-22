@@ -1,5 +1,8 @@
-class Main extends Base {
-    void main(File f) {
-        f.file
+class Main implements Base {
+    void main() {
+        NAME
     }
+}
+interface Base {
+    static final String NAME = "Joe"
 }

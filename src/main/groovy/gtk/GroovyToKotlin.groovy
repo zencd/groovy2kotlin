@@ -526,11 +526,11 @@ class GroovyToKotlin implements GtkConsts {
         String name = node.getName() == null ? "<unknown>" : node.getName()
         boolean mutable = GtkUtils.isMutable(node)
         String type = predefinedKotlinType ?: typeToKotlinString(node.getType(), false, mutable)
-        if (node.getInitialExpression() == null) {
-            out.append("${name}: ${type}")
-        } else {
+        if (node.hasInitialExpression()) {
             out.append("$name: $type = ")
             translateExpr(node.getInitialExpression())
+        } else {
+            out.append("${name}: ${type}")
         }
     }
 
@@ -904,19 +904,10 @@ class GroovyToKotlin implements GtkConsts {
             out.append('::class.java')
         } else {
             def av = expr.accessedVariable
-            // accessedVariable can be: PropertyNode, Parameter, FieldNode
             if (av instanceof PropertyNode) {
                 def method = findGetter(av.field.declaringClass, expr.name)
-                if (method) {
-                    //out.append(method.name)
-                    //out.append("()")
-                    out.append(expr.name)
-                } else {
-                    out.append(expr.name)
-                }
-            } else {
-                out.append(expr.name)
             }
+            out.append(expr.name)
         }
         //if (!expr.dynamicTyped) {
         //    out.append(": ${typeToKotlinString(expr.type)}")

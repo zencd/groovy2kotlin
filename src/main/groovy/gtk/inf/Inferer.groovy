@@ -318,6 +318,7 @@ class Inferer implements GtkConsts {
      */
     @DynamicDispatch
     ClassNode infer(VariableExpression expr) {
+        def ec = getEnclosingClass()
         def av = expr.accessedVariable
         if (av) {
             if (av instanceof PropertyNode) {
@@ -331,6 +332,9 @@ class Inferer implements GtkConsts {
                 return av.originType
             } else if (av instanceof DynamicVariable) {
                 // an implicit variable accessed
+                if (ec) {
+                    def field = GtkUtils.findField(ec, expr.name)
+                }
                 return av.originType
             } else {
                 log.error("warning: unrecognized VariableExpression.accessedVariable: {}", av)
@@ -338,7 +342,6 @@ class Inferer implements GtkConsts {
             }
         } else if (expr.name == "this") {
             // `this` is accessed this way
-            def ec = getEnclosingClass()
             if (ec) {
                 return ec
             } else {

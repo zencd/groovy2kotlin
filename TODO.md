@@ -1,5 +1,6 @@
 ## Todo
 
+- access to implemented interface's static const
 - Convert `"a"` to `'a'` if acceptor's type is `char`
 - Fix `constructors.txt`
 - Logical NOT, double NOT
