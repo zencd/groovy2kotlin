@@ -1,6 +1,7 @@
 package gtk.inf
 
 import gtk.FieldUse
+import gtk.GeneralUtils
 import org.codehaus.groovy.ast.DynamicVariable
 import gtk.DynamicDispatch
 import gtk.GroovyExtensions
@@ -54,8 +55,11 @@ import org.codehaus.groovy.ast.stmt.ThrowStatement
 import org.codehaus.groovy.ast.stmt.TryCatchStatement
 import org.codehaus.groovy.ast.stmt.WhileStatement
 import org.codehaus.groovy.classgen.BytecodeSequence
+import org.codehaus.groovy.runtime.MethodClosure
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import java.lang.reflect.Field
 
 import static gtk.GtkUtils.getCachedClass
 import static gtk.GtkUtils.isList
@@ -79,7 +83,15 @@ class Inferer implements GtkConsts {
     public static final ClassNode RESOLVED_NO_TYPE = RESOLVED_UNKNOWN
     public static final ClassNode RESOLVED_ERROR = new ClassNode(ResolvedErrorMarker.class)
 
-    private final Stack<ClassNode> enclosingClasses = new Stack<ClassNode>()
+    private final Stack<ClassNode> enclosingClasses = new Stack<>()
+
+    private final Stack<Triple> currentNode = new Stack<>()
+
+    private static class Triple {
+        ASTNode parent
+        String childName
+        ASTNode child
+    }
 
     private final Scopes scopes = new Scopes()
 
@@ -117,8 +129,7 @@ class Inferer implements GtkConsts {
         }
     }
 
-    @DynamicDispatch
-    private ClassNode inferType(ASTNode node) {
+    private ClassNode __inferType(ASTNode node) {
         assert node != null
 
         def type = node.getNodeMetaData(INFERRED_TYPE) as ClassNode
@@ -130,6 +141,45 @@ class Inferer implements GtkConsts {
         assert type != null
         setTypeToExprAndMeta(node, type)
         return getCachedClass(type)
+    }
+
+    private ClassNode inferType(Closure ref) {
+        def ref2 = ref as MethodClosure
+        def parent = ref2.delegate as ASTNode
+        def childName = ref2.method
+        def child = parent[childName] as ASTNode
+        currentNode.add(new Triple(parent: parent, childName: childName, child: child))
+
+        def type = __inferType(child)
+
+        currentNode.pop()
+        return type
+    }
+
+    private ClassNode inferType(ASTNode child) {
+        currentNode.add(new Triple(parent: null, childName: null, child: child))
+        def type = __inferType(child)
+        currentNode.pop()
+        return type
+    }
+
+    private void markCurrentNodeForReplacement(Expression replacement) {
+        def cn = currentNode.peek()
+        if (cn.parent) {
+            try {
+                cn.parent[cn.childName] = replacement
+            } catch (ReadOnlyPropertyException e) {
+                Field field
+                if (BooleanExpression.class.isAssignableFrom(cn.parent.class) && cn.childName == 'expression') {
+                    field = BooleanExpression.class.getDeclaredField(cn.childName)
+                } else {
+                    field = cn.parent.class.getDeclaredField(cn.childName)
+                }
+                GeneralUtils.setFinalField(cn.parent, field, replacement)
+            }
+        } else {
+            log.warn("no parent node found for replacing its child with {}", replacement)
+        }
     }
 
     static ClassNode setTypeToExprAndMeta(ASTNode node, ClassNode type) {
@@ -212,7 +262,7 @@ class Inferer implements GtkConsts {
             scopes.addName(param)
         }
         if (method.code != null) {
-            inferType(method.code)
+            inferType(method.&code)
         }
         scopes.popScope()
         return RESOLVED_UNKNOWN
@@ -226,7 +276,7 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(ReturnStatement stmt) {
-        return inferType(stmt.expression)
+        return inferType(stmt.&expression)
     }
 
     @DynamicDispatch
@@ -239,11 +289,11 @@ class Inferer implements GtkConsts {
         final originalType = expr.type
         def oe = expr.objectExpression
         final objTypeWas = oe.type
-        def objType = inferType(oe)
+        def objType = inferType(expr.&objectExpression)
         // todo find method from expr.methodAsString
         if (expr.method instanceof ConstantExpression) {
             String methodName = expr.method.value
-            inferType(expr.arguments)
+            inferType(expr.&arguments)
             def customResolved = tryResolveMethodReturnType(objType, methodName, expr.arguments)
             ClassNode resultType = customResolved ?: originalType
             if (isList(objType) && (methodName == 'add' || methodName == 'addAll')) {
@@ -261,24 +311,24 @@ class Inferer implements GtkConsts {
     @DynamicDispatch
     ClassNode infer(ForStatement stmt) {
         // todo infer other things
-        inferType(stmt.loopBlock)
+        inferType(stmt.&loopBlock)
     }
 
     @DynamicDispatch
     ClassNode infer(ConstructorCallExpression stmt) {
-        inferType(stmt.arguments)
+        inferType(stmt.&arguments)
         return stmt.type
     }
 
     @DynamicDispatch
     ClassNode infer(CastExpression expr) {
-        inferType(expr.expression)
+        inferType(expr.&expression)
         return expr.type
     }
 
     @DynamicDispatch
     ClassNode infer(ClosureExpression expr) {
-        inferType(expr.code)
+        inferType(expr.&code)
         return RESOLVED_UNKNOWN // todo
     }
 
@@ -295,15 +345,15 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(TernaryExpression expr) {
-        inferType(expr.booleanExpression)
-        def t1 = inferType(expr.trueExpression)
-        def t2 = inferType(expr.falseExpression)
+        inferType(expr.&booleanExpression)
+        def t1 = inferType(expr.&trueExpression)
+        def t2 = inferType(expr.&falseExpression)
         return t1 // todo combine t1 and t2 somehow, don't pick randomly
     }
 
     @DynamicDispatch
     ClassNode infer(BooleanExpression expr) {
-        inferType(expr.expression) // do not save the result here
+        inferType(expr.&expression) // do not save the result here
         def type = expr.getType()
         assert type == ClassHelper.boolean_TYPE
         return type
@@ -316,7 +366,7 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(ExpressionStatement stmt) {
-        inferType(stmt.expression)
+        inferType(stmt.&expression)
         return RESOLVED_UNKNOWN
     }
 
@@ -327,14 +377,14 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(WhileStatement stmt) {
-        inferType(stmt.booleanExpression)
-        inferType(stmt.loopBlock)
+        inferType(stmt.&booleanExpression)
+        inferType(stmt.&loopBlock)
         return RESOLVED_UNKNOWN
     }
 
     @DynamicDispatch
     ClassNode infer(TryCatchStatement stmt) {
-        inferType(stmt.tryStatement)
+        inferType(stmt.&tryStatement)
         for (CatchStatement aCatch : stmt.catchStatements) {
             inferType(aCatch)
         }
@@ -344,7 +394,7 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(CatchStatement stmt) {
-        inferType(stmt.code)
+        inferType(stmt.&code)
         return RESOLVED_UNKNOWN
     }
 
@@ -352,7 +402,7 @@ class Inferer implements GtkConsts {
     ClassNode infer(DeclarationExpression expr) {
         def left = expr.leftExpression
 
-        def type = inferType(expr.rightExpression)
+        def type = inferType(expr.&rightExpression)
         if (left instanceof VariableExpression) {
             scopes.addName(left)
             if (isNullConstant(expr.rightExpression)) {
@@ -372,16 +422,16 @@ class Inferer implements GtkConsts {
     ClassNode infer(BinaryExpression expr) {
         if (expr.operation.text == '=') {
             // XXX note the different order for assignment
-            def rt = inferType(expr.rightExpression)
-            def lt = inferAssignment(expr.leftExpression, expr.rightExpression)
+            def rt = inferType(expr.&rightExpression)
+            def lt = inferAssignment(expr.&leftExpression, expr.rightExpression)
             def left = expr.leftExpression
             if (left instanceof VariableExpression) {
                 scopes.markVarAsWritable(left.name)
             }
             return rt
         } else {
-            def type1 = inferType(expr.leftExpression)
-            def type2 = inferType(expr.rightExpression)
+            def type1 = inferType(expr.&leftExpression)
+            def type2 = inferType(expr.&rightExpression)
             if (GtkUtils.isBoolean(expr)) {
                 return ClassHelper.boolean_TYPE
             } else {
@@ -398,6 +448,19 @@ class Inferer implements GtkConsts {
     ///////////////////////////////////////////////////
     // inferAssignment
     ///////////////////////////////////////////////////
+
+    ClassNode inferAssignment(Closure ref, Expression rvalue) {
+        def ref2 = ref as MethodClosure
+        def parent = ref2.delegate as ASTNode
+        def childName = ref2.method
+        def child = parent[childName] as ASTNode
+        currentNode.add(new Triple(parent: parent, childName: childName, child: child))
+
+        def type = inferAssignment(child, rvalue)
+
+        currentNode.pop()
+        return type
+    }
 
     @DynamicDispatch
     ClassNode inferAssignment(Expression expr, Expression rvalue) {
@@ -416,6 +479,7 @@ class Inferer implements GtkConsts {
      */
     @DynamicDispatch
     ClassNode inferAssignment(VariableExpression expr, Expression rvalue) {
+        boolean isAssignment = rvalue != null
         //ClassNode infer(VariableExpression expr) {
         def ec = getEnclosingClass()
         def av = expr.accessedVariable
@@ -431,12 +495,12 @@ class Inferer implements GtkConsts {
                 if (rvalue) {
                     markAsRW(av)
                 }
+                def field = ec ? GtkUtils.findField(ec, expr.name) : null
+                def fieldUse = new FieldUse(expr.name, field, isAssignment)
+                markCurrentNodeForReplacement(fieldUse)
                 return av.originType
             } else if (av instanceof DynamicVariable) {
                 // an implicit variable accessed
-                if (ec) {
-                    def field = GtkUtils.findField(ec, expr.name)
-                }
                 return av.originType
             } else if (av instanceof VariableExpression) {
                 // VariableExpression can have accessedVariable with endless nesting
@@ -487,8 +551,11 @@ class Inferer implements GtkConsts {
                 setMeta(expr, AST_NODE_META__GETTER, getter)
                 return setTypeToExprAndMeta(expr, getter.returnType)
             } else if (field) {
-                //setMeta(expr, AST_NODE_META__GETTER, field)
-                return setTypeToExprAndMeta(expr, field.type)
+                def fieldUse = new FieldUse(propName, field, false)
+                GeneralUtils.setFinalField(expr, 'property', fieldUse)
+                setTypeToExprAndMeta(expr, field.type)
+                setTypeToExprAndMeta(fieldUse, field.type)
+                return field.type
             } else {
                 return setTypeToExprAndMeta(expr, RESOLVED_UNKNOWN)
             }
@@ -500,8 +567,13 @@ class Inferer implements GtkConsts {
                 return setTypeToExprAndMeta(expr, setter.returnType)
             } else if (field) {
                 markAsRW(field)
-                //setMeta(expr, AST_NODE_META__SETTER, field)
-                return setTypeToExprAndMeta(expr, field.type)
+
+                def fieldUse = new FieldUse(propName, field, true)
+                GeneralUtils.setFinalField(expr, 'property', fieldUse)
+                setTypeToExprAndMeta(expr, field.type)
+                setTypeToExprAndMeta(fieldUse, field.type)
+
+                return field.type
             } else {
                 return setTypeToExprAndMeta(expr, RESOLVED_UNKNOWN)
             }
@@ -514,10 +586,10 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(IfStatement stmt) {
-        inferType(stmt.booleanExpression)
-        inferType(stmt.ifBlock)
+        inferType(stmt.&booleanExpression)
+        inferType(stmt.&ifBlock)
         if (stmt.elseBlock) {
-            inferType(stmt.elseBlock)
+            inferType(stmt.&elseBlock)
         }
         return RESOLVED_UNKNOWN
     }
@@ -535,33 +607,33 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(AssertStatement stmt) {
-        inferType(stmt.booleanExpression)
-        inferType(stmt.messageExpression)
+        inferType(stmt.&booleanExpression)
+        inferType(stmt.&messageExpression)
         return RESOLVED_UNKNOWN
     }
 
     @DynamicDispatch
     ClassNode infer(ThrowStatement stmt) {
-        inferType(stmt.expression)
+        inferType(stmt.&expression)
         return RESOLVED_UNKNOWN
     }
 
     @DynamicDispatch
     ClassNode infer(SwitchStatement stmt) {
-        inferType(stmt.expression)
+        inferType(stmt.&expression)
         for (CaseStatement aCase : stmt.caseStatements) {
             inferType(aCase)
         }
         if (stmt.defaultStatement != null) {
-            inferType(stmt.defaultStatement)
+            inferType(stmt.&defaultStatement)
         }
         return RESOLVED_NO_TYPE
     }
 
     @DynamicDispatch
     ClassNode infer(CaseStatement stmt) {
-        inferType(stmt.expression)
-        inferType(stmt.code)
+        inferType(stmt.&expression)
+        inferType(stmt.&code)
         return RESOLVED_NO_TYPE
     }
 
@@ -583,7 +655,7 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(StaticMethodCallExpression expr) {
-        inferType(expr.arguments)
+        inferType(expr.&arguments)
         final methodName = expr.method
         final method = expr.ownerType.tryFindPossibleMethod(methodName, expr.arguments)
         if (method) {
@@ -594,19 +666,19 @@ class Inferer implements GtkConsts {
                 return RESOLVED_ERROR
             }
         } else {
-            log.warn("no method {} found for {}", methodName, expr.ownerType.name)
+            log.warn("no method found: {}.{}", expr.ownerType.name, methodName)
             return RESOLVED_ERROR
         }
     }
 
     @DynamicDispatch
     ClassNode infer(PostfixExpression expr) {
-        return inferType(expr.expression)
+        return inferType(expr.&expression)
     }
 
     @DynamicDispatch
     ClassNode infer(PrefixExpression expr) {
-        return inferType(expr.expression)
+        return inferType(expr.&expression)
     }
 
     @DynamicDispatch
@@ -623,8 +695,8 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(MapEntryExpression expr) {
-        inferType(expr.keyExpression)
-        inferType(expr.valueExpression)
+        inferType(expr.&keyExpression)
+        inferType(expr.&valueExpression)
         return RESOLVED_NO_TYPE
     }
 

@@ -865,6 +865,13 @@ class GroovyToKotlin implements GtkConsts {
         translatePropertyExpressionImpl(left, rvalue)
     }
 
+    @DynamicDispatch
+    private void translateAssignment(FieldUse left, Expression rvalue) {
+        out.append(left.name)
+        out.append(" = ")
+        translateExpr(rvalue)
+    }
+
     /////////////////////////////////////
     //
     /////////////////////////////////////
@@ -886,7 +893,7 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     /**
-     * Groovy devs thinks `a[0]` is a binary expression.
+     * Like `a[0]`.
      */
     private void translateIndexingExpr(BinaryExpression expr) {
         translateExpr(expr.leftExpression)
@@ -922,6 +929,11 @@ class GroovyToKotlin implements GtkConsts {
         //if (!expr.dynamicTyped) {
         //    out.append(": ${typeToKotlinString(expr.type)}")
         //}
+    }
+
+    @DynamicDispatch
+    void translateExpr(FieldUse expr) {
+        out.append(expr.name)
     }
 
     @DynamicDispatch
@@ -1059,7 +1071,7 @@ class GroovyToKotlin implements GtkConsts {
         if (prop instanceof ConstantExpression) {
             out.append(prop.text)
         } else {
-            out.append("ERROR(expecting ConstantExpression)")
+            out.append("ERROR(expecting ConstantExpression #1)")
         }
     }
 
@@ -1123,9 +1135,15 @@ class GroovyToKotlin implements GtkConsts {
                     out.append(propName)
                 }
             }
+        } else if (prop instanceof FieldUse) {
+            out.append(prop.name)
+            if (rvalue) {
+                out.append(' = ')
+                translateExpr(rvalue)
+            }
         } else {
             // translateExpr(expr.property)
-            out.append("ERROR(expecting ConstantExpression)")
+            out.append("ERROR(expecting ConstantExpression #2)")
         }
 
         int stop = 0

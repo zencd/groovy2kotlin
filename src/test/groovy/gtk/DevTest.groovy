@@ -1,6 +1,7 @@
 package gtk
 
 import org.codehaus.groovy.ast.ClassHelper
+import org.codehaus.groovy.runtime.MethodClosure
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.slf4j.Logger
@@ -55,11 +56,9 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
+    int xxx
     void main(Main o, Main x) {
-        def xxx = """
-111
-222
-        """
+        o.xxx = 123
     }
 }
 '''
@@ -76,9 +75,15 @@ class Main {
 
     def x = 22
 
+    static class Human {
+        String name = "Joe"
+    }
+
     @Test
     void tmp() {
-        ''.split()
+        def x = (new Human().&name) as MethodClosure
+        x.delegate[x.method] = "22222"
+        def xx = x.delegate[x.method]
         int stop = 0
     }
 

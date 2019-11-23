@@ -17,7 +17,7 @@ The policy:
 
 The current implementation's passes:
 - One or multiple modules are parsed into AST by the Groovy itself;
-- All types are resolved, including dependent libs;
+- All types (including dependent libs) gets resolved as strictly as possible;
 - AST traversed to resolve types of locals and expressions;
 - Kotlin code generated.
 
@@ -26,7 +26,7 @@ Feel free to submit a bug, ticket and do all the github things.
 ## Requirements
 
 - JDK 1.8 (for running the tool)
-- Groovy 2.5.8 (for running the tool)
+- Groovy 2.5.8 (for running the tool + input language level)
 - Kotlin 1.3 (produced code level)
 
 Others may be supported but was not tested.

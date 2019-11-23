@@ -6,10 +6,12 @@ import org.codehaus.groovy.ast.expr.ExpressionTransformer
 
 class FieldUse extends Expression {
 
+    final String name
     final FieldNode field
     final boolean assignment
 
-    FieldUse(FieldNode field, boolean assignment) {
+    FieldUse(String name, FieldNode field, boolean assignment) {
+        this.name = name
         this.field = field
         this.assignment = assignment
         setType(field.type)
@@ -18,5 +20,10 @@ class FieldUse extends Expression {
     @Override
     Expression transformExpression(ExpressionTransformer transformer) {
         return transformer.transform(this)
+    }
+
+    @Override
+    String toString() {
+        return "FieldUse(name: $name, field: $field)"
     }
 }

@@ -2,6 +2,9 @@ package gtk
 
 import groovy.json.StringEscapeUtils
 
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
+
 /**
  * Common use utils.
  */
@@ -71,4 +74,18 @@ class GeneralUtils {
     static void makeDirsForRegularFile(File file) {
         file.parentFile.mkdir()
     }
+
+    static void setFinalField(Object obj, String fieldName, Object value) {
+        setFinalField(obj, obj.class.getDeclaredField(fieldName), value)
+    }
+
+    static void setFinalField(Object obj, Field field, Object value) {
+        Field modifiersField = Field.class.getDeclaredField("modifiers")
+        modifiersField.setAccessible(true)
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL)
+
+        field.setAccessible(true)
+        field.set(obj, value)
+    }
+
 }
