@@ -56,7 +56,10 @@ class Temp {
         String groovyText = '''
 class Main {
     void main(Main o, Main x) {
-        o <=> x
+        def xxx = """
+111
+222
+        """
     }
 }
 '''

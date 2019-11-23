@@ -3,34 +3,29 @@
 - access to implemented interface's static const
 - Convert `"a"` to `'a'` if acceptor's type is `char`
 - Fix `constructors.txt`
-- Logical NOT, double NOT
 - Special treatment of `expr as boolean`, `(boolean)expr`, `boolean x = expr`  in Groovy
-- Kotlin prohibits implicit casts like `Int -> Long`
 - Wildcard expressions: `list*.prop = 123`
 - Presence of both field `some` and `getSome()` is not respected by Kotlin (but it's ok in Groovy)
 - If there are both field `some` and `getSome()` in Groovy code, the method should be preferred (like Groovy does)
 - Groovy scripts (statements outside any classes)
 - Allow annotations for everything
 - Preserve javadoc (there is a way)
-- Replace use/import of anno `groovy.transform.CompileStatic` with Kotlin's analog
-- Probably translate `def` → `Any` in formal params, not `Object`
-- Groovy allows implicit conversions like `String s = 1L`
+- Translate multi-line strings with respect for the author's formatting, and use `trimIndent()`
+- Kotlin prohibits implicit casts like `Int -> Long`
+- Groovy allows implicit casts like `String s = 1L`
 - `static` can't be applied to static inner classes
 - Check a field is never rewritten thru code, and mark it as `val` then
-- Groovy's special use of bitwise operators on lists, streams, etc
+- Groovy's special use of bitwise operators on ~~lists~~, streams, etc
 - Translate Groovy's implicit `return` (solved for certain cases)
-- Implement "Groovy truth" behaviour for:
-    - List and Map ancestors
-    - Object
-    - Check for presence of `asBoolean()`
+- Groovy truth: check for presence of `asBoolean()` in user classes
+- Start checking for custom type-into-type converters defined in user classes
 - Mappings:
-    - `String.length()` → `length` attr
     - `String.execute()`
     - `File.text`
     - `File.eachLine()` → `forEachLine`
     - `List.eachWithIndex()` → `forEachIndexed` (params swapped!)
     - `List.grep()`
-- Optional:
+- Non urgent things:
     - `@Deprecated` -> `@kotlin.Deprecated(message)`
 - Add tests:
     - `list << item`
@@ -42,37 +37,32 @@
     - `List.size() -> size`
     - `List.every() -> all`
 
-## Some history
+## What's done
 
 ✔ Classes ✔ Interfaces
+✔ Inheritance
+✔ Overriding
 ✔ Anonymous classes 
 ✔ Inner classes ✔ Nested classes
-✔ Inheritance
 ✔ Annotations
 ✔ Range expression
 ✔ In-string expressions
 ✔ Bitwise expressions
 ✔ Exceptions
-✔ `in`
-✔ `==~`
-✔ `=~`
-✔ `is`
+✔ `in` ✔ `==~` ✔ `=~` ✔ `is` ✔ `<=>`
 ✔ Arrays
 ✔ Local vars
 ✔ Multiple value assignment
 ✔ `/.+/` regexps
-✔ `if`
-✔ `while`
-✔ `for(;;)`
+✔ `if/else` ✔ `switch` ✔ `while` ✔ `for in` ✔ `for(;;)`
 ✔ `break` ✔ `continue`
 ✔ Loop labels
+✔ `try/catch`
 ✔ `throws`
-✔ Overriding
 ✔ Standard methods
-✔ Kotlin `const` for constants
+✔ `const`
 ✔ Groovy truth
 ✔ Groovy's property-style method access
-✔ Groovy diamond operator
 
 
 ## Progress on a project
