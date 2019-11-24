@@ -55,10 +55,9 @@ class Temp {
         String groovyText = '''
 class Main {
     int xxx
-    void main() {
-        Arrays.asList(1,2,3).each { x ->
-            println(x)
-        }
+    void main(int arg) {
+        arg = 101
+        println(arg)
     }
 }
 '''

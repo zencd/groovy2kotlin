@@ -71,6 +71,7 @@ import static GtkUtils.typeToKotlinString
 import static gtk.GtkUtils.dropFirstArgument
 import static gtk.GtkUtils.findGetter
 import static gtk.GtkUtils.getClassExtendedByAnonymousClass
+import static gtk.GtkUtils.getWritableParamName
 import static gtk.GtkUtils.isAnyNumber
 import static gtk.GtkUtils.isAnyString
 import static gtk.GtkUtils.isBinary
@@ -495,6 +496,15 @@ class GroovyToKotlin implements GtkConsts {
             out.append(" {")
             out.lineBreak()
             out.push()
+
+            for (aParam in method.parameters) {
+                // introduce new variables for rewritable method params
+                if (Inferer.isMarkedRW(aParam)) {
+                    def tmpLocalName = getWritableParamName(aParam)
+                    out.newLineCrlf("var ${tmpLocalName} = ${aParam.name}")
+                }
+            }
+
             for (stmt in stmts) {
                 translateStatement(stmt)
             }
@@ -922,10 +932,17 @@ class GroovyToKotlin implements GtkConsts {
             out.append('::class.java')
         } else {
             def av = expr.accessedVariable
+            def originalName = expr.name
+            def usedName = originalName
             if (av instanceof PropertyNode) {
-                def method = findGetter(av.field.declaringClass, expr.name)
+                def method = findGetter(av.field.declaringClass, originalName)
+            } else if (av instanceof Parameter) {
+                def rw = Inferer.isMarkedRW(av)
+                if (rw) {
+                    usedName = getWritableParamName(av)
+                }
             }
-            out.append(expr.name)
+            out.append(usedName)
         }
         //if (!expr.dynamicTyped) {
         //    out.append(": ${typeToKotlinString(expr.type)}")

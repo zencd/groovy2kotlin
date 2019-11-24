@@ -1,12 +1,12 @@
 class Bitwise {
     void bitwise(x) {
-        x = 16 | 32
-        x = 16 & 32
-        x = 16 << 32
-        x = 16 >> 32
-        x = 16 >>> 32
-        x = 16 ^ 32
-        x = ~16
+        16 | 32
+        16 & 32
+        16 << 32
+        16 >> 32
+        16 >>> 32
+        16 ^ 32
+        ~16
     }
 }
 ---------------
@@ -15,12 +15,12 @@ open class Bitwise {
     companion object {
     }
     fun bitwise(x: Any) {
-        x = 16 or 32
-        x = 16 and 32
-        x = 16 shl 32
-        x = 16 shr 32
-        x = 16 ushr 32
-        x = 16 xor 32
-        x = 16.inv()
+        16 or 32
+        16 and 32
+        16 shl 32
+        16 shr 32
+        16 ushr 32
+        16 xor 32
+        16.inv()
     }
 }

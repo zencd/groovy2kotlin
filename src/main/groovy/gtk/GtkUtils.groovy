@@ -782,4 +782,9 @@ class GtkUtils implements GtkConsts {
             return null
         }
     }
+
+    static String getWritableParamName(Parameter param) {
+        assert Inferer.isMarkedRW(param)
+        return param.name + "RW"
+    }
 }

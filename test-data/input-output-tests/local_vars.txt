@@ -27,6 +27,11 @@
         i = 1
         f = 1
     }
+    void temp_var_created_for_rewritable_params(int readOnly, String writable) {
+        writable = "new value"
+        println(readOnly)
+        println(writable)
+    }
 }
 -------------------
 $DEFAULT_IMPORTS
@@ -60,5 +65,11 @@ open class ClassName {
         var f: Float
         i = 1
         f = 1
+    }
+    fun temp_var_created_for_rewritable_params(readOnly: Int, writable: String) {
+        var writableRW = writable
+        writableRW = "new value"
+        println(readOnly)
+        println(writableRW)
     }
 }
