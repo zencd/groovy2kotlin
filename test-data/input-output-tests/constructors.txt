@@ -3,10 +3,10 @@ class Main extends Base {
         super()
     }
     Main(String name) {
-        super(name)
+        super   (name)
     }
     Main(int i) {
-        this("invoking this()")
+        this ("invoking this()")
     }
 }
 

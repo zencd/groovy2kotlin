@@ -55,7 +55,7 @@ class Temp {
         String groovyText = '''
 class Main {
     Main(int i) {
-        super(i)
+        super (i)
         println(111)
     }
     void main() {}

@@ -663,6 +663,14 @@ class GtkUtils implements GtkConsts {
             return null
         }
         int left = pos - 1
+
+        while (left >= 0) {
+            //skipping optional spaces
+            def ch = currentSource.text.charAt(left)
+            if (!Character.isSpaceChar(ch)) break
+            left--
+        }
+
         while (left >= 0) {
             def ch = currentSource.text.charAt(left)
             if (!Character.isJavaIdentifierPart(ch)) break
