@@ -55,9 +55,8 @@ class Temp {
         String groovyText = '''
 class Main {
     int xxx
-    void main(int arg) {
-        arg = 101
-        println(arg)
+    void main(int[] args) {
+        if (args) {}
     }
 }
 '''

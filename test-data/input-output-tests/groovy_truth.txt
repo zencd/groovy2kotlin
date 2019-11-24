@@ -12,6 +12,13 @@ class Main {
         if (true && true || i) {}
         if (true && true || date) {}
     }
+
+    void collections(Collection coll, List list, Map map, String[] array) {
+        if (coll) {}
+        if (list) {}
+        if (map) {}
+        if (array) {}
+    }
 }
 ---------------
 $DEFAULT_IMPORTS
@@ -38,6 +45,16 @@ open class Main {
         if ((true && true) || i) {
         }
         if ((true && true) || date != null) {
+        }
+    }
+    fun collections(coll: Collection, list: List<Any>, map: Map<Any, Any>, array: Array<String>) {
+        if (coll != null && coll.size > 0) {
+        }
+        if (list != null && list.size > 0) {
+        }
+        if (map != null && map.size > 0) {
+        }
+        if (array != null && array.size > 0) {
         }
     }
 }
