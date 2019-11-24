@@ -480,20 +480,36 @@ class GroovyToKotlin implements GtkConsts {
         translateMethodParams(method.parameters)
         //out.append(getParametersText(method.parameters))
         out.append(")")
-        out.append(rt3)
+
         def code = method.code
-        if (code == null) {
-            out.lineBreak()
-        } else if (code instanceof BlockStatement) {
-            def stmts = code.statements
-
+        List<Statement> stmts = null
+        ConstructorCallExpression constructorCall = null
+        if (code instanceof BlockStatement) {
+            stmts = code.statements
             stmts = stmts.findAll { !GtkUtils.isGroovyImplicitConstructorStatement(it) }
-
             // todo probably do not make this transformation because nesting maybe useful to avoid name clash
             // but fix formatting then
             stmts = Transformers.tryReduceUselessBlockNesting(stmts)
             stmts = Transformers.tryAddExplicitReturnToMethodBody(method, stmts)
+            if (isConstructor && !stmts.isEmpty() && stmts[0] instanceof ExpressionStatement) {
+                def es = stmts[0] as ExpressionStatement
+                if (es.expression instanceof ConstructorCallExpression) {
+                    constructorCall = es.expression as ConstructorCallExpression
+                    stmts = stmts.subList(1, stmts.size())
+                }
+            }
+        }
 
+        if (isConstructor && constructorCall) {
+            out.append(" : ")
+            translateExpr(constructorCall)
+        }
+
+        out.append(rt3)
+
+        if (code == null) {
+            out.lineBreak()
+        } else if (code instanceof BlockStatement) {
             out.append(" {")
             out.lineBreak()
             out.push()

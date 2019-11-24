@@ -87,6 +87,8 @@ class Inferer implements GtkConsts {
 
     private final Stack<Triple> currentNode = new Stack<>()
 
+    private final Deps deps = new Deps()
+
     private static class Triple {
         ASTNode parent
         String childName

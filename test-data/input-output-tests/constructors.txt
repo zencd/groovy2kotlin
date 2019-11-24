@@ -3,10 +3,10 @@ class Main extends Base {
         super()
     }
     Main(String name) {
-        super  (name)
+        super(name)
     }
     Main(int i) {
-        this  ("invoking this()")
+        this("invoking this()")
     }
 }
 
@@ -19,11 +19,11 @@ $DEFAULT_IMPORTS
 open class Main : Base {
     companion object {
     }
-    constructor(): super() {
+    constructor() : super() {
     }
-    constructor(name: String): super(name) {
+    constructor(name: String) : super(name) {
     }
-    constructor(i: Int): this("invoking this()") {
+    constructor(i: Int) : this("invoking this()") {
     }
 }
 open class Base {

@@ -4,7 +4,8 @@ class Optionals {
         String name
     }
 
-    void main(User user) {
+    void main() {
+        User user
         def x = user.name
         def xx = foo(x)
     }
@@ -13,3 +14,12 @@ class Optionals {
         return null
     }
 }
+
+/*
+
+main_x -> User_name
+foo_x -> main_x
+xx -> foo
+
+
+*/

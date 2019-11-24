@@ -59,7 +59,6 @@ class MainTest {
         testFromFile("switch.txt")
     }
 
-    @Disabled
     @Test
     void "constructors"() {
         testFromFile("constructors.txt")

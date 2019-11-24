@@ -54,9 +54,15 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    int xxx
-    void main(int[] args) {
-        if (!args) {}
+    Main(int i) {
+        super(i)
+        println(111)
+    }
+    void main() {}
+}
+class Base {
+    Base(int i) {
+        println(222)
     }
 }
 '''

@@ -2,7 +2,6 @@
 
 - access to implemented interface's static const
 - Convert `"a"` to `'a'` if acceptor's type is `char`
-- Fix `constructors.txt`
 - Special treatment of `expr as boolean`, `(boolean)expr`, `boolean x = expr`  in Groovy
 - Wildcard expressions: `list*.prop = 123`
 - Presence of both field `some` and `getSome()` is not respected by Kotlin (but it's ok in Groovy)
@@ -74,3 +73,4 @@
     2019-11-17 - 526
     2019-11-19 - 487
     2019-11-21 - 443
+    2019-11-24 - 419
