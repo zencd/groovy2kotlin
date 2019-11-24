@@ -1,7 +1,7 @@
 package gtk.inf
 
-import gtk.FieldUse
 import gtk.GeneralUtils
+import gtk.ast.FieldUse
 import org.codehaus.groovy.ast.DynamicVariable
 import gtk.DynamicDispatch
 import gtk.GroovyExtensions
@@ -657,7 +657,7 @@ class Inferer implements GtkConsts {
     ClassNode infer(StaticMethodCallExpression expr) {
         inferType(expr.&arguments)
         final methodName = expr.method
-        final method = expr.ownerType.tryFindPossibleMethod(methodName, expr.arguments)
+        final method = GtkUtils.findMethodLoosely(expr.ownerType, methodName, expr.arguments)
         if (method) {
             if (method.isStatic()) {
                 return method.returnType

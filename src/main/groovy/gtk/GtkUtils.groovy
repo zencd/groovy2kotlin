@@ -502,8 +502,29 @@ class GtkUtils implements GtkConsts {
         new Token(0, s, 0,0)
     }
 
-    static MethodNode findMethod(ClassNode objectType, String methodName, Expression args = ArgumentListExpression.EMPTY_ARGUMENTS) {
-        return objectType.tryFindPossibleMethod(methodName, args)
+    static MethodNode findMethodStrictly(ClassNode objectType, String methodName, Expression args = ArgumentListExpression.EMPTY_ARGUMENTS) {
+        Closure findInThisType = { objectType.tryFindPossibleMethod(methodName, args) }
+        Closure findInRedirect = { objectType.redirect()?.tryFindPossibleMethod(methodName, args) }
+        def method = findInThisType() ?: findInRedirect()
+        return method
+    }
+
+    static MethodNode findMethodLoosely(ClassNode objectType, String methodName, Expression args = ArgumentListExpression.EMPTY_ARGUMENTS) {
+        Closure findStrictly = { findMethodStrictly(objectType, methodName, args) }
+        Closure findLoosely = {
+            def mm = objectType.getMethods(methodName)
+            if (mm.size() == 1) {
+                def rt = mm[0].returnType
+                def allHaveSameReturnType = mm.every { it.returnType == rt }
+                return allHaveSameReturnType ? mm[0] : null
+            } else if (mm.size() > 0) {
+                return mm[0]
+            } else {
+                return null
+            }
+        }
+        def method = findStrictly() ?: findLoosely()
+        return method
     }
 
     static MethodNode findGetter(ClassNode objectType, String propName) {

@@ -1,5 +1,6 @@
 package gtk
 
+import gtk.ast.FieldUse
 import gtk.inf.Inferer
 import org.codehaus.groovy.ast.DynamicVariable
 import org.codehaus.groovy.ast.AnnotationNode

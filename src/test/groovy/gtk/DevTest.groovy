@@ -50,15 +50,15 @@ class Temp {
         println(kotlinText)
     }
 
-    // nodes[0].classes[0].methods[0].code.statements[0].expression.leftExpression
-
     @Test
     void trans_single_string() {
         String groovyText = '''
 class Main {
     int xxx
-    void main(Main o, Main x) {
-        o.xxx = 123
+    void main() {
+        Arrays.asList(1,2,3).each { x ->
+            println(x)
+        }
     }
 }
 '''
@@ -73,18 +73,8 @@ class Main {
         int stop = 0
     }
 
-    def x = 22
-
-    static class Human {
-        String name = "Joe"
-    }
-
     @Test
     void tmp() {
-        def x = (new Human().&name) as MethodClosure
-        x.delegate[x.method] = "22222"
-        def xx = x.delegate[x.method]
-        int stop = 0
     }
 
     @Test

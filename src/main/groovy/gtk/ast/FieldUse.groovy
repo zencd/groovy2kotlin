@@ -1,4 +1,4 @@
-package gtk
+package gtk.ast
 
 import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.expr.Expression
