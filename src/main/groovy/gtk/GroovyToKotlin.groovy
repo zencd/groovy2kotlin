@@ -1508,12 +1508,13 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateStatement(AssertStatement stmt) {
-        out.newLine("assert (")
+        out.newLine("assert(")
         transAsGroovyTruth(stmt.booleanExpression, true)
         out.append(")")
         if (stmt.messageExpression != null && !isNullConstant(stmt.messageExpression)) {
-            out.append(" : ")
+            out.append(" { ")
             translateExpr(stmt.messageExpression)
+            out.append(" }")
         }
         out.lineBreak()
     }
