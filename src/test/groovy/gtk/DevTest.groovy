@@ -56,7 +56,7 @@ class Temp {
 class Main {
     int xxx
     void main(int[] args) {
-        if (args) {}
+        if (!args) {}
     }
 }
 '''

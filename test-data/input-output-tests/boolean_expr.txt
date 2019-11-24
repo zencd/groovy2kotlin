@@ -49,7 +49,7 @@ open class Main {
 
     fun main() {
         anyObject != null && anyObject != null
-        (list != null && list.size > 0) && (map != null && map.size > 0)
+        (list != null && list.isNotEmpty()) && (map != null && map.isNotEmpty())
         b && b
         B && B
         i || i
@@ -64,13 +64,13 @@ open class Main {
         anyObject == null
         s == null || s.length == 0
         !i
-        (list == null || list.size == 0) && (map == null || map.size == 0)
+        (list == null || list.isEmpty()) && (map == null || map.isEmpty())
     }
 
     fun double_not() {
         anyObject != null
         (s != null && s.length > 0)
         i
-        (list != null && list.size > 0) && (map != null && map.size > 0)
+        (list != null && list.isNotEmpty()) && (map != null && map.isNotEmpty())
     }
 }

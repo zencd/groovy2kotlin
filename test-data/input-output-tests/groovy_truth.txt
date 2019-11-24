@@ -19,6 +19,13 @@ class Main {
         if (map) {}
         if (array) {}
     }
+
+    void collections_not(Collection coll, List list, Map map, String[] array) {
+        if (!coll) {}
+        if (!list) {}
+        if (!map) {}
+        if (!array) {}
+    }
 }
 ---------------
 $DEFAULT_IMPORTS
@@ -48,13 +55,23 @@ open class Main {
         }
     }
     fun collections(coll: Collection, list: List<Any>, map: Map<Any, Any>, array: Array<String>) {
-        if (coll != null && coll.size > 0) {
+        if (coll != null && coll.isNotEmpty()) {
         }
-        if (list != null && list.size > 0) {
+        if (list != null && list.isNotEmpty()) {
         }
-        if (map != null && map.size > 0) {
+        if (map != null && map.isNotEmpty()) {
         }
-        if (array != null && array.size > 0) {
+        if (array != null && array.isNotEmpty()) {
+        }
+    }
+    fun collections_not(coll: Collection, list: List<Any>, map: Map<Any, Any>, array: Array<String>) {
+        if ((coll == null || coll.isEmpty())) {
+        }
+        if ((list == null || list.isEmpty())) {
+        }
+        if ((map == null || map.isEmpty())) {
+        }
+        if ((array == null || array.isEmpty())) {
         }
     }
 }
