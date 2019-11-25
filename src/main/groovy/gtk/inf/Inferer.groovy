@@ -336,6 +336,7 @@ class Inferer implements GtkConsts {
             def customResolved = tryResolveMethodReturnType(objType, methodName, expr.arguments)
             ClassNode resultType = customResolved ?: originalType
             if (isList(objType) && (methodName == 'add' || methodName == 'addAll')) {
+                // todo maybe check for Collection, not for List here
                 if (oe instanceof VariableExpression) {
                     scopes.markAsMutable(oe.name)
                 }

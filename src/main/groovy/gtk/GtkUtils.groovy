@@ -562,6 +562,9 @@ class GtkUtils implements GtkConsts {
         return false
     }
 
+    /**
+     * XXX usually ou want isCollection().
+     */
     static boolean isList(ClassNode type) {
         isDerivedFrom(type, ClassHelper.LIST_TYPE)
     }

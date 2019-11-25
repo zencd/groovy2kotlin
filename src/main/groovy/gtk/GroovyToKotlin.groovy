@@ -608,19 +608,19 @@ class GroovyToKotlin implements GtkConsts {
             else if (isAnyString(objType) && name == 'readLines' && numParams == 0) {
                 name = 'lines'
             }
-            else if (isList(objType) && name == 'findAll' && numParams == 1) {
+            else if (isCollection(objType) && name == 'findAll' && numParams == 1) {
                 name = 'filter'
             }
             else if (objType.isArray() && name == 'findAll' && numParams == 1) {
                 name = 'filter'
             }
-            else if (isList(objType) && name == 'collect' && numParams == 1) {
+            else if (isCollection(objType) && name == 'collect' && numParams == 1) {
                 name = 'map'
             }
-            else if (isList(objType) && name == 'every' && numParams == 1) {
+            else if (isCollection(objType) && name == 'every' && numParams == 1) {
                 name = 'all'
             }
-            else if (isList(objType) && name == 'join' && numParams == 1) {
+            else if (isCollection(objType) && name == 'join' && numParams == 1) {
                 name = 'joinToString'
             }
             else if (isAnyString(objType) && name == 'getBytes' && numParams == 1) {
@@ -835,7 +835,7 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     private boolean tryTranslateSpecialLeftShift(BinaryExpression expr) {
-        if (isList(expr.leftExpression.type) && expr.operation.text == GR_SHIFT_LEFT) {
+        if (isCollection(expr.leftExpression.type) && expr.operation.text == GR_SHIFT_LEFT) {
             // todo must be rewritten with a sub-tree replacement
             translateExpr(expr.leftExpression)
             out.append(".add(")
