@@ -53,21 +53,13 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = '''
-class Main extends BaseClass implements BaseInterface {
+class Main implements Base {
     void main() {
-        CLASS_CONST
-        CLASS_CONST = 22
-        INTERFACE_CONST
-        INTERFACE_CONST = 22
-        new File(STRING_CONST)
+        DB_DIR.absolutePath
     }
 }
-class BaseClass {
-    static int CLASS_CONST = 11
-}
-interface BaseInterface {
-    static int INTERFACE_CONST = 11
-    static String STRING_CONST = "xxx"
+interface Base {
+    static File DB_DIR = new File(".")
 }
 '''
         def texts = [groovyText]

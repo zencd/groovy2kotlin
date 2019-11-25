@@ -641,6 +641,9 @@ class GroovyToKotlin implements GtkConsts {
             else if (isFile(objType) && name == 'getText') {
                 name = 'readText'
             }
+            else if (isFile(objType) && name == 'eachLine') {
+                name = 'forEachLine'
+            }
             else if (isAnyNumber(objType) && (name in GtkUtils.GROOVY_NUMBER_CONVERTERS) && numParams == 0) {
                 name = GtkUtils.GROOVY_TO_KOTLIN_NUMBER_CONVERTERS[name]
             }

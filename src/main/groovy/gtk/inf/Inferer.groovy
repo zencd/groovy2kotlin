@@ -571,7 +571,7 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode inferAssignment(PropertyExpression expr, Expression rvalue) {
-        def objType = inferType(expr.objectExpression)
+        def objType = inferType(expr.&objectExpression)
         def propName = expr.propertyAsString
         def field = objType.getField(propName)
         if (propName == null) {

@@ -6,6 +6,7 @@ class Main extends BaseClass implements BaseInterface {
         INTERFACE_CONST
         INTERFACE_CONST = 22
         new File(STRING_CONST)
+        DIR.absolutePath // a special case: constant as an object expression + property-style invocation
     }
 }
 class BaseClass {
@@ -14,6 +15,7 @@ class BaseClass {
 interface BaseInterface {
     static int INTERFACE_CONST = 11
     static String STRING_CONST = "xxx"
+    static File DIR = new File(".")
 }
 -----------------
 package xxx
@@ -28,6 +30,7 @@ open class Main : BaseClass(), BaseInterface {
         BaseInterface.INTERFACE_CONST
         BaseInterface.INTERFACE_CONST = 22
         File(BaseInterface.STRING_CONST)
+        BaseInterface.DIR.getAbsolutePath()
     }
 }
 open class BaseClass {
@@ -39,5 +42,6 @@ interface BaseInterface {
     companion object {
         const val INTERFACE_CONST: Int = 11
         const val STRING_CONST: String = "xxx"
+        val DIR: File = File(".")
     }
 }

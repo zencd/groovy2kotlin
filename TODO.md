@@ -1,6 +1,6 @@
 ## Todo
 
-- access to implemented interface's static const
+- Use `true` not `return true` within closures
 - Convert `"a"` to `'a'` if acceptor's type is `char`
 - Special treatment of `expr as boolean`, `(boolean)expr`, `boolean x = expr`  in Groovy
 - Wildcard expressions: `list*.prop = 123`
