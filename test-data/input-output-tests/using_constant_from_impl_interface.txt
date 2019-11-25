@@ -1,0 +1,41 @@
+class Main extends BaseClass implements BaseInterface {
+    void main() {
+        CLASS_CONST
+        CLASS_CONST = 22
+        INTERFACE_CONST
+        INTERFACE_CONST = 22
+        new File(STRING_CONST)
+    }
+}
+class BaseClass {
+    static int CLASS_CONST = 11
+}
+interface BaseInterface {
+    static int INTERFACE_CONST = 11
+    static String STRING_CONST = "xxx"
+}
+-----------------
+$DEFAULT_IMPORTS
+open class Main : BaseClass(), BaseInterface {
+    companion object {
+    }
+
+    fun main() {
+        CLASS_CONST
+        CLASS_CONST = 22
+        BaseInterface.INTERFACE_CONST
+        BaseInterface.INTERFACE_CONST = 22
+        File(BaseInterface.STRING_CONST)
+    }
+}
+open class BaseClass {
+    companion object {
+        var CLASS_CONST: Int = 11
+    }
+}
+interface BaseInterface {
+    companion object {
+        const val INTERFACE_CONST: Int = 11
+        const val STRING_CONST: String = "xxx"
+    }
+}

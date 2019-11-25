@@ -303,7 +303,6 @@ class GroovyToKotlin implements GtkConsts {
             if (synth2) {
                 // groovy-specific methods added implicitly, we don't want them
                 // Examples: `getProperty`, `invokeMethod`, `setMetaClass`, `$getStaticMetaClass`
-                int stop = 0
             } else if (synth1) {
                 // known cases:
                 // 1) static initializer
@@ -453,10 +452,6 @@ class GroovyToKotlin implements GtkConsts {
         def isConstructor = GtkUtils.isConstructor(method)
         def isStaticBlock = '<clinit>' == method.name
         def name = method.name
-
-        if (isConstructor) {
-            int stop = 0
-        }
 
         if (isStaticBlock) {
             out.newLineCrlf("/*")
@@ -895,7 +890,7 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     private void translateAssignment(FieldUse left, Expression rvalue) {
-        out.append(left.name)
+        transFieldName(left)
         out.append(" = ")
         translateExpr(rvalue)
     }
@@ -968,7 +963,34 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(FieldUse expr) {
-        out.append(expr.name)
+        transFieldName(expr)
+    }
+
+    private void transFieldName(FieldUse expr) {
+        def translated = false
+
+        if (expr.field.isStatic()) {
+            def owner = expr.field.owner
+            def ec = expr.enclosingClass
+            if (ec && owner.isInterface() && ec.implementsInterface(owner)) {
+                //
+                // By some reason Kotlin 1.30 prohibits accessing an constant from implemented interface
+                // in its (constant's) simplest form like "FOO".
+                // This is still okay for constants from base classes.
+                // So here we use qualified name to avoid Kotlin errors.
+                //
+                // todo try use getRelativeClassName()
+                out.append(owner.name)
+                out.append(".")
+                out.append(expr.name)
+                translated = true
+            }
+        }
+
+        if (!translated) {
+            out.append(expr.name)
+            translated = true
+        }
     }
 
     @DynamicDispatch
@@ -1180,8 +1202,6 @@ class GroovyToKotlin implements GtkConsts {
             // translateExpr(expr.property)
             out.append("ERROR(expecting ConstantExpression #2)")
         }
-
-        int stop = 0
     }
 
     @DynamicDispatch
@@ -1241,7 +1261,6 @@ class GroovyToKotlin implements GtkConsts {
             out.append(entry.keyExpression.text)
             out.append('=')
             translateExpr(entry.valueExpression)
-            int stop = 0
         }
         out.append(')')
     }

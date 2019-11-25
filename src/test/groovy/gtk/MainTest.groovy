@@ -174,6 +174,11 @@ class MainTest {
         testFromFile("strings.txt")
     }
 
+    @Test
+    void "using_constant_from_impl_interface"() {
+        testFromFile("using_constant_from_impl_interface.txt")
+    }
+
     //@Test
     //@Disabled
     //void test_from_files() {

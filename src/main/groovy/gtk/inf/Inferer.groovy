@@ -91,6 +91,7 @@ class Inferer implements GtkConsts {
 
     private static class Triple {
         ASTNode parent
+        List<ASTNode> parentList
         String childName
         ASTNode child
     }
@@ -165,9 +166,19 @@ class Inferer implements GtkConsts {
         return type
     }
 
-    private void markCurrentNodeForReplacement(Expression replacement) {
+    void inferList(List<ASTNode> nodes) {
+        nodes.each {
+            currentNode.add(new Triple(parentList: nodes, child: it))
+            inferType(it)
+            currentNode.pop()
+        }
+    }
+
+    private void markCurrentNodeForReplacement(Expression original, Expression replacement) {
+        boolean replaced = false
         def cn = currentNode.peek()
-        if (cn.parent) {
+
+        if (!replaced && cn && cn.parent && cn.childName) {
             try {
                 cn.parent[cn.childName] = replacement
             } catch (ReadOnlyPropertyException e) {
@@ -179,7 +190,23 @@ class Inferer implements GtkConsts {
                 }
                 GeneralUtils.setFinalField(cn.parent, field, replacement)
             }
-        } else {
+            replaced = true
+        }
+
+        if (!replaced && cn && cn.child && cn.child.is(original)) {
+            def prevNode = currentNode[currentNode.size() - 2]
+            def list = prevNode.parentList
+            if (list) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (list[i].is(original)) {
+                        list[i] = replacement
+                        replaced = true
+                    }
+                }
+            }
+        }
+
+        if (!replaced) {
             log.warn("no parent node found for replacing its child with {}", replacement)
         }
     }
@@ -213,12 +240,6 @@ class Inferer implements GtkConsts {
         } else {
             log.warn("null ASTNode passed to getType()")
             return RESOLVED_UNKNOWN
-        }
-    }
-
-    void inferList(List<ASTNode> nodes) {
-        nodes.each {
-            inferType(it)
         }
     }
 
@@ -493,16 +514,26 @@ class Inferer implements GtkConsts {
                 // a local accessed
                 return av.originType
             } else if (av instanceof FieldNode) {
-                // a field accessed
+                // a field accessed, type resolved
                 if (rvalue) {
                     markAsRW(av)
                 }
                 def field = ec ? GtkUtils.findField(ec, expr.name) : null
-                def fieldUse = new FieldUse(expr.name, field, isAssignment)
-                markCurrentNodeForReplacement(fieldUse)
+                if (field) {
+                    def fieldUse = new FieldUse(expr.name, field, isAssignment, ec)
+                    markCurrentNodeForReplacement(expr, fieldUse)
+                }
                 return av.originType
             } else if (av instanceof DynamicVariable) {
-                // an implicit variable accessed
+                // Unresolved names:
+                // 1) an implicit variable accessed
+                // 2) a non-qualified constant from extended class/interface accessed
+                def field = ec ? GtkUtils.findField(ec, expr.name) : null
+                if (field) {
+                    def fieldUse = new FieldUse(expr.name, field, isAssignment, ec)
+                    markCurrentNodeForReplacement(expr, fieldUse)
+                    return field.type
+                }
                 return av.originType
             } else if (av instanceof VariableExpression) {
                 // VariableExpression can have accessedVariable with endless nesting
@@ -553,7 +584,7 @@ class Inferer implements GtkConsts {
                 setMeta(expr, AST_NODE_META__GETTER, getter)
                 return setTypeToExprAndMeta(expr, getter.returnType)
             } else if (field) {
-                def fieldUse = new FieldUse(propName, field, false)
+                def fieldUse = new FieldUse(propName, field, false, null)
                 GeneralUtils.setFinalField(expr, 'property', fieldUse)
                 setTypeToExprAndMeta(expr, field.type)
                 setTypeToExprAndMeta(fieldUse, field.type)
@@ -570,7 +601,7 @@ class Inferer implements GtkConsts {
             } else if (field) {
                 markAsRW(field)
 
-                def fieldUse = new FieldUse(propName, field, true)
+                def fieldUse = new FieldUse(propName, field, true, null)
                 GeneralUtils.setFinalField(expr, 'property', fieldUse)
                 setTypeToExprAndMeta(expr, field.type)
                 setTypeToExprAndMeta(fieldUse, field.type)
