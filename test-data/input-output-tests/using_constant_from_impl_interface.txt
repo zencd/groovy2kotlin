@@ -1,3 +1,4 @@
+package xxx
 class Main extends BaseClass implements BaseInterface {
     void main() {
         CLASS_CONST
@@ -15,6 +16,7 @@ interface BaseInterface {
     static String STRING_CONST = "xxx"
 }
 -----------------
+package xxx
 $DEFAULT_IMPORTS
 open class Main : BaseClass(), BaseInterface {
     companion object {

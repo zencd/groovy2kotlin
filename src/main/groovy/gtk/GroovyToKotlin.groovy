@@ -970,17 +970,16 @@ class GroovyToKotlin implements GtkConsts {
         def translated = false
 
         if (expr.field.isStatic()) {
-            def owner = expr.field.owner
-            def ec = expr.enclosingClass
-            if (ec && owner.isInterface() && ec.implementsInterface(owner)) {
+            def fieldOwner = expr.field.owner
+            def useOwner = expr.enclosingClass
+            if (useOwner && fieldOwner.isInterface() && useOwner.implementsInterface(fieldOwner)) {
                 //
                 // By some reason Kotlin 1.30 prohibits accessing an constant from implemented interface
                 // in its (constant's) simplest form like "FOO".
                 // This is still okay for constants from base classes.
                 // So here we use qualified name to avoid Kotlin errors.
                 //
-                // todo try use getRelativeClassName()
-                out.append(owner.name)
+                out.append(GtkUtils.getRelativeClassName(fieldOwner, useOwner, useOwner.module))
                 out.append(".")
                 out.append(expr.name)
                 translated = true
