@@ -647,7 +647,7 @@ class GroovyToKotlin implements GtkConsts {
             else if (isAnyNumber(objType) && (name in GtkUtils.GROOVY_NUMBER_CONVERTERS) && numParams == 0) {
                 name = GtkUtils.GROOVY_TO_KOTLIN_NUMBER_CONVERTERS[name]
             }
-            else if (isList(objType) && name == 'size' && numParams == 0) {
+            else if (isCollection(objType) && name == 'size' && numParams == 0) {
                 // name stays the same
                 methodWasConvertedToAttribute = true
             }
@@ -1449,9 +1449,23 @@ class GroovyToKotlin implements GtkConsts {
         out.newLine("}")
     }
 
+    /**
+     * Kotlin disallows old-fashioned `return` inside a closure.
+     * The possibilities are 1) emit the value without the `return` 2) use `return@method value`.
+     * The safest one is `return@method`, it's preferred but the problem with method remapping is not solved.
+     * TODO start using `return@method` style, but it's needed to solve method remapping first
+     */
     @DynamicDispatch
     void translateStatement(ReturnStatement stmt) {
-        out.newLine("return ")
+        def insideClosure = Inferer.getMeta(stmt, AST_NODE_META__RETURN_INSIDE_CLOSURE, false)
+        String methodName = Inferer.getMeta(stmt, AST_NODE_META__CLOSURE_CALLING_METHOD)
+        //if (methodName) {
+        //    out.newLine("return@${methodName} ")
+        if (insideClosure) {
+            out.newLine("")
+        } else {
+            out.newLine("return ")
+        }
         translateExpr(stmt.expression)
         out.lineBreak()
     }

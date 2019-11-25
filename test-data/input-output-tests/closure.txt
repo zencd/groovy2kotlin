@@ -8,6 +8,11 @@ class Temp {
             println(s)
         }
     }
+    void return_from_closure() {
+        smth {
+            return true
+        }
+    }
 }
 ---------
 $DEFAULT_IMPORTS
@@ -21,6 +26,11 @@ open class Temp {
         args.eachWithIndex { s, i: Int ->
             println(s)
             println(s)
+        }
+    }
+    fun return_from_closure() {
+        smth {
+            true
         }
     }
 }

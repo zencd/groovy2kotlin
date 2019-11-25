@@ -15,6 +15,9 @@ interface GtkConsts {
     static final String AST_NODE_META__WRITABLE = "${AST_NODE_META_PREFIX}.WRITABLE"
     static final String AST_NODE_META__MUTABLE = "${AST_NODE_META_PREFIX}.MUTABLE"
 
+    static final String AST_NODE_META__RETURN_INSIDE_CLOSURE = "${AST_NODE_META_PREFIX}.RETURN_INSIDE_CLOSURE"
+    static final String AST_NODE_META__CLOSURE_CALLING_METHOD = "${AST_NODE_META_PREFIX}.CLOSURE_CALLING_METHOD"
+
     /**
      * Force generate `ClassName` instead of `ClassName::class.java`.
      */

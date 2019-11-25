@@ -53,13 +53,12 @@ class Temp {
     @Test
     void trans_single_string() {
         String groovyText = '''
-class Main implements Base {
+class Main {
     void main() {
-        DB_DIR.absolutePath
+        smth {
+            return true
+        }
     }
-}
-interface Base {
-    static File DB_DIR = new File(".")
 }
 '''
         def texts = [groovyText]

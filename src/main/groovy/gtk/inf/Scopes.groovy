@@ -12,6 +12,8 @@ class Scopes implements GtkConsts {
 
     static class Scope {
         private final Map<String, Variable> vars = new HashMap<>()
+        boolean isClosure = false
+        String methodNameUsingThisClosure = null
         void addName(Variable expr) {
             if (expr.name in vars) {
                 // nop
@@ -23,7 +25,7 @@ class Scopes implements GtkConsts {
 
     private final scopes = new Stack<Scope>()
 
-    private Scope getScope() {
+    Scope getScope() {
         return scopes.peek()
     }
 

@@ -229,7 +229,7 @@ class Inferer implements GtkConsts {
         node.putNodeMetaData(key, value)
     }
 
-    static <T> Object getMeta(ASTNode node, String key, T defVal = null) {
+    static <T> T getMeta(ASTNode node, String key, T defVal = null) {
         T val = node.getNodeMetaData(key)
         return val == null ? defVal : val
     }
@@ -299,6 +299,13 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(ReturnStatement stmt) {
+        def currentScope = scopes.getScope()
+        if (currentScope.isClosure) {
+            setMeta(stmt, AST_NODE_META__RETURN_INSIDE_CLOSURE, true)
+        }
+        if (currentScope.methodNameUsingThisClosure) {
+            setMeta(stmt, AST_NODE_META__CLOSURE_CALLING_METHOD, currentScope.methodNameUsingThisClosure)
+        }
         return inferType(stmt.&expression)
     }
 
@@ -316,6 +323,15 @@ class Inferer implements GtkConsts {
         // todo find method from expr.methodAsString
         if (expr.method instanceof ConstantExpression) {
             String methodName = expr.method.value
+            def args = expr.arguments
+            if (args instanceof TupleExpression) {
+                for (arg in args.expressions) {
+                    if (arg instanceof ClosureExpression) {
+                        // XXX do it before inferring arguments
+                        setMeta(arg, AST_NODE_META__CLOSURE_CALLING_METHOD, methodName)
+                    }
+                }
+            }
             inferType(expr.&arguments)
             def customResolved = tryResolveMethodReturnType(objType, methodName, expr.arguments)
             ClassNode resultType = customResolved ?: originalType
@@ -351,8 +367,17 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(ClosureExpression expr) {
+        def scope = scopes.pushScope()
+        scope.isClosure = true
+        def methodName = getMeta(expr, AST_NODE_META__CLOSURE_CALLING_METHOD)
+        if (methodName) {
+            scope.methodNameUsingThisClosure = methodName
+        }
+
         inferType(expr.&code)
-        return RESOLVED_UNKNOWN // todo
+
+        scopes.popScope()
+        return ClassHelper.CLOSURE_TYPE
     }
 
     @DynamicDispatch
