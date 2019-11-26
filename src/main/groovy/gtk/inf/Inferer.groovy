@@ -31,6 +31,7 @@ import org.codehaus.groovy.ast.expr.GStringExpression
 import org.codehaus.groovy.ast.expr.ListExpression
 import org.codehaus.groovy.ast.expr.MapEntryExpression
 import org.codehaus.groovy.ast.expr.MapExpression
+import org.codehaus.groovy.ast.expr.MethodCall
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.PostfixExpression
 import org.codehaus.groovy.ast.expr.PrefixExpression
@@ -323,15 +324,7 @@ class Inferer implements GtkConsts {
         // todo find method from expr.methodAsString
         if (expr.method instanceof ConstantExpression) {
             String methodName = expr.method.value
-            def args = expr.arguments
-            if (args instanceof TupleExpression) {
-                for (arg in args.expressions) {
-                    if (arg instanceof ClosureExpression) {
-                        // XXX do it before inferring arguments
-                        setMeta(arg, AST_NODE_META__CLOSURE_CALLING_METHOD, methodName)
-                    }
-                }
-            }
+            enhanceTheseArgumentsWhichAreClosures(methodName, expr) // XXX do it before inferring arguments
             inferType(expr.&arguments)
             def customResolved = tryResolveMethodReturnType(objType, methodName, expr.arguments)
             ClassNode resultType = customResolved ?: originalType
@@ -345,6 +338,37 @@ class Inferer implements GtkConsts {
         } else {
             log.warn("yet unsupported expr.method as ${expr.method.class.name}")
             return originalType
+        }
+    }
+
+    @DynamicDispatch
+    ClassNode infer(StaticMethodCallExpression expr) {
+        final methodName = expr.method
+        enhanceTheseArgumentsWhichAreClosures(methodName, expr)
+        inferType(expr.&arguments)
+        final method = GtkUtils.findMethodLoosely(expr.ownerType, methodName, expr.arguments)
+        if (method) {
+            if (method.isStatic()) {
+                return method.returnType
+            } else {
+                log.warn("method is not static: {}", method)
+                return RESOLVED_ERROR
+            }
+        } else {
+            log.warn("no method found: {}.{}", expr.ownerType.name, methodName)
+            return RESOLVED_ERROR
+        }
+    }
+
+    private void enhanceTheseArgumentsWhichAreClosures(String methodName, MethodCall methodCall) {
+        // todo apply it to ConstructorCallExpression too
+        def args = methodCall.arguments
+        if (args instanceof TupleExpression) {
+            for (arg in args.expressions) {
+                if (arg instanceof ClosureExpression) {
+                    setMeta(arg, AST_NODE_META__CLOSURE_CALLING_METHOD, methodName)
+                }
+            }
         }
     }
 
@@ -710,24 +734,6 @@ class Inferer implements GtkConsts {
     ClassNode infer(GStringExpression expr) {
         inferList(expr.values)
         return expr.getType()
-    }
-
-    @DynamicDispatch
-    ClassNode infer(StaticMethodCallExpression expr) {
-        inferType(expr.&arguments)
-        final methodName = expr.method
-        final method = GtkUtils.findMethodLoosely(expr.ownerType, methodName, expr.arguments)
-        if (method) {
-            if (method.isStatic()) {
-                return method.returnType
-            } else {
-                log.warn("method is not static: {}", method)
-                return RESOLVED_ERROR
-            }
-        } else {
-            log.warn("no method found: {}.{}", expr.ownerType.name, methodName)
-            return RESOLVED_ERROR
-        }
     }
 
     @DynamicDispatch

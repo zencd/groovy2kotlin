@@ -55,7 +55,7 @@ class Temp {
         String groovyText = '''
 class Main {
     void main() {
-        smth {
+        [].findAll {
             return true
         }
     }
