@@ -8,6 +8,8 @@ class Strings {
     void gstring() {
         "${a}$b${toString()}text$c\\d"
         "${this.class}" // property translated to method inside a GString
+        "${'name'}!!" // single quotes inside a GString
+        "${"name"}!!" // double quotes inside a GString
     }
 }
 -----------
@@ -24,5 +26,7 @@ open class Strings {
     fun gstring() {
         "${a}${b}${toString()}text${c}\\d"
         "${this.javaClass}"
+        "${"name"}!!"
+        "${"name"}!!"
     }
 }
