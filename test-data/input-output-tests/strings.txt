@@ -5,11 +5,13 @@ class Strings {
         def regex = /[-]?\d\d+/
         def crlf = '\r\n'
     }
-    void gstring() {
+    void gString(Object o) {
         "${a}$b${toString()}text$c\\d"
         "${this.class}" // property translated to method inside a GString
         "${'name'}!!" // single quotes inside a GString
         "${"name"}!!" // double quotes inside a GString
+        o."${"name"}"       // GString property read
+        o."${"name"}" = 123 // GString property write
     }
 }
 -----------
@@ -23,10 +25,12 @@ open class Strings {
             val crlf = "\r\n"
         }
     }
-    fun gstring() {
+    fun gString(o: Any) {
         "${a}${b}${toString()}text${c}\\d"
         "${this.javaClass}"
         "${"name"}!!"
         "${"name"}!!"
+        o."${"name"}"
+        o."${"name"}" = 123
     }
 }

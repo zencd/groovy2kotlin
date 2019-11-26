@@ -54,10 +54,11 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    void main() {
-        [].findAll {
-            return true
-        }
+    String name = "Joe"
+    void main(Main o) {
+        o.'name'
+        o."name"
+        o."${'name'.trim()}"
     }
 }
 '''

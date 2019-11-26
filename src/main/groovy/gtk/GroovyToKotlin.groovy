@@ -1200,8 +1200,21 @@ class GroovyToKotlin implements GtkConsts {
                 out.append(' = ')
                 translateExpr(rvalue)
             }
+        } else if (prop instanceof GStringExpression) {
+            //
+            // Expr like: obj."${xxx}"
+            //
+            // Kotlin does not allow accessing object properties that way,
+            // so the produced code gonna be predictably invalid.
+            // Probably a kind of runtime discovery can be used.
+            // Probably Kotlin has such a kind of discovery built-in.
+
+            translateExpr(prop)
+            if (rvalue) {
+                out.append(' = ')
+                translateExpr(rvalue)
+            }
         } else {
-            // translateExpr(expr.property)
             out.append("ERROR(expecting ConstantExpression #2)")
         }
     }
