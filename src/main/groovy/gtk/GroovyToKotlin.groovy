@@ -329,7 +329,7 @@ class GroovyToKotlin implements GtkConsts {
     void translateAnno(AnnotationNode anno) {
         if (GtkUtils.isEnabled(anno)) {
             out.newLineCrlf("@${anno.classNode.name}")
-        } else {
+        } else if (!GtkUtils.isSilentlyDisabled(anno)) {
             out.newLineCrlf("// groovy2kotlin: omitted: @${anno.classNode.name}")
         }
     }

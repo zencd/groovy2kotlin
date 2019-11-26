@@ -463,18 +463,29 @@ class GtkUtils implements GtkConsts {
 
     static {
         addDisabledAnno(CompileStatic.class)
-        addDisabledAnno(Override.class)
+        addDisabledAnno(Override.class, true)
     }
 
     private static final Set<String> ALL_DISABLED_ANNO_CLASSES = []
+    private static final Set<String> ALL_SILENTLY_DISABLED_ANNO_CLASSES = []
 
-    private static void addDisabledAnno(Class anno) {
+    private static void addDisabledAnno(Class anno, boolean silent = false) {
         ALL_DISABLED_ANNO_CLASSES.add(anno.name)
-        ALL_DISABLED_ANNO_CLASSES.add(anno.simpleName)
+        if (silent) {
+            ALL_SILENTLY_DISABLED_ANNO_CLASSES.add(anno.name)
+        }
     }
 
     static boolean isEnabled(AnnotationNode anno) {
         return !(anno.classNode.name in ALL_DISABLED_ANNO_CLASSES)
+    }
+
+    /**
+     * Normally we could emit a java comment mentioning the disabled anno.
+     * For certain cases (like @Override) we don't want event that.
+     */
+    static boolean isSilentlyDisabled(AnnotationNode anno) {
+        anno.classNode.name in ALL_SILENTLY_DISABLED_ANNO_CLASSES
     }
 
     static boolean isConstructor(MethodNode method) {

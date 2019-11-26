@@ -26,6 +26,7 @@
     - `List.grep()`
 - Non urgent things:
     - `@Deprecated` -> `@kotlin.Deprecated(message)`
+    - `a && b && c` leads to correct but complicated code gen
 - Add tests:
     - `list << item`
     - `String.toByteArray`
