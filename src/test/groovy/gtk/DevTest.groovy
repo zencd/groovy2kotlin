@@ -60,8 +60,8 @@ class Temp {
         String groovyText = '''
 class Main {
     void main(int a) {
-        int b = 11
-        b = 22
+        int b = a
+        int c = a
     }
 }
 '''

@@ -4,6 +4,8 @@ import gtk.DynamicDispatch
 import gtk.MapOfSets
 import gtk.ast.LocalUse
 import org.codehaus.groovy.ast.ASTNode
+import org.codehaus.groovy.ast.Parameter
+import org.codehaus.groovy.ast.Variable
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,6 +28,8 @@ class Deps {
         waterfall.addToSet(fromDescr, toDescr)
     }
 
+    //////////////////// getDescriptor()
+
     @DynamicDispatch
     private String getDescriptor(ASTNode node) {
         //throw new RuntimeException("no way to create Deps descriptor from ${node?.class?.name}")
@@ -40,8 +44,28 @@ class Deps {
 
     @DynamicDispatch
     private String getDescriptor(VariableExpression node) {
-        return node.name
+        return getAccessedVariableDescriptor(node.accessedVariable)
     }
+
+    //////////////////// getAccessedVariableDescriptor()
+
+    @DynamicDispatch
+    private String getAccessedVariableDescriptor(Variable var) {
+        log.warn("no way to getAccessedVariableDescriptor from {}", var?.class?.name)
+        return null
+    }
+
+    @DynamicDispatch
+    private String getAccessedVariableDescriptor(VariableExpression var) {
+        return var.name
+    }
+
+    @DynamicDispatch
+    private String getAccessedVariableDescriptor(Parameter param) {
+        return param.name
+    }
+
+    ///////////////////////////////////
 
     void debug() {
         println("Deps:")
