@@ -27,6 +27,8 @@ interface GtkConsts {
     static final String KT_ANY_OPT = 'Any?'
     static final String KT_ANY = 'Any'
     static final String KT_REF_EQ = '==='
+    static final String KT_VAL = 'val'
+    static final String KT_VAR = 'var'
 
     // For expr like `this.javaClass`
     static final String KT_javaClass = 'javaClass'

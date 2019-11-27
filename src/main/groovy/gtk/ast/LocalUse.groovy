@@ -1,5 +1,6 @@
 package gtk.ast
 
+import gtk.inf.LocalVar
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.Variable
 import org.codehaus.groovy.ast.expr.Expression
@@ -8,18 +9,9 @@ import org.codehaus.groovy.ast.expr.ExpressionTransformer
 /**
  * One use of a local variable, read or write.
  */
+@Deprecated
 class LocalUse extends Expression implements Variable {
-    final String name
-    public int modifiers
-    ClassNode originType
-    Expression initialExpression
-    boolean dynamicTyped
-    boolean closureSharedVariable
-    boolean inStaticContext
-
-    LocalUse(String name) {
-        this.name = name
-    }
+    public LocalVar localVar
 
     @Override
     Expression transformExpression(ExpressionTransformer transformer) {
@@ -27,17 +19,51 @@ class LocalUse extends Expression implements Variable {
     }
 
     @Override
+    ClassNode getOriginType() {
+        return localVar.originType
+    }
+
+    String getName() {
+        return localVar.name
+    }
+
+    @Override
+    Expression getInitialExpression() {
+        return localVar.getInitialExpression()
+    }
+
+    @Override
     boolean hasInitialExpression() {
-        return initialExpression != null
+        return localVar.hasInitialExpression()
+    }
+
+    @Override
+    boolean isInStaticContext() {
+        return localVar.isInStaticContext()
+    }
+
+    @Override
+    boolean isDynamicTyped() {
+        return localVar.isDynamicTyped()
+    }
+
+    @Override
+    boolean isClosureSharedVariable() {
+        return localVar.isClosureSharedVariable()
+    }
+
+    @Override
+    void setClosureSharedVariable(boolean inClosure) {
+        localVar.setClosureSharedVariable(inClosure)
     }
 
     @Override
     int getModifiers() {
-        return modifiers
+        return localVar.getModifiers()
     }
 
     @Override
     String toString() {
-        "${this.class.simpleName}($name)"
+        "${this.class.simpleName}(${localVar.name})"
     }
 }

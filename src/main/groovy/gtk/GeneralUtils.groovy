@@ -88,6 +88,7 @@ class GeneralUtils {
         field.set(obj, value)
     }
 
+    @Deprecated
     static void setFieldHack(Object obj, String fieldName, Object value) {
         Class type = obj.class
         while (type != null) {

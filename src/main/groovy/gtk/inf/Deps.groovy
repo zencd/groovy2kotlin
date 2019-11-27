@@ -27,19 +27,19 @@ class Deps {
     }
 
     @DynamicDispatch
-    String getDescriptor(ASTNode node) {
+    private String getDescriptor(ASTNode node) {
         //throw new RuntimeException("no way to create Deps descriptor from ${node?.class?.name}")
         log.warn("no way to create Deps descriptor from {}", node?.class?.name)
         return null
     }
 
     @DynamicDispatch
-    String getDescriptor(LocalUse node) {
+    private String getDescriptor(LocalUse node) {
         return node.name
     }
 
     @DynamicDispatch
-    String getDescriptor(VariableExpression node) {
+    private String getDescriptor(VariableExpression node) {
         return node.name
     }
 

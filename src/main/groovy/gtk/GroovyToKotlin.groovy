@@ -1,7 +1,6 @@
 package gtk
 
 import gtk.ast.FieldUse
-import gtk.ast.LocalUse
 import gtk.inf.Inferer
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.DynamicVariable
@@ -768,10 +767,10 @@ class GroovyToKotlin implements GtkConsts {
         boolean optional
         def writable = Inferer.isMarkedRW(expr.leftExpression)
         if (!hasInitializer || assignedByNull || writable) {
-            varOrVal = 'var'
+            varOrVal = KT_VAR
             optional = true
         } else {
-            varOrVal = 'val'
+            varOrVal = KT_VAL
             optional = false
         }
 
@@ -796,7 +795,7 @@ class GroovyToKotlin implements GtkConsts {
             out.append("$varOrVal ")
             translateExpr(expr.leftExpression as ArgumentListExpression)
         } else {
-            log.error("unexpected case e267e55f-2f53-42ca-a998-64356a3f10c1")
+            log.error("unexpected DeclarationExpression's left side: {}", expr.leftExpression?.class?.name)
         }
 
         if (hasInitializer) {

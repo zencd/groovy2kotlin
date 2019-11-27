@@ -483,29 +483,33 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(DeclarationExpression expr) {
-        def rightType = inferType(expr.rightExpression)
+        def rExpr = expr.rightExpression
+        def rType = inferType(rExpr)
 
         def left = expr.leftExpression
 
         def type = inferType(expr.&rightExpression)
         if (left instanceof VariableExpression) {
-            def localUse = new LocalUse(left.name)
-            localUse.modifiers = left.modifiers
-            localUse.type = left.originType
-            localUse.originType = left.originType
-            localUse.dynamicTyped = left.dynamicTyped
+            //def localVar = new LocalVar(
+            //        name: left.name,
+            //        modifiers: left.modifiers,
+            //        type: left.originType,
+            //        originType: left.originType,
+            //        dynamicTyped: left.dynamicTyped,
+            //)
+            //scopes.addName(localVar)
+            //left.accessedVariable = localVar
 
-            scopes.addName(localUse)
-            if (isNullConstant(expr.rightExpression)) {
+            scopes.addName(left)
+
+            if (isNullConstant(rExpr)) {
                 // keep the left type
+                // todo what if the left type is not specified? need to infer it from the right then
             } else {
-                setTypeToExprAndMeta(localUse, type)
+                setTypeToExprAndMeta(left, type)
             }
 
-            left = localUse
-            setFieldHack(expr, 'leftExpression', localUse) // replacing AST sub-tree
-
-            deps.addDep(expr.rightExpression, expr.leftExpression)
+            deps.addDep(rExpr, left)
 
         } else if (left instanceof ArgumentListExpression) {
             log.warn("infer() not impl for ${left.class.name}") // todo
