@@ -31,6 +31,22 @@ class Deps {
         }
     }
 
+    void resolve() {
+        for (nullable in nullables) {
+            resolveOne(nullable)
+        }
+    }
+
+    void resolveOne(ASTNode node) {
+        Inferer.markAsOptional(node)
+        def deps = waterfall.get(node)
+        if (deps) {
+            for (dep in deps) {
+                resolveOne(dep)
+            }
+        }
+    }
+
     private void addToWaterfall(ASTNode fromDescr, ASTNode toDescr) {
         waterfall.addToSet(fromDescr, toDescr)
     }

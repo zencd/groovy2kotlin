@@ -40,7 +40,7 @@ open class ClassName {
     }
     fun main() {
         val i = 0
-        var localWithoutInitializer
+        val localWithoutInitializer
     }
     fun local_is_var_when_re_written_later() {
         var x = 1
@@ -57,8 +57,8 @@ open class ClassName {
         f = 1
     }
     fun primitive_not_initialized() {
-        var i: Int
-        var f: Float
+        val i: Int
+        val f: Float
     }
     fun primitive_initialized_later() {
         var i: Int

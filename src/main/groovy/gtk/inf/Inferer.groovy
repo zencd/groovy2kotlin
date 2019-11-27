@@ -64,6 +64,7 @@ import org.slf4j.LoggerFactory
 
 import java.lang.reflect.Field
 
+import static gtk.GeneralUtils.hasIndex
 import static gtk.GeneralUtils.setFieldHack
 import static gtk.GtkUtils.getCachedClass
 import static gtk.GtkUtils.isList
@@ -329,7 +330,22 @@ class Inferer implements GtkConsts {
             String methodName = expr.method.value
             enhanceTheseArgumentsWhichAreClosures(methodName, expr) // XXX do it before inferring arguments
             inferType(expr.&arguments)
-            def customResolved = tryResolveMethodReturnType(objType, methodName, expr.arguments)
+
+            def args = expr.arguments
+            def method = objType.tryFindPossibleMethod(methodName, args)
+
+            if (method && args instanceof TupleExpression) {
+                for (int i = 0; i < args.expressions.size(); i++) {
+                    if (hasIndex(method.parameters, i)) {
+                        def actualArg = args.expressions[i]
+                        def formalArg = method.parameters[i]
+                        deps.addDep(actualArg, formalArg)
+                    }
+                }
+            }
+
+            def customResolved = method?.returnType
+            //def customResolved = tryResolveMethodReturnType(objType, methodName, expr.arguments)
             ClassNode resultType = customResolved ?: originalType
             if (isList(objType) && (methodName == 'add' || methodName == 'addAll')) {
                 // todo maybe check for Collection, not for List here
@@ -818,5 +834,13 @@ class Inferer implements GtkConsts {
 
     static boolean isMarkedRW(ASTNode node) {
         getMeta(node, AST_NODE_META__WRITABLE, false)
+    }
+
+    static void markAsOptional(ASTNode node) {
+        setMeta(node, AST_NODE_META__OPTIONAL, true)
+    }
+
+    static boolean isOptional(ASTNode node) {
+        getMeta(node, AST_NODE_META__OPTIONAL, false)
     }
 }

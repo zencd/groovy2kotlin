@@ -12,7 +12,7 @@ open class Temp {
     companion object {
     }
     fun main(o: Array<String>) {
-        var arr: Array<Array<String>>? = null
+        val arr: Array<Array<String>>? = null
     }
     fun renamedMethods(ss: Array<String>) {
         ss.filter {

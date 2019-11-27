@@ -1,5 +1,6 @@
 ## Todo
 
+- Fix `val localWithoutInitializer` - var must have a type or be initialized
 - Use `true` not `return true` within closures
 - Convert `"a"` to `'a'` if acceptor's type is `char`
 - Special treatment of `expr as boolean`, `(boolean)expr`, `boolean x = expr`  in Groovy

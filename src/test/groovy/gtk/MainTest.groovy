@@ -337,6 +337,11 @@ private val x = "hello"
         testFromFile("class_inner.txt")
     }
 
+    @Test
+    void "optional"() {
+        testFromFile("optional.txt")
+    }
+
     @Disabled
     @Test
     void type_resolved_for_assigned_variable() {

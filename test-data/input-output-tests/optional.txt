@@ -1,0 +1,20 @@
+class Main {
+    void main(String a) {
+        String b = a
+        String c = b
+        String d = a
+        b = null
+    }
+}
+------------------
+$DEFAULT_IMPORTS
+open class Main {
+    companion object {
+    }
+    fun main(a: String) {
+        var b: String? = a
+        val c: String? = b
+        val d: String = a
+        b = null
+    }
+}

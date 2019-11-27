@@ -140,6 +140,7 @@ class GroovyToKotlin implements GtkConsts {
 
     void translateAll() {
         inferer.doInference(modules)
+        inferer.deps.resolve()
         translateAllToKotlin()
     }
 
@@ -554,7 +555,8 @@ class GroovyToKotlin implements GtkConsts {
         def predefinedKotlinType = node.getNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
         String name = node.getName() == null ? "<unknown>" : node.getName()
         boolean mutable = GtkUtils.isMutable(node as ASTNode)
-        String type = predefinedKotlinType ?: typeToKotlinString(node.getType(), false, mutable)
+        boolean optional = Inferer.isOptional(node)
+        String type = predefinedKotlinType ?: typeToKotlinString(node.getType(), optional, mutable)
         if (node.hasInitialExpression()) {
             out.append("$name: $type = ")
             translateExpr(node.getInitialExpression())
@@ -763,14 +765,16 @@ class GroovyToKotlin implements GtkConsts {
         def rightExpr = expr.rightExpression
         def assignedByNull = isNullConstant(rightExpr)
         def hasInitializer = rightExpr != null && !(rightExpr instanceof EmptyExpression)
-        String varOrVal
-        boolean optional
         def writable = Inferer.isMarkedRW(expr.leftExpression)
-        if (!hasInitializer || assignedByNull || writable) {
-            varOrVal = KT_VAR
+        def inferredOptional = Inferer.isOptional(expr.leftExpression)
+        String varOrVal = writable ? KT_VAR: KT_VAL
+        boolean optional
+        if (!hasInitializer || assignedByNull || inferredOptional) {
+            // todo hasInitializer looks unsuitable here
+            //varOrVal = KT_VAR
             optional = true
         } else {
-            varOrVal = KT_VAL
+            //varOrVal = KT_VAL
             optional = false
         }
 

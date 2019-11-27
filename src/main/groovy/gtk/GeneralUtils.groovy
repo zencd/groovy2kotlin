@@ -102,4 +102,12 @@ class GeneralUtils {
         }
     }
 
+    static boolean hasIndex(List list, int index) {
+        return (list != null) && (index >= 0) && (index < list.size())
+    }
+
+    static <T> boolean hasIndex(T[] array, int index) {
+        return (array != null) && (index >= 0) && (index < array.size())
+    }
+
 }

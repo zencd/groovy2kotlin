@@ -59,11 +59,13 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    void main(String a) {
-        String b = a
-        String c = b
-        b = null
+    void main() {
+        String s = null
+        foo(s)
+        bar("xxx")
     }
+    void foo(String s) {}
+    void bar(String s) {}
 }
 '''
         def texts = [groovyText]
