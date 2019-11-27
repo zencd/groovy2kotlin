@@ -2,6 +2,7 @@ package gtk.inf
 
 import gtk.GeneralUtils
 import gtk.ast.FieldUse
+import gtk.ast.LocalUse
 import org.codehaus.groovy.ast.DynamicVariable
 import gtk.DynamicDispatch
 import gtk.GroovyExtensions
@@ -22,6 +23,7 @@ import org.codehaus.groovy.ast.expr.BooleanExpression
 import org.codehaus.groovy.ast.expr.CastExpression
 import org.codehaus.groovy.ast.expr.ClassExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
+import org.codehaus.groovy.ast.expr.ClosureListExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.ConstructorCallExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
@@ -62,6 +64,7 @@ import org.slf4j.LoggerFactory
 
 import java.lang.reflect.Field
 
+import static gtk.GeneralUtils.setFieldHack
 import static gtk.GtkUtils.getCachedClass
 import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isNullConstant
@@ -374,8 +377,15 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(ForStatement stmt) {
-        // todo infer other things
+        inferType(stmt.collectionExpression)
         inferType(stmt.&loopBlock)
+        return RESOLVED_NO_TYPE
+    }
+
+    @DynamicDispatch
+    ClassNode infer(ClosureListExpression stmt) {
+        inferList(stmt.expressions)
+        return RESOLVED_NO_TYPE
     }
 
     @DynamicDispatch
@@ -477,12 +487,21 @@ class Inferer implements GtkConsts {
 
         def type = inferType(expr.&rightExpression)
         if (left instanceof VariableExpression) {
-            scopes.addName(left)
+            def localUse = new LocalUse(left.name)
+            localUse.modifiers = left.modifiers
+            localUse.type = left.originType
+            localUse.originType = left.originType
+            localUse.dynamicTyped = left.dynamicTyped
+
+            scopes.addName(localUse)
             if (isNullConstant(expr.rightExpression)) {
                 // keep the left type
             } else {
-                setTypeToExprAndMeta(left, type)
+                setTypeToExprAndMeta(localUse, type)
             }
+
+            left = localUse
+            setFieldHack(expr, 'leftExpression', localUse) // replacing AST sub-tree
         } else if (left instanceof ArgumentListExpression) {
             log.warn("infer() not impl for ${left.class.name}") // todo
         } else {

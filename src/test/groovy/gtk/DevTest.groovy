@@ -1,11 +1,16 @@
 package gtk
 
 import org.codehaus.groovy.ast.ClassHelper
+import org.codehaus.groovy.ast.expr.ArgumentListExpression
+import org.codehaus.groovy.ast.expr.DeclarationExpression
+import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.runtime.MethodClosure
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import static gtk.GeneralUtils.setFieldHack
 
 @Disabled("not a test actually but added for purposes of development")
 class DevTest {
@@ -54,11 +59,8 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    String name = "Joe"
-    void main(Main o) {
-        o.'name'
-        o."name"
-        o."${'name'.trim()}"
+    void for3_no_block() {
+        for (int i = 0; i < 3; i++) println("1")
     }
 }
 '''
@@ -75,6 +77,10 @@ class Main {
 
     @Test
     void tmp() {
+        def var = new VariableExpression("xxx")
+        def expr = new DeclarationExpression(var, GtkUtils.makeToken("xxx"), var)
+        setFieldHack(expr, 'leftExpression', ArgumentListExpression.EMPTY_ARGUMENTS)
+        //expr.@leftExpression = ArgumentListExpression.EMPTY_ARGUMENTS
     }
 
     @Test

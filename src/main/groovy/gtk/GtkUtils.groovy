@@ -2,6 +2,7 @@ package gtk
 
 import groovy.transform.CompileStatic
 import groovyjarjarasm.asm.Opcodes
+import gtk.ast.LocalUse
 import gtk.inf.Inferer
 import org.codehaus.groovy.antlr.LineColumn
 import org.codehaus.groovy.antlr.SourceBuffer
@@ -699,7 +700,7 @@ class GtkUtils implements GtkConsts {
         return mutable != null ? mutable : false
     }
 
-    static boolean isMutable(VariableExpression param) {
+    static boolean isMutable(LocalUse param) {
         def mutable = Inferer.getMeta(param, AST_NODE_META__MUTABLE)
         return mutable != null ? mutable : false
     }

@@ -88,4 +88,17 @@ class GeneralUtils {
         field.set(obj, value)
     }
 
+    static void setFieldHack(Object obj, String fieldName, Object value) {
+        Class type = obj.class
+        while (type != null) {
+            try {
+                Field field = type.getDeclaredField(fieldName)
+                setFinalField(obj, field, value)
+                break
+            } catch (NoSuchFieldException ignored) {
+                type = type.superclass
+            }
+        }
+    }
+
 }

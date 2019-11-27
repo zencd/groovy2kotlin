@@ -1,6 +1,7 @@
 package gtk
 
 import gtk.ast.FieldUse
+import gtk.ast.LocalUse
 import gtk.inf.Inferer
 import org.codehaus.groovy.ast.DynamicVariable
 import org.codehaus.groovy.ast.AnnotationNode
@@ -773,13 +774,13 @@ class GroovyToKotlin implements GtkConsts {
         }
 
         boolean leftIsArray = false
-        if (expr.leftExpression instanceof VariableExpression) {
-            def left = expr.leftExpression as VariableExpression
+        if (expr.leftExpression instanceof LocalUse) {
+            def left = expr.leftExpression as LocalUse
             final leftType = left.originType
             if (ClassHelper.isPrimitiveType(leftType)) {
                 optional = false
             }
-            leftIsArray = GtkUtils.isArray(leftType)
+            leftIsArray = isArray(leftType)
             if (left.dynamicTyped) {
                 out.append("$varOrVal ${left.name}")
             } else {
@@ -793,7 +794,7 @@ class GroovyToKotlin implements GtkConsts {
             out.append("$varOrVal ")
             translateExpr(expr.leftExpression as ArgumentListExpression)
         } else {
-            log.warn("unexpected case e267e55f-2f53-42ca-a998-64356a3f10c1")
+            log.error("unexpected case e267e55f-2f53-42ca-a998-64356a3f10c1")
         }
 
         if (hasInitializer) {
@@ -1530,6 +1531,10 @@ class GroovyToKotlin implements GtkConsts {
         }
 
         if (initExpr) {
+            if (initExpr instanceof DeclarationExpression) {
+                // seems like the single case possible
+                Inferer.markAsRW(initExpr.leftExpression)
+            }
             translateStatement(new ExpressionStatement(initExpr))
         }
         out.newLine("while (")
