@@ -412,6 +412,10 @@ class GtkUtils implements GtkConsts {
         return (expr instanceof ConstantExpression) && expr.isNullExpression()
     }
 
+    static boolean isNullConstant(ASTNode node) {
+        return (node instanceof ConstantExpression) && node.isNullExpression()
+    }
+
     static boolean isAnonymous(ClassNode classNode) {
         return classNode instanceof InnerClassNode && classNode.anonymous
     }

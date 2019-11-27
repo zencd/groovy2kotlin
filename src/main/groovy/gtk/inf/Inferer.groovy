@@ -529,6 +529,7 @@ class Inferer implements GtkConsts {
             if (left instanceof VariableExpression) {
                 scopes.markVarAsWritable(left.name)
             }
+            deps.addDep(expr.rightExpression, left)
             return rt
         } else {
             def type1 = inferType(expr.&leftExpression)

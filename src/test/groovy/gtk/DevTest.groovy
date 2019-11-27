@@ -59,9 +59,10 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    void main(int a) {
-        int b = a
-        int c = a
+    void main(String a) {
+        String b = a
+        String c = b
+        b = null
     }
 }
 '''

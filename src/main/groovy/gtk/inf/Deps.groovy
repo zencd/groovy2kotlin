@@ -1,11 +1,13 @@
 package gtk.inf
 
 import gtk.DynamicDispatch
+import gtk.GtkUtils
 import gtk.MapOfSets
 import gtk.ast.LocalUse
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.Variable
+import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,63 +16,80 @@ class Deps {
 
     private static final Logger log = LoggerFactory.getLogger(this)
 
-    private final waterfall = new MapOfSets<String, String>()
+    private final waterfall = new MapOfSets<ASTNode, ASTNode>()
+    private final nullables = new HashSet<ASTNode>()
 
     void addDep(ASTNode from, ASTNode to) {
         def fromDescr = getDescriptor(from)
         def toDescr = getDescriptor(to)
         if (fromDescr && toDescr) {
-            addToWaterfall(fromDescr, toDescr)
+            if (GtkUtils.isNullConstant(fromDescr)) {
+                nullables.add(toDescr)
+            } else {
+                addToWaterfall(fromDescr, toDescr)
+            }
         }
     }
 
-    private void addToWaterfall(String fromDescr, String toDescr) {
+    private void addToWaterfall(ASTNode fromDescr, ASTNode toDescr) {
         waterfall.addToSet(fromDescr, toDescr)
     }
 
     //////////////////// getDescriptor()
 
     @DynamicDispatch
-    private String getDescriptor(ASTNode node) {
+    private ASTNode getDescriptor(ASTNode node) {
         //throw new RuntimeException("no way to create Deps descriptor from ${node?.class?.name}")
-        log.warn("no way to create Deps descriptor from {}", node?.class?.name)
-        return null
+        //log.warn("no way to getDescriptor() from {}", node?.class?.name)
+        return node
     }
 
     @DynamicDispatch
-    private String getDescriptor(LocalUse node) {
-        return node.name
+    private ASTNode getDescriptor(ConstantExpression expr) {
+        return expr
     }
 
     @DynamicDispatch
-    private String getDescriptor(VariableExpression node) {
+    private ASTNode getDescriptor(VariableExpression node) {
         return getAccessedVariableDescriptor(node.accessedVariable)
     }
 
     //////////////////// getAccessedVariableDescriptor()
 
     @DynamicDispatch
-    private String getAccessedVariableDescriptor(Variable var) {
-        log.warn("no way to getAccessedVariableDescriptor from {}", var?.class?.name)
+    private ASTNode getAccessedVariableDescriptor(Variable var) {
+        log.warn("no way to getAccessedVariableDescriptor() from {}", var?.class?.name)
         return null
     }
 
     @DynamicDispatch
-    private String getAccessedVariableDescriptor(VariableExpression var) {
-        return var.name
+    private ASTNode getAccessedVariableDescriptor(VariableExpression var) {
+        return var
     }
 
     @DynamicDispatch
-    private String getAccessedVariableDescriptor(Parameter param) {
-        return param.name
+    private ASTNode getAccessedVariableDescriptor(Parameter param) {
+        return param
     }
 
     ///////////////////////////////////
 
     void debug() {
+        def shortName = {
+            it.toString()
+                    .replace('org.codehaus.groovy.ast.expr.', '')
+                    .replace('org.codehaus.groovy.ast.', '')
+        }
         println("Deps:")
-        waterfall.forEach { k, v ->
-            println("$k -> $v")
+        waterfall.forEach { k, set ->
+            println("  " + shortName(k))
+            set.each {
+                println("    " + shortName(it))
+            }
+        }
+        println("Nullables:")
+        nullables.each {
+            println("  " + shortName(it))
         }
     }
 }
