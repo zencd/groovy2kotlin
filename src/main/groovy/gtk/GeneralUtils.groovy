@@ -23,14 +23,14 @@ class GeneralUtils {
     }
 
     /**
-     * Escapes Java string to a form like "hello\nЖердь".
+     * Escapes Java string to a form like "hello\n\u0416\u0435\u0440\u0434\u044C".
      */
     static String escapeJavaStringAllAscii(String s) {
         return StringEscapeUtils.escapeJava(s)
     }
 
     /**
-     * Escapes Java string to a form like "hello\n\u0416\u0435\u0440\u0434\u044C".
+     * Escapes Java string to a form like "hello\nЖердь".
      */
     static String escapeAsJavaStringUnicode(String s) {
         def buf = new StringBuilder()

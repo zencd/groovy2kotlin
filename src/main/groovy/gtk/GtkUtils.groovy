@@ -695,13 +695,8 @@ class GtkUtils implements GtkConsts {
         return subs ?: null
     }
 
-    static boolean isMutable(Parameter param) {
-        def mutable = Inferer.getMeta(param, AST_NODE_META__MUTABLE)
-        return mutable != null ? mutable : false
-    }
-
-    static boolean isMutable(LocalUse param) {
-        def mutable = Inferer.getMeta(param, AST_NODE_META__MUTABLE)
+    static boolean isMutable(ASTNode node) {
+        def mutable = Inferer.getMeta(node, AST_NODE_META__MUTABLE)
         return mutable != null ? mutable : false
     }
 

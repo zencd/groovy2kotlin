@@ -5,6 +5,9 @@ import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.ExpressionTransformer
 
+/**
+ * One use of a class field, read or write.
+ */
 class FieldUse extends Expression {
 
     final String name

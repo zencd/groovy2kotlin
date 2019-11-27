@@ -91,7 +91,7 @@ class Inferer implements GtkConsts {
 
     private final Stack<Triple> currentNode = new Stack<>()
 
-    private final Deps deps = new Deps()
+    final Deps deps = new Deps()
 
     private static class Triple {
         ASTNode parent
@@ -483,6 +483,8 @@ class Inferer implements GtkConsts {
 
     @DynamicDispatch
     ClassNode infer(DeclarationExpression expr) {
+        def rightType = inferType(expr.rightExpression)
+
         def left = expr.leftExpression
 
         def type = inferType(expr.&rightExpression)
@@ -502,6 +504,9 @@ class Inferer implements GtkConsts {
 
             left = localUse
             setFieldHack(expr, 'leftExpression', localUse) // replacing AST sub-tree
+
+            deps.addDep(expr.rightExpression, expr.leftExpression)
+
         } else if (left instanceof ArgumentListExpression) {
             log.warn("infer() not impl for ${left.class.name}") // todo
         } else {

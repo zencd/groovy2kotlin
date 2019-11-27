@@ -59,19 +59,22 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    void for3_no_block() {
-        for (int i = 0; i < 3; i++) println("1")
+    void main(int a) {
+        int b = a
+        int c = a
     }
 }
 '''
         def texts = [groovyText]
         def bufs = GtkUtils.makeSourceBuffers(texts)
         def nodes = Gtk.parseTexts(texts)
-        def kotlinText = Gtk.toKotlinAsSingleString(nodes, bufs)
+        def gtk = Gtk.toKotlin(nodes, bufs)
+        def kotlinText = Gtk.joinBuffers(gtk)
         println(kotlinText)
         //def node = nodes[0].classes[0]
         def node = nodes[0].classes[0].methods[0].code.statements
-        //def node = nodes[0].classes[0].declaredConstructors*.code
+        //def constructors = nodes[0].classes[0].declaredConstructors*.code
+        gtk.inferer.deps.debug()
         int stop = 0
     }
 

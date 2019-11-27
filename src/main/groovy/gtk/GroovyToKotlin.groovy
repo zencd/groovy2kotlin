@@ -3,6 +3,7 @@ package gtk
 import gtk.ast.FieldUse
 import gtk.ast.LocalUse
 import gtk.inf.Inferer
+import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.DynamicVariable
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
@@ -14,6 +15,7 @@ import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.ModuleNode
 import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.PropertyNode
+import org.codehaus.groovy.ast.Variable
 import org.codehaus.groovy.ast.VariableScope
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.AttributeExpression
@@ -552,7 +554,7 @@ class GroovyToKotlin implements GtkConsts {
     private void translateMethodParam(Parameter node) {
         def predefinedKotlinType = node.getNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
         String name = node.getName() == null ? "<unknown>" : node.getName()
-        boolean mutable = GtkUtils.isMutable(node)
+        boolean mutable = GtkUtils.isMutable(node as ASTNode)
         String type = predefinedKotlinType ?: typeToKotlinString(node.getType(), false, mutable)
         if (node.hasInitialExpression()) {
             out.append("$name: $type = ")
@@ -774,8 +776,8 @@ class GroovyToKotlin implements GtkConsts {
         }
 
         boolean leftIsArray = false
-        if (expr.leftExpression instanceof LocalUse) {
-            def left = expr.leftExpression as LocalUse
+        if (expr.leftExpression instanceof Variable) {
+            def left = expr.leftExpression as Variable
             final leftType = left.originType
             if (ClassHelper.isPrimitiveType(leftType)) {
                 optional = false
@@ -784,7 +786,7 @@ class GroovyToKotlin implements GtkConsts {
             if (left.dynamicTyped) {
                 out.append("$varOrVal ${left.name}")
             } else {
-                def mutable = GtkUtils.isMutable(left)
+                def mutable = GtkUtils.isMutable(left as ASTNode)
                 def st = typeToKotlinString(leftType, optional, mutable)
                 out.append("$varOrVal ${left.name}: $st")
             }

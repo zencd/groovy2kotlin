@@ -5,6 +5,9 @@ import org.codehaus.groovy.ast.Variable
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.ExpressionTransformer
 
+/**
+ * One use of a local variable, read or write.
+ */
 class LocalUse extends Expression implements Variable {
     final String name
     public int modifiers

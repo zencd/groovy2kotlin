@@ -7,6 +7,7 @@ class Main extends Base {
     }
     Main(int i) {
         this ("invoking this()")
+        int localDecl = 50 // a regression
     }
 }
 
@@ -24,6 +25,7 @@ open class Main : Base {
     constructor(name: String) : super(name) {
     }
     constructor(i: Int) : this("invoking this()") {
+        val localDecl: Int = 50
     }
 }
 open class Base {
