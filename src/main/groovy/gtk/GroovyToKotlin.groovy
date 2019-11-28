@@ -369,6 +369,7 @@ class GroovyToKotlin implements GtkConsts {
         }
 
         def fieldType = field.type
+        final boolean fin = isFinal(field.modifiers)
 
         Expression initialExpression = field.initialValueExpression
         if (!initialExpression) {
@@ -377,7 +378,7 @@ class GroovyToKotlin implements GtkConsts {
 
         def inferredOptional = Inferer.isOptional(field)
         def optional = inferredOptional
-        if (isFinal(field.modifiers)) {
+        if (fin) {
             optional = false
         }
         if (ClassHelper.isPrimitiveType(fieldType)) {
@@ -390,9 +391,9 @@ class GroovyToKotlin implements GtkConsts {
         // todo temporarily disabled: this is the strategy to always emit `val`, unless the field is rewritten in the code
         //final varOrVal = (rw && !isFinal(field.modifiers) && !field.hasInitialExpression()) ? 'var' : 'val'
 
-        // todo OMG, start using the `writable` inference
         boolean rw = Inferer.isMarkedRW(field)
-        final varOrVal = isFinal(field.modifiers) ? KT_VAL : KT_VAR
+        if (fin) rw = false
+        final varOrVal = rw ? KT_VAR : KT_VAL
 
         out.append("$varOrVal ${field.name}")
         if (!field.dynamicTyped) {
@@ -766,7 +767,7 @@ class GroovyToKotlin implements GtkConsts {
         def rightExpr = expr.rightExpression
         def assignedByNull = isNullConstant(rightExpr)
         def hasInitializer = rightExpr != null && !(rightExpr instanceof EmptyExpression)
-        def writable = Inferer.isMarkedRW(expr.leftExpression)
+        def writable = Inferer.isMarkedRW(expr.leftExpression) // todo consider the final mod too
         def inferredOptional = Inferer.isOptional(expr.leftExpression)
         String varOrVal = writable ? KT_VAR: KT_VAL
         boolean optional

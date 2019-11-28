@@ -1,7 +1,9 @@
 package gtk
 
 import org.codehaus.groovy.ast.ClassHelper
+import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
+import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.runtime.MethodClosure
@@ -59,13 +61,11 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    String name
+    String name = "aaa"
     void main() {
-        this.name = null
-        foo(this.name)
+        foo(null)
     }
     void foo(String s) {}
-    void bar(String s) {}
 }
 '''
         def texts = [groovyText]
@@ -82,12 +82,17 @@ class Main {
         int stop = 0
     }
 
+    static class Human {
+        void updateName(String name) {}
+    }
+
     @Test
     void tmp() {
-        def var = new VariableExpression("xxx")
-        def expr = new DeclarationExpression(var, GtkUtils.makeToken("xxx"), var)
-        setFieldHack(expr, 'leftExpression', ArgumentListExpression.EMPTY_ARGUMENTS)
-        //expr.@leftExpression = ArgumentListExpression.EMPTY_ARGUMENTS
+        def type = new ClassNode(Human.class)
+        def args = new ArgumentListExpression(ConstantExpression.NULL)
+        //def args = new ArgumentListExpression(new ConstantExpression("Joe"))
+        def method = MethodMatcher.findMethod(type, "updateName", args)
+        int stop = 0
     }
 
     @Test

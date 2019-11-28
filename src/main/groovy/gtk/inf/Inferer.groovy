@@ -1,6 +1,7 @@
 package gtk.inf
 
 import gtk.GeneralUtils
+import gtk.MethodMatcher
 import gtk.ast.FieldUse
 import gtk.ast.LocalUse
 import org.codehaus.groovy.ast.DynamicVariable
@@ -107,6 +108,8 @@ class Inferer implements GtkConsts {
         initMetaClasses()
         GroovyExtensions.forceLoad()
     }
+
+    Inferer() {}
 
     void doInference(List<ModuleNode> modules) {
         modules.each { inferType(it) }
@@ -332,7 +335,8 @@ class Inferer implements GtkConsts {
             inferType(expr.&arguments)
 
             def args = expr.arguments
-            def method = objType.tryFindPossibleMethod(methodName, args)
+            //def method = objType.tryFindPossibleMethod(methodName, args)
+            def method = MethodMatcher.findMethod(objType, methodName, args)
 
             if (method && args instanceof TupleExpression) {
                 for (int i = 0; i < args.expressions.size(); i++) {

@@ -18,7 +18,7 @@ class ClassName {
 $DEFAULT_IMPORTS
 open class ClassName {
     companion object {
-        var FLAG: Int = 1
+        val FLAG: Int = 1
         private fun parse(): Int {
             return 123
         }

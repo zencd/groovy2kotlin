@@ -14,6 +14,8 @@ The tool performs type checking so you are required to supply:
 - The `groovy2kotlin.jar` or corresponding classes
 - All dependencies of your Groovy project
 
+Make sure the Groovy sources are valid and compilable by the Groovy SDK you gonna use for the translation.
+
 ### Option 1
 
 Personally I'd just fetch the code into the Groovy project intended for the conversion

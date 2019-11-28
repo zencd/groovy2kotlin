@@ -25,5 +25,5 @@ open class Slave {
 open class ClassName {
     companion object {
     }
-    var xxx = emptyList()
+    val xxx = emptyList()
 }

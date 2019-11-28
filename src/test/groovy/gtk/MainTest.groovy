@@ -257,19 +257,8 @@ class MainTest {
     }
 
     @Test
-    @Disabled
     void final_field_without_type() {
-        // todo fix it
-        def (String groovy, String kotlin) = splitGroovyAndKotlin("""
-class ClassName {
-final x = 'hello'
-}
----------------
-class ClassName {
-private val x = "hello"
-}
-""")
-        //assertGeneratedKotlin(kotlin, DevMain.toKotlin(groovy))
+        testFromFile("final_field_without_type.txt")
     }
 
     @Test

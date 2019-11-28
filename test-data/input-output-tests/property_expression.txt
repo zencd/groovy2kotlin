@@ -23,9 +23,9 @@ $DEFAULT_IMPORTS
 open class Main {
     companion object {
     }
-    var instance1: Main? = null
-    var instance2: Main? = null
-    var type: Int = 0
+    val instance1: Main? = null
+    val instance2: Main? = null
+    val type: Int = 0
 
     fun main(o: Main) {
         o.instance1.type

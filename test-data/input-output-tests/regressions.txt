@@ -28,7 +28,7 @@ open class RegressionTests {
 open class PropertyAccessInField {
     companion object {
     }
-    var x = InetAddress.getLocalHost()
+    val x = InetAddress.getLocalHost()
 }
 open class Misc {
     companion object {

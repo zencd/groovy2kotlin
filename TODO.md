@@ -6,6 +6,8 @@
     - ✔ for locals
     - ✔ for fields
     - for a method return value
+- RW- & null-inference: if a implicit setter is invoked then apply the inference rules
+- Groovy's list expansion
 - Fix `val localWithoutInitializer` - var must have a type or be initialized
 - Method signature cannot be found with a `null` actual argument - need a custom algo
 - Start considering annotations like `@Nullable`
@@ -31,7 +33,7 @@
     - `List.eachWithIndex()` → `forEachIndexed` (params swapped!)
     - `List.grep()`
 - Non urgent things:
-    - `@Deprecated` -> `@kotlin.Deprecated(message)`
+    - `@Deprecated` → `@kotlin.Deprecated(message)`
     - `a && b && c` leads to correct but complicated code gen
 - Add tests:
     - `list << item`
@@ -82,3 +84,4 @@
     2019-11-21 - 443
     2019-11-24 - 419
     2019-11-25 - 387
+    2019-11-28 - 367

@@ -1,0 +1,10 @@
+class ClassName {
+final x = 'hello'
+}
+---------------
+$DEFAULT_IMPORTS
+open class ClassName {
+companion object {
+}
+val x = "hello"
+}

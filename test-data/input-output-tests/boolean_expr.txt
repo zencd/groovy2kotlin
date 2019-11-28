@@ -39,13 +39,13 @@ $DEFAULT_IMPORTS
 open class Main {
     companion object {
     }
-    var s: String? = null
-    var i: Int = 0
-    var list: ArrayList? = null
-    var map: HashMap? = null
-    var b: Boolean = false
-    var B: Boolean = false
-    var anyObject: Class? = null
+    val s: String? = null
+    val i: Int = 0
+    val list: ArrayList? = null
+    val map: HashMap? = null
+    val b: Boolean = false
+    val B: Boolean = false
+    val anyObject: Class? = null
 
     fun main() {
         anyObject != null && anyObject != null

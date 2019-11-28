@@ -13,13 +13,17 @@ The policy:
 - But it is acceptable since an operator can easily review such errors;
 - Silent behavioural changes are highly undesirable;
 - But they are still possible because Groovy can do unpredictable things in runtime;
-- Nevertheless do the best to emit valid, readable code.
+- Nevertheless do the best to emit valid, readable code;
+- Prefer `val` over `var` when possible;
+- Prefer emitting non-optionals;
+- Prefer emitting non-mutables.
 
 The current implementation's passes:
 - One or multiple modules are parsed into AST by the Groovy itself;
 - All types (including dependent libs) gets resolved as strictly as possible;
 - AST traversed to resolve types of locals and expressions;
-- Kotlin code generated.
+- Inferring optionals;
+- Kotlin source code generated finally.
 
 Feel free to submit a bug, ticket and do all the github things.
 
@@ -27,7 +31,7 @@ Feel free to submit a bug, ticket and do all the github things.
 
 - JDK 1.8 (for running the tool)
 - Groovy 2.5.8 (for running the tool + input language level)
-- Kotlin 1.3 (produced code level)
+- Kotlin 1.3.60 (produced code level)
 
 Others may be supported but was not tested.
 

@@ -11,14 +11,14 @@ class Temp {
 $DEFAULT_IMPORTS
 open class Temp {
     companion object {
-        var anon = object : java.util.ArrayList <E extends java.lang.Object> {
+        val anon = object : java.util.ArrayList <E extends java.lang.Object> {
             override fun toString(): String {
                 return "xxx"
             }
         }
-        var withArgs = object : java.util.HashMap <K extends java.lang.Object, V extends java.lang.Object>(20) {
+        val withArgs = object : java.util.HashMap <K extends java.lang.Object, V extends java.lang.Object>(20) {
         }
-        var fromInterface = object : Cloneable {
+        val fromInterface = object : Cloneable {
         }
     }
 }

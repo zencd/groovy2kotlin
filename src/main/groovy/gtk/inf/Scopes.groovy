@@ -56,6 +56,7 @@ class Scopes implements GtkConsts {
         return null
     }
 
+    // todo better not find it by name but find it from the actual AST node
     void markVarAsWritable(String varName) {
         def expr = findVar(varName)
         if (expr) {
