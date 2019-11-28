@@ -5,7 +5,6 @@ import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.AttributeExpression
 import org.codehaus.groovy.ast.expr.BinaryExpression
-import org.codehaus.groovy.ast.expr.BooleanExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.expr.Expression
@@ -82,7 +81,7 @@ class Transformers implements GtkConsts {
             // todo maybe do it in a general way
             def param0 = method.parameters[0]
             if (param0.type == ClassHelper.OBJECT_TYPE) {
-                param0.putNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING, KT_ANY_OPT)
+                param0.putNodeMetaData(AST_NODE_META__PRECISE_KOTLIN_TYPE_AS_STRING, KT_ANY_OPT)
             }
         }
     }

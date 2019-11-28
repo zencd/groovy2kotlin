@@ -54,6 +54,13 @@ class GtkUtils implements GtkConsts {
     public static final ClassNode Collection_TYPE = ClassHelper.makeCached(Collection.class)
     public static final ClassNode BufferedWriter_TYPE = ClassHelper.makeCached(BufferedWriter.class)
 
+    public static final ConstantExpression ZERO_byte = new ConstantExpression(0 as byte, true)
+    public static final ConstantExpression ZERO_short = new ConstantExpression(0 as short, true)
+    public static final ConstantExpression ZERO_int = new ConstantExpression(0 as int, true)
+    public static final ConstantExpression ZERO_long = new ConstantExpression(0 as long, true)
+    public static final ConstantExpression ZERO_float = new ConstantExpression(0 as float, true)
+    public static final ConstantExpression ZERO_double = new ConstantExpression(0 as double, true)
+
     /**
      * Binary logical operators: AND and OR only.
      */
@@ -409,11 +416,11 @@ class GtkUtils implements GtkConsts {
     }
 
     static boolean isNullConstant(Expression expr) {
-        return (expr instanceof ConstantExpression) && expr.isNullExpression()
+        return (expr != null) && (expr instanceof ConstantExpression) && expr.isNullExpression()
     }
 
     static boolean isNullConstant(ASTNode node) {
-        return (node instanceof ConstantExpression) && node.isNullExpression()
+        return (node != null) && (node instanceof ConstantExpression) && node.isNullExpression()
     }
 
     static boolean isAnonymous(ClassNode classNode) {
@@ -441,29 +448,27 @@ class GtkUtils implements GtkConsts {
         }
     }
 
-    static String makeDefaultInitialValue(String kotlinType) {
-        // todo string comparison is lame
-        kotlinType = GeneralUtils.tryCutFromEnd(kotlinType, '?')
-        String defValForObjects = "null"
-        def KT_TYPE_TO_INITIAL_VALUE = [
-                "String": defValForObjects,
-                "Boolean": "false",
-                "Byte": "0",
-                "Short": "0",
-                "Int": "0",
-                "Integer": "0",
-                "Long": "0L",
-                "BigInteger": "0",
-                "BigDecimal": "0",
-                "Number": "0",
-                "Float": "0F",
-                "Double": "0",
+    static Expression makeDefaultInitialExpression(ClassNode varType) {
+        def map = [
+                (ClassHelper.boolean_TYPE): ConstantExpression.PRIM_FALSE,
+                (ClassHelper.Boolean_TYPE): ConstantExpression.PRIM_FALSE,
+                (ClassHelper.byte_TYPE): ZERO_byte,
+                (ClassHelper.Byte_TYPE): ZERO_byte,
+                (ClassHelper.short_TYPE): ZERO_short,
+                (ClassHelper.Short_TYPE): ZERO_short,
+                (ClassHelper.int_TYPE): ZERO_int,
+                (ClassHelper.Integer_TYPE): ZERO_int,
+                (ClassHelper.long_TYPE): ZERO_long,
+                (ClassHelper.Long_TYPE): ZERO_long,
+                (ClassHelper.float_TYPE): ZERO_float,
+                (ClassHelper.Float_TYPE): ZERO_float,
+                (ClassHelper.double_TYPE): ZERO_double,
+                (ClassHelper.Double_TYPE): ZERO_double,
+                (ClassHelper.BigInteger_TYPE): ZERO_int, // todo check if it's ok in Kotlin
+                (ClassHelper.BigDecimal_TYPE): ZERO_int, // todo check if it's ok in Kotlin
         ]
-        if (KT_TYPE_TO_INITIAL_VALUE.containsKey(kotlinType)) {
-            return KT_TYPE_TO_INITIAL_VALUE[kotlinType]
-        } else {
-            defValForObjects
-        }
+        Expression result = map[varType] ?: ConstantExpression.NULL
+        return result
     }
 
     static {

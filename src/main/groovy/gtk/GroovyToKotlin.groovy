@@ -81,7 +81,6 @@ import static gtk.GtkUtils.isBinary
 import static gtk.GtkUtils.isCharSequence
 import static gtk.GtkUtils.isCollection
 import static gtk.GtkUtils.isFile
-import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isLogicalBinaryExpr
 import static gtk.GtkUtils.isLogicalBinaryOp
 import static gtk.GtkUtils.isMap
@@ -89,6 +88,7 @@ import static gtk.GtkUtils.isNullConstant
 import static gtk.GtkUtils.isNullOrEmptyStatement
 import static gtk.GtkUtils.isPrimitive
 import static gtk.GtkUtils.isWrapper
+import static gtk.GtkUtils.makeDefaultInitialExpression
 
 /**
  * The core code of the translator.
@@ -362,8 +362,6 @@ class GroovyToKotlin implements GtkConsts {
         def constStr = beConst ? "const " : ""
         out.append(constStr)
 
-        boolean rw = Inferer.isMarkedRW(field)
-
         // XXX we don't need private fields because a field is private in Groovy if no access modifier given
         def mods = getModifierString(field.modifiers, false, false, false)
         if (mods) {
@@ -372,28 +370,37 @@ class GroovyToKotlin implements GtkConsts {
 
         def fieldType = field.type
 
-        // todo temporarily disabled: this is the strategy to always emit `val`, unless the field is rewritten in the code
-        //final varOrVal = (rw && !isFinal(field.modifiers) && !field.hasInitialExpression()) ? 'var' : 'val'
+        Expression initialExpression = field.initialValueExpression
+        if (!initialExpression) {
+            initialExpression = makeDefaultInitialExpression(fieldType)
+        }
 
-        final varOrVal = isFinal(field.modifiers) ? 'val' : 'var'
-
-        def optional // defines if the type would be marked as `Int` or `Int?`
+        def inferredOptional = Inferer.isOptional(field)
+        def optional = inferredOptional
         if (isFinal(field.modifiers)) {
             optional = false
-        } else {
-            optional = true
         }
         if (ClassHelper.isPrimitiveType(fieldType)) {
             optional = false
         }
+        if (isNullConstant(initialExpression)) {
+            optional = true
+        }
+
+        // todo temporarily disabled: this is the strategy to always emit `val`, unless the field is rewritten in the code
+        //final varOrVal = (rw && !isFinal(field.modifiers) && !field.hasInitialExpression()) ? 'var' : 'val'
+
+        // todo OMG, start using the `writable` inference
+        boolean rw = Inferer.isMarkedRW(field)
+        final varOrVal = isFinal(field.modifiers) ? KT_VAL : KT_VAR
 
         out.append("$varOrVal ${field.name}")
-        def kotlinType = null
         if (!field.dynamicTyped) {
-            kotlinType = typeToKotlinString(fieldType, optional)
+            def kotlinType = typeToKotlinString(fieldType, optional)
             out.append(": $kotlinType")
         }
-        if (field.hasInitialExpression()) {
+
+        if (initialExpression) {
             def staticContextPushed = false
             if (isStatic(field)) {
                 staticContext.push(field.declaringClass)
@@ -401,23 +408,17 @@ class GroovyToKotlin implements GtkConsts {
             }
 
             out.append(" = ")
-            if (GtkUtils.isArray(fieldType)) {
-                field.initialValueExpression.putNodeMetaData(AST_NODE_META_PRODUCE_ARRAY, true)
-            }
 
-            translateExpr(field.initialValueExpression)
+            if (isArray(fieldType)) {
+                initialExpression.putNodeMetaData(AST_NODE_META__PRODUCE_ARRAY, true)
+            }
+            translateExpr(initialExpression)
 
             if (staticContextPushed) {
                 staticContext.pop()
             }
-        } else {
-            //if (optional) {
-                def initialValue = GtkUtils.makeDefaultInitialValue(kotlinType)
-                if (initialValue) {
-                    out.append(" = ${initialValue}")
-                }
-            //}
         }
+
         out.lineBreak()
     }
 
@@ -552,7 +553,7 @@ class GroovyToKotlin implements GtkConsts {
     }
 
     private void translateMethodParam(Parameter node) {
-        def predefinedKotlinType = node.getNodeMetaData(AST_NODE_META_PRECISE_KOTLIN_TYPE_AS_STRING)
+        def predefinedKotlinType = node.getNodeMetaData(AST_NODE_META__PRECISE_KOTLIN_TYPE_AS_STRING)
         String name = node.getName() == null ? "<unknown>" : node.getName()
         boolean mutable = GtkUtils.isMutable(node as ASTNode)
         boolean optional = Inferer.isOptional(node)
@@ -805,7 +806,7 @@ class GroovyToKotlin implements GtkConsts {
         if (hasInitializer) {
             out.append(" = ")
             if (leftIsArray) {
-                rightExpr.putNodeMetaData(AST_NODE_META_PRODUCE_ARRAY, true)
+                rightExpr.putNodeMetaData(AST_NODE_META__PRODUCE_ARRAY, true)
             }
             translateExpr(rightExpr)
         }
@@ -1107,7 +1108,7 @@ class GroovyToKotlin implements GtkConsts {
 
     @DynamicDispatch
     void translateExpr(ListExpression expr) {
-        def forceArray = expr.getNodeMetaData(AST_NODE_META_PRODUCE_ARRAY) == true
+        def forceArray = expr.getNodeMetaData(AST_NODE_META__PRODUCE_ARRAY) == true
         def function = forceArray ? 'arrayOf' : 'listOf'
         out.append("${function}(")
         expr.expressions.eachWithIndex { anExpr, int i ->

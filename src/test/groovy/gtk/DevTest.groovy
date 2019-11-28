@@ -59,10 +59,10 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
+    String name
     void main() {
-        String s = null
-        foo(s)
-        bar("xxx")
+        this.name = null
+        foo(this.name)
     }
     void foo(String s) {}
     void bar(String s) {}
@@ -75,6 +75,7 @@ class Main {
         def kotlinText = Gtk.joinBuffers(gtk)
         println(kotlinText)
         //def node = nodes[0].classes[0]
+        //def method = nodes[0].classes[0].methods[1]
         def node = nodes[0].classes[0].methods[0].code.statements
         //def constructors = nodes[0].classes[0].declaredConstructors*.code
         gtk.inferer.deps.debug()

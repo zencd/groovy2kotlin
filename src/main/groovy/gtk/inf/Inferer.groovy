@@ -836,8 +836,14 @@ class Inferer implements GtkConsts {
         getMeta(node, AST_NODE_META__WRITABLE, false)
     }
 
+    @DynamicDispatch
     static void markAsOptional(ASTNode node) {
         setMeta(node, AST_NODE_META__OPTIONAL, true)
+    }
+
+    @DynamicDispatch
+    static void markAsOptional(FieldUse node) {
+        setMeta(node.field, AST_NODE_META__OPTIONAL, true)
     }
 
     static boolean isOptional(ASTNode node) {

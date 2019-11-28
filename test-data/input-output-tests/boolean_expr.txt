@@ -44,7 +44,7 @@ open class Main {
     var list: ArrayList? = null
     var map: HashMap? = null
     var b: Boolean = false
-    var B: Boolean? = false
+    var B: Boolean = false
     var anyObject: Class? = null
 
     fun main() {

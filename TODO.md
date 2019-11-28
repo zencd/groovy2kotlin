@@ -1,9 +1,16 @@
 ## Todo
 
+- NULL INFERENCE
+    - method cannot be found if any actual argument is null
+    - detect `a == null` checks in source code
+    - ✔ for locals
+    - ✔ for fields
+    - for a method return value
 - Fix `val localWithoutInitializer` - var must have a type or be initialized
-- Use `true` not `return true` within closures
+- Method signature cannot be found with a `null` actual argument - need a custom algo
+- Start considering annotations like `@Nullable`
 - Convert `"a"` to `'a'` if acceptor's type is `char`
-- Special treatment of `expr as boolean`, `(boolean)expr`, `boolean x = expr`  in Groovy
+- Special treatment of `asBoolean()`, `expr as boolean`, `(boolean)expr`, `boolean x = expr`, etc in Groovy
 - Wildcard expressions: `list*.prop = 123`
 - Presence of both field `some` and `getSome()` is not respected by Kotlin (but it's ok in Groovy)
 - If there are both field `some` and `getSome()` in Groovy code, the method should be preferred (like Groovy does)
@@ -14,10 +21,8 @@
 - Kotlin prohibits implicit casts like `Int -> Long`
 - Groovy allows implicit casts like `String s = 1L`
 - `static` can't be applied to static inner classes
-- Check a field is never rewritten thru code, and mark it as `val` then
 - Groovy's special use of bitwise operators on ~~lists~~, streams, etc
 - Translate Groovy's implicit `return` (solved for certain cases)
-- Groovy truth: check for presence of `asBoolean()` in user classes
 - Start checking for custom type-into-type converters defined in user classes
 - Mappings:
     - `String.execute()`

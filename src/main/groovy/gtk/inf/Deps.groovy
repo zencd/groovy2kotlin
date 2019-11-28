@@ -3,11 +3,13 @@ package gtk.inf
 import gtk.DynamicDispatch
 import gtk.GtkUtils
 import gtk.MapOfSets
-import gtk.ast.LocalUse
+import gtk.ast.FieldUse
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.Variable
 import org.codehaus.groovy.ast.expr.ConstantExpression
+import org.codehaus.groovy.ast.expr.Expression
+import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,6 +27,7 @@ class Deps {
         if (fromDescr && toDescr) {
             if (GtkUtils.isNullConstant(fromDescr)) {
                 nullables.add(toDescr)
+                Inferer.markAsOptional(toDescr)
             } else {
                 addToWaterfall(fromDescr, toDescr)
             }
@@ -56,7 +59,12 @@ class Deps {
     @DynamicDispatch
     private ASTNode getDescriptor(ASTNode node) {
         //throw new RuntimeException("no way to create Deps descriptor from ${node?.class?.name}")
-        //log.warn("no way to getDescriptor() from {}", node?.class?.name)
+        log.warn("no way to getDescriptor() from {} - returning the node itself", node?.class?.name)
+        return node
+    }
+
+    @DynamicDispatch
+    private ASTNode getDescriptor(Parameter node) {
         return node
     }
 
@@ -68,6 +76,24 @@ class Deps {
     @DynamicDispatch
     private ASTNode getDescriptor(VariableExpression node) {
         return getAccessedVariableDescriptor(node.accessedVariable)
+    }
+
+    @DynamicDispatch
+    private ASTNode getDescriptor(PropertyExpression expr) {
+        return getPropertyDescriptor(expr.property)
+    }
+
+    //////////////////// getAccessedVariableDescriptor()
+
+    @DynamicDispatch
+    private ASTNode getPropertyDescriptor(Expression expr) {
+        log.warn("no way to getPropertyDescriptor() from {} - returning the node itself", expr?.class?.name)
+        return expr
+    }
+
+    @DynamicDispatch
+    private ASTNode getPropertyDescriptor(FieldUse expr) {
+        return expr.field
     }
 
     //////////////////// getAccessedVariableDescriptor()
