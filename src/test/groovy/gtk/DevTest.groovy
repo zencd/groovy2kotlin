@@ -63,7 +63,7 @@ class Temp {
 class Main {
     String name
     Main() {
-        name = "xxx"
+        this.name = "xxx"
     }
     void main() {
         //name = null

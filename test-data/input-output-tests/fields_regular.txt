@@ -1,10 +1,20 @@
-﻿class ClassName {
-    String field
+﻿class Main {
+    String noInit
+    String initInPlace = "initInPlace"
+    String initInCtor
+    Main() {
+        initInCtor = "initInCtor"
+    }
 }
 -------------------
 $DEFAULT_IMPORTS
-open class ClassName {
+open class Main {
     companion object {
     }
-    val field: String? = null
+    val noInit: String? = null
+    val initInPlace: String = "initInPlace"
+    val initInCtor: String
+    constructor() {
+        initInCtor = "initInCtor"
+    }
 }

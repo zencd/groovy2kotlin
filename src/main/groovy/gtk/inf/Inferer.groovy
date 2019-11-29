@@ -4,6 +4,7 @@ import gtk.GeneralUtils
 import gtk.MethodMatcher
 import gtk.ast.FieldUse
 import gtk.ast.LocalUse
+import org.codehaus.groovy.ast.ConstructorNode
 import org.codehaus.groovy.ast.DynamicVariable
 import gtk.DynamicDispatch
 import gtk.GroovyExtensions
@@ -68,6 +69,8 @@ import java.lang.reflect.Field
 import static gtk.GeneralUtils.hasIndex
 import static gtk.GeneralUtils.setFieldHack
 import static gtk.GtkUtils.getCachedClass
+import static gtk.GtkUtils.isAnonymous
+import static gtk.GtkUtils.isGroovyGenerated
 import static gtk.GtkUtils.isList
 import static gtk.GtkUtils.isNullConstant
 import static gtk.GtkUtils.isObject
@@ -265,8 +268,12 @@ class Inferer implements GtkConsts {
         for (field in classNode.fields) {
             inferType(field)
         }
-        for (method in classNode.declaredConstructors) {
-            // todo
+        for (ctor in classNode.declaredConstructors) {
+            // skipping the constructors auto-generated for inner (non-static and anonymous) classes
+            def gen = isGroovyGenerated(ctor)
+            if (!isAnonymous(classNode) && !gen) {
+                inferType(ctor)
+            }
         }
         for (def objInit : classNode.objectInitializerStatements) {
             // todo
@@ -283,6 +290,23 @@ class Inferer implements GtkConsts {
     ClassNode infer(FieldNode field) {
         scopes.addName(field)
         inferTypeOptional(field.initialValueExpression)
+        return RESOLVED_UNKNOWN
+    }
+
+    @DynamicDispatch
+    ClassNode infer(ConstructorNode method) {
+        def scope = scopes.pushScope()
+        scope.isInConstructor = true
+
+        // todo some code dup with MethodNode
+        for (param in method.parameters) {
+            scopes.addName(param)
+        }
+        if (method.code != null) {
+            inferType(method.&code)
+        }
+
+        scopes.popScope()
         return RESOLVED_UNKNOWN
     }
 
@@ -546,7 +570,13 @@ class Inferer implements GtkConsts {
             def rt = inferType(expr.&rightExpression)
             def lt = inferAssignment(expr.&leftExpression, expr.rightExpression)
             def left = expr.leftExpression
-            if (left instanceof VariableExpression) {
+            def curScope = scopes.scope
+            if (curScope.isInConstructor) {
+                // here we are marking the assigned field as initialized in constructor
+                // if the left side is a field, of course
+                // todo make sure the field belongs to the initialized object, not some other object of the same class
+                markAsWrittenInConstructor(left)
+            } else if (left instanceof VariableExpression) {
                 scopes.markVarAsWritable(left.name)
             }
             deps.addDep(expr.rightExpression, left)
@@ -560,6 +590,16 @@ class Inferer implements GtkConsts {
                 return type1 // todo randomly picked
             }
         }
+    }
+
+    @DynamicDispatch
+    static void markAsWrittenInConstructor(Expression o) {
+        log.warn("markAsWrittenInConstructor: not overridden")
+    }
+
+    @DynamicDispatch
+    static void markAsWrittenInConstructor(FieldUse fieldUse) {
+        setMeta(fieldUse.field, AST_NODE_META__WRITTEN_IN_CTOR, true)
     }
 
     @DynamicDispatch
@@ -614,7 +654,7 @@ class Inferer implements GtkConsts {
                 return av.originType
             } else if (av instanceof FieldNode) {
                 // a field accessed, type resolved
-                if (rvalue) {
+                if (rvalue && !scopes.scope.isInConstructor) {
                     markAsRW(av)
                 }
                 def field = ec ? GtkUtils.findField(ec, expr.name) : null

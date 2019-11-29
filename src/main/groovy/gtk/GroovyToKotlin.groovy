@@ -370,9 +370,10 @@ class GroovyToKotlin implements GtkConsts {
 
         def fieldType = field.type
         final boolean fin = isFinal(field.modifiers)
+        final ctorInitialized = Inferer.getMeta(field, AST_NODE_META__WRITTEN_IN_CTOR, false)
 
         Expression initialExpression = field.initialValueExpression
-        if (!initialExpression) {
+        if (!initialExpression && !ctorInitialized) {
             initialExpression = makeDefaultInitialExpression(fieldType)
         }
 

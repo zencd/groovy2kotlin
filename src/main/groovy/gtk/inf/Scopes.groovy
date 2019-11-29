@@ -13,6 +13,7 @@ class Scopes implements GtkConsts {
     static class Scope {
         private final Map<String, Variable> vars = new HashMap<>()
         boolean isClosure = false
+        boolean isInConstructor = false
         String methodNameUsingThisClosure = null
         private void addName(Variable expr) {
             if (expr.name in vars) {
