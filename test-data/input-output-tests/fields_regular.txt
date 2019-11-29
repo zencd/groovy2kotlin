@@ -1,9 +1,11 @@
 ﻿class Main {
     String noInit
     String initInPlace = "initInPlace"
-    String initInCtor
+    String initInCtorWithoutThis
+    String initInCtorWithThis
     Main() {
-        initInCtor = "initInCtor"
+        initInCtorWithoutThis = "initInCtorWithoutThis"
+        this.initInCtorWithThis = "initInCtorWithThis"
     }
 }
 -------------------
@@ -13,8 +15,10 @@ open class Main {
     }
     val noInit: String? = null
     val initInPlace: String = "initInPlace"
-    val initInCtor: String
+    val initInCtorWithoutThis: String
+    val initInCtorWithThis: String
     constructor() {
-        initInCtor = "initInCtor"
+        initInCtorWithoutThis = "initInCtorWithoutThis"
+        this.initInCtorWithThis = "initInCtorWithThis"
     }
 }

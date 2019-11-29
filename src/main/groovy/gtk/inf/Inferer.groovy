@@ -593,6 +593,15 @@ class Inferer implements GtkConsts {
     }
 
     @DynamicDispatch
+    ClassNode infer(PropertyExpression expr) {
+        return inferAssignment(expr, null)
+    }
+
+    ///////////////////////////////////////////////////
+    // markAsWrittenInConstructor
+    ///////////////////////////////////////////////////
+
+    @DynamicDispatch
     static void markAsWrittenInConstructor(Expression o) {
         log.warn("markAsWrittenInConstructor: not overridden")
     }
@@ -603,8 +612,11 @@ class Inferer implements GtkConsts {
     }
 
     @DynamicDispatch
-    ClassNode infer(PropertyExpression expr) {
-        return inferAssignment(expr, null)
+    static void markAsWrittenInConstructor(PropertyExpression expr) {
+        def property = expr.property
+        if (property instanceof FieldUse) {
+            setMeta(property.field, AST_NODE_META__WRITTEN_IN_CTOR, true)
+        }
     }
 
     ///////////////////////////////////////////////////
@@ -738,7 +750,7 @@ class Inferer implements GtkConsts {
                 setMeta(expr, AST_NODE_META__SETTER, setter)
                 return setTypeToExprAndMeta(expr, setter.returnType)
             } else if (field) {
-                markAsRW(field)
+                //markAsRW(field) // performed in the BinaryExpression handler
 
                 def fieldUse = new FieldUse(propName, field, true, null)
                 GeneralUtils.setFinalField(expr, 'property', fieldUse)
