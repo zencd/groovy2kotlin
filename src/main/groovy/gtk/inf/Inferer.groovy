@@ -353,8 +353,9 @@ class Inferer implements GtkConsts {
         final objTypeWas = oe.type
         def objType = inferType(expr.&objectExpression)
         // todo find method from expr.methodAsString
-        if (expr.method instanceof ConstantExpression) {
-            String methodName = expr.method.value
+        def exprMethod = expr.method
+        if (exprMethod instanceof ConstantExpression) {
+            String methodName = exprMethod.value
             enhanceTheseArgumentsWhichAreClosures(methodName, expr) // XXX do it before inferring arguments
             inferType(expr.&arguments)
 
@@ -383,7 +384,7 @@ class Inferer implements GtkConsts {
             }
             return resultType
         } else {
-            log.warn("yet unsupported expr.method as ${expr.method.class.name}")
+            log.warn("yet unsupported expr.method as ${exprMethod?.class?.name}")
             return originalType
         }
     }

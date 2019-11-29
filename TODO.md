@@ -1,10 +1,9 @@
 ## Todo
 
+- Parse & use `DefaultGroovyMethods.class`
 - NULL INFERENCE
     - method cannot be found if any actual argument is null
     - detect `a == null` checks in source code
-    - ✔ for locals
-    - ✔ for fields
     - for a method return value
 - RW- & null-inference: if a implicit setter is invoked then apply the inference rules
 - Groovy's list expansion
@@ -32,6 +31,7 @@
     - `File.eachLine()` → `forEachLine`
     - `List.eachWithIndex()` → `forEachIndexed` (params swapped!)
     - `List.grep()`
+    - `System.sleep()` → `Thread.sleep()`
 - Non urgent things:
     - `@Deprecated` → `@kotlin.Deprecated(message)`
     - `a && b && c` leads to correct but complicated code gen

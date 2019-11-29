@@ -61,13 +61,10 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    String name
-    Main() {
-        //name = "xxx"
-        this.name = "xxx"
-    }
-    void main() {
-        //name = null
+    void main(List<String> list) {
+        list.each { x ->
+            x
+        }
     }
 }
 '''

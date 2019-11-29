@@ -16,7 +16,8 @@ The policy:
 - Nevertheless do the best to emit valid, readable code;
 - Prefer `val` over `var` when possible;
 - Prefer emitting non-optionals;
-- Prefer emitting non-mutables.
+- Prefer emitting non-mutables;
+- No runtime dependencies.
 
 The current implementation's passes:
 - One or multiple modules are parsed into AST by the Groovy itself;
