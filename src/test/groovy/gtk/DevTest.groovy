@@ -61,11 +61,13 @@ class Temp {
     void trans_single_string() {
         String groovyText = '''
 class Main {
-    String name = "aaa"
-    void main() {
-        foo(null)
+    String name
+    Main() {
+        name = "xxx"
     }
-    void foo(String s) {}
+    void main() {
+        //name = null
+    }
 }
 '''
         def texts = [groovyText]
@@ -76,6 +78,8 @@ class Main {
         println(kotlinText)
         //def node = nodes[0].classes[0]
         //def method = nodes[0].classes[0].methods[1]
+        //def ctors = nodes[0].classes[0].innerClasses[0].declaredConstructors
+        //def constr = nodes[0].classes[0].declaredConstructors
         def node = nodes[0].classes[0].methods[0].code.statements
         //def constructors = nodes[0].classes[0].declaredConstructors*.code
         gtk.inferer.deps.debug()

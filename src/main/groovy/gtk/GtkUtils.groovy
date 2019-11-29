@@ -424,7 +424,7 @@ class GtkUtils implements GtkConsts {
     }
 
     static boolean isAnonymous(ClassNode classNode) {
-        return classNode instanceof InnerClassNode && classNode.anonymous
+        return (classNode instanceof InnerClassNode) && classNode.anonymous
     }
 
     static boolean isInner(ClassNode classNode) {
@@ -813,5 +813,11 @@ class GtkUtils implements GtkConsts {
     static String getWritableParamName(Parameter param) {
         assert Inferer.isMarkedRW(param)
         return param.name + "RW"
+    }
+
+    static boolean isGroovyGenerated(MethodNode method) {
+        return method.annotations.any {
+            it.classNode.name == groovy.transform.Generated.class.name
+        }
     }
 }
