@@ -1,5 +1,6 @@
 ## Todo
 
+- Check enums
 - Blah-blah
 - Parse & use `DefaultGroovyMethods.class`
 - NULL INFERENCE

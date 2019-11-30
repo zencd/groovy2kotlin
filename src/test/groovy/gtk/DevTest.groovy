@@ -1,5 +1,7 @@
 package gtk
 
+import gtk.ust.AModule
+import gtk.ust.AstConverters
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
@@ -81,6 +83,10 @@ class Main {
         def node = nodes[0].classes[0].methods[0].code.statements
         //def constructors = nodes[0].classes[0].declaredConstructors*.code
         gtk.inferer.deps.debug()
+
+        def c = new AstConverters()
+        def mod2 = c.convert(nodes[0])
+
         int stop = 0
     }
 

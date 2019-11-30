@@ -4,6 +4,7 @@ import groovy.json.StringEscapeUtils
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+import java.lang.reflect.ParameterizedType
 
 /**
  * Common use utils.
@@ -108,6 +109,11 @@ class GeneralUtils {
 
     static <T> boolean hasIndex(T[] array, int index) {
         return (array != null) && (index >= 0) && (index < array.size())
+    }
+
+    static Class getListElementType(Field field) {
+        ParameterizedType integerListType = (ParameterizedType) field.getGenericType();
+        return (Class<?>) integerListType.getActualTypeArguments()[0];
     }
 
 }
